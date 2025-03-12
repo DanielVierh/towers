@@ -73,6 +73,8 @@ function gameLoop() {
 
     // Zuerst die Waypoints zeichnen
     drawWaypoints();
+
+    // Zuerst die Tower Places zeichnen
     drawTowerPlaces();
 
     // Dann die Orcs darüber zeichnen
