@@ -19,6 +19,19 @@ const waypoints = [
     { x: 450, y: 340 },
 ];
 
+const tower_places = [
+    { x: 70, y: 10 },
+    { x: 260, y: 10 },
+    // { x: 350, y: 100 },
+    // { x: 30, y: 100 },
+    // { x: 30, y: 180 },
+    // { x: 350, y: 180 },
+    // { x: 350, y: 260 },
+    // { x: 30, y: 260 },
+    // { x: 30, y: 340 },
+    // { x: 450, y: 340 },
+];
+
 const enemies = [];
 
 function spawnEnemy() {
@@ -48,11 +61,19 @@ function drawWaypoints() {
     ctx.stroke();
 }
 
+function drawTowerPlaces() {
+    ctx.fillStyle = 'white';
+    tower_places.forEach(place => {
+        ctx.fillRect(place.x, place.y, 30, 30);
+    });
+}
+
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Zuerst die Waypoints zeichnen
     drawWaypoints();
+    drawTowerPlaces();
 
     // Dann die Orcs darüber zeichnen
     enemies.forEach((enemy, index) => {
