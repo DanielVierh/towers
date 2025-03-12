@@ -37,12 +37,13 @@ function drawWaypoints() {
     ctx.lineWidth = 30;
     ctx.beginPath();
     waypoints.forEach((waypoint, index) => {
+        const adjustedY = waypoint.y + 40; // Verschiebe die y-Koordinate um 50 Pixel nach unten
         if (index === 0) {
-            ctx.moveTo(waypoint.x, waypoint.y);
+            ctx.moveTo(waypoint.x, adjustedY);
         } else {
-            ctx.lineTo(waypoint.x, waypoint.y);
+            ctx.lineTo(waypoint.x, adjustedY);
         }
-        ctx.arc(waypoint.x, waypoint.y, 5, 0, Math.PI * 2);
+        ctx.arc(waypoint.x, adjustedY, 5, 0, Math.PI * 2);
     });
     ctx.stroke();
 }
