@@ -34,7 +34,7 @@ const tower_places = [
 
 const enemies = [];
 const towerImage = new Image();
-towerImage.src = 'src/assets/tower3.png';
+towerImage.src = 'src/assets/tower2.png';
 
 function spawnEnemy() {
     const posX = -100;
@@ -64,7 +64,7 @@ function drawWaypoints() {
 }
 
 function drawTowerPlaces() {
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'black';
     tower_places.forEach(place => {
         if (place.is_tower) {
             ctx.drawImage(towerImage, place.x, place.y, 30, 30);
@@ -72,6 +72,10 @@ function drawTowerPlaces() {
             ctx.fillRect(place.x, place.y, 30, 30);
         }
     });
+}
+
+function calculateDistance(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
 function gameLoop() {
@@ -86,6 +90,20 @@ function gameLoop() {
     // Dann die Orcs darüber zeichnen
     enemies.forEach((enemy, index) => {
         enemy.update();
+
+        // Überprüfen, ob der Orc in der Nähe eines Turms ist
+        tower_places.forEach(place => {
+            if (place.is_tower) {
+                const distance = calculateDistance(enemy.x, enemy.y, place.x, place.y);
+                if (distance < 50) { // Radius von 50 Pixeln
+                    enemy.health -= 1; // Schaden anwenden
+                    if (enemy.health <= 0) {
+                        enemy.markedForDeletion = true;
+                    }
+                }
+            }
+        });
+
         if (enemy.markedForDeletion) {
             enemies.splice(index, 1);
         } else {

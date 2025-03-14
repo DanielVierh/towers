@@ -22,7 +22,7 @@ export class Orc {
         this.currentWaypointIndex = 0;
         this.direction = 1; // 1 für vorwärts, -1 für rückwärts
         this.markedForDeletion = false; // Markierung für Löschung
-        this.live = 100;
+        this.health = 100;
     }
 
     update() {
