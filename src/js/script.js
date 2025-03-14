@@ -20,8 +20,8 @@ const waypoints = [
 ];
 
 const tower_places = [
-    { x: 70, y: 10 },
-    { x: 260, y: 10 },
+    { x: 70, y: 10, is_tower: false },
+    { x: 260, y: 10, is_tower: false },
     // { x: 350, y: 100 },
     // { x: 30, y: 100 },
     // { x: 30, y: 180 },
@@ -33,6 +33,8 @@ const tower_places = [
 ];
 
 const enemies = [];
+const towerImage = new Image();
+towerImage.src = 'src/assets/tower3.png';
 
 function spawnEnemy() {
     const posX = -100;
@@ -64,7 +66,11 @@ function drawWaypoints() {
 function drawTowerPlaces() {
     ctx.fillStyle = 'white';
     tower_places.forEach(place => {
-        ctx.fillRect(place.x, place.y, 30, 30);
+        if (place.is_tower) {
+            ctx.drawImage(towerImage, place.x, place.y, 30, 30);
+        } else {
+            ctx.fillRect(place.x, place.y, 30, 30);
+        }
     });
 }
 
@@ -74,7 +80,7 @@ function gameLoop() {
     // Zuerst die Waypoints zeichnen
     drawWaypoints();
 
-    // Zuerst die Tower Places zeichnen
+    // Tower Places zeichnen
     drawTowerPlaces();
 
     // Dann die Orcs darüber zeichnen
@@ -91,6 +97,23 @@ function gameLoop() {
         gameLoop()
     }, 20);
 }
+
+
+// Event-Listener for click on Tower Place
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    tower_places.forEach(place => {
+        if (x >= place.x && x <= place.x + 30 && y >= place.y && y <= place.y + 30) {
+            console.log('Tower place clicked:', place);
+            if (!place.is_tower) {
+                place.is_tower = true;
+            }
+        }
+    });
+});
 
 // Start the game loop
 gameLoop();
