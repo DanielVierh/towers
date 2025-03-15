@@ -47,6 +47,7 @@ let waveTimer = 30; // Timer für die nächste Welle in Sekunden
 let money = 100;
 let max_enemy_amount = 3;
 let wave = 0;
+let enemy_max_health = 250;
 
 
 //* Spawn Enemies
@@ -58,7 +59,7 @@ function spawnEnemy() {
     const height = 80;
     const imgSrc = "src/assets/orc.png";
     const scale = 0.6;
-    const health = Math.floor(Math.random() * (250 - 90 + 1)) + 90;
+    const health = Math.floor(Math.random() * (enemy_max_health - 90 + 1)) + 90;
     const velocity = Math.random() * (5 - 1) + 1;
     enemies.push(
       new Orc(
@@ -203,6 +204,7 @@ function updateWaveTimer() {
     waveTimer = 30; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
+    enemy_max_health += 2;
     if (wave > 5) {
         max_enemy_amount += Math.floor(wave / 2);
     } else {
