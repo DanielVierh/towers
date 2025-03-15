@@ -23,6 +23,7 @@ export class Orc {
         this.direction = 1; // 1 für vorwärts, -1 für rückwärts
         this.markedForDeletion = false; // Markierung für Löschung
         this.health = health;
+        this.maxHealth = health; // Speichern des maximalen Gesundheitswerts
         this.is_hit = false;
         this.hitFrameCounter = 0;
     }
@@ -43,6 +44,11 @@ export class Orc {
                 this.pos_y += (dy / distance) * this.velocity;
                 this.direction = dx < 0 ? -1 : 1; // Setze die Richtung basierend auf dx
             }
+        }
+
+        // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
+        if (this.pos_x > 400) {
+            this.markedForDeletion = true;
         }
 
         // Update frame index für die Animation
@@ -74,6 +80,18 @@ export class Orc {
                 ctx.drawImage(this.image, sx, sy, this.frameWidth, this.frameHeight, this.pos_x, this.pos_y, scaledWidth, scaledHeight);
             }
             ctx.restore();
+
+            // Zeichne die Lebensanzeige
+            const healthBarWidth = 40;
+            const healthBarHeight = 5;
+            const healthBarX = this.pos_x + (scaledWidth / 2) - (healthBarWidth / 2);
+            const healthBarY = this.pos_y - 10;
+
+            ctx.fillStyle = 'red';
+            ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+            ctx.fillStyle = 'green';
+            ctx.fillRect(healthBarX, healthBarY, (this.health / this.maxHealth) * healthBarWidth, healthBarHeight);
         }
     }
 }
