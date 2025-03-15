@@ -46,6 +46,8 @@ let money = 100;
 let max_enemy_amount = 3;
 let wave = 0;
 
+
+//* Spawn Enemies
 function spawnEnemy() {
   for (let i = 1; i < max_enemy_amount; i++) {
     const posX = -100;
@@ -196,7 +198,12 @@ function updateWaveTimer() {
     waveTimer = 30; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    max_enemy_amount += wave;
+    if (wave > 5) {
+        max_enemy_amount += Math.floor(wave / 2);
+    } else {
+        max_enemy_amount += wave;
+    }
+   
   }
 }
 
