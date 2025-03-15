@@ -22,14 +22,13 @@ const waypoints = [
 const tower_places = [
     { x: 70, y: 10, is_tower: false },
     { x: 260, y: 10, is_tower: false },
-    // { x: 350, y: 100 },
-    // { x: 30, y: 100 },
-    // { x: 30, y: 180 },
-    // { x: 350, y: 180 },
-    // { x: 350, y: 260 },
-    // { x: 30, y: 260 },
-    // { x: 30, y: 340 },
-    // { x: 450, y: 340 },
+    { x: 90, y: 165, is_tower: false  },
+    { x: 250, y: 245, is_tower: false  },
+    { x: 130, y: 330, is_tower: false  },
+    // { x: 350, y: 260, is_tower: false  },
+    // { x: 30, y: 260, is_tower: false  },
+    // { x: 30, y: 340, is_tower: false  },
+    // { x: 450, y: 340, is_tower: false  },
 ];
 
 const enemies = [];
@@ -43,8 +42,8 @@ function spawnEnemy() {
     const height = 80;
     const imgSrc = 'src/assets/orc.png';
     const scale = .6;
-    enemies.push(new Orc(posX, posY, width, height, imgSrc, scale, waypoints));
-    console.log(enemies);
+    const health = 150;
+    enemies.push(new Orc(posX, posY, width, height, imgSrc, scale, waypoints, health));
 }
 
 function drawWaypoints() {
@@ -94,9 +93,19 @@ function gameLoop() {
         // Überprüfen, ob der Orc in der Nähe eines Turms ist
         tower_places.forEach(place => {
             if (place.is_tower) {
-                const distance = calculateDistance(enemy.x, enemy.y, place.x, place.y);
-                if (distance < 50) { // Radius von 50 Pixeln
+                const distance = calculateDistance(enemy.pos_x, enemy.pos_y, place.x, place.y);
+                
+                // Zeichne den Radius um den Turm
+                ctx.beginPath();
+                ctx.arc(place.x + 15, place.y + 15, 80, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                if (distance < 80) { // Radius von 80 Pixeln
                     enemy.health -= 1; // Schaden anwenden
+                    console.log(`Orc health: ${enemy.health}`);
+                    
                     if (enemy.health <= 0) {
                         enemy.markedForDeletion = true;
                     }

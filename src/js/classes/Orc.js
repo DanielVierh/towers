@@ -1,5 +1,5 @@
 export class Orc {
-    constructor(pos_x, pos_y, width, height, img_src, scale = 1, waypoints) {
+    constructor(pos_x, pos_y, width, height, img_src, scale = 1, waypoints, health) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.width = width;
@@ -22,7 +22,7 @@ export class Orc {
         this.currentWaypointIndex = 0;
         this.direction = 1; // 1 für vorwärts, -1 für rückwärts
         this.markedForDeletion = false; // Markierung für Löschung
-        this.health = 100;
+        this.health = health;
     }
 
     update() {
