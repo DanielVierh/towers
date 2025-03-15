@@ -43,11 +43,12 @@ towerImage.src = "src/assets/tower2.png";
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
-let waveTimer = 30; // Timer für die nächste Welle in Sekunden
+let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let money = 100;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 250;
+let enemy_max_velocity = 5;
 
 
 //* Spawn Enemies
@@ -60,7 +61,7 @@ function spawnEnemy() {
     const imgSrc = "src/assets/orc.png";
     const scale = 0.6;
     const health = Math.floor(Math.random() * (enemy_max_health - 90 + 1)) + 90;
-    const velocity = Math.random() * (5 - 1) + 1;
+    const velocity = Math.random() * (enemy_max_velocity - 1) + 1;
     enemies.push(
       new Orc(
         posX,
@@ -159,7 +160,15 @@ function gameLoop() {
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
-            money += 5;
+            console.log(wave);
+            
+            if(wave > 10) {
+              money += 1;
+            }else if(wave >= 4) {
+              money += 2;
+            }else {
+              money += 10;
+            }
           }
 
           // Erzeuge einen Laser
@@ -201,10 +210,11 @@ function updateWaveTimer() {
   waveTimer--;
   lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
-    waveTimer = 30; // Reset the timer for the next wave
+    waveTimer = 15; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
     enemy_max_health += 2;
+    enemy_max_velocity += 0.2;
     if (wave > 5) {
         max_enemy_amount += Math.floor(wave / 2);
     } else {
