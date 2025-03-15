@@ -40,6 +40,8 @@ const enemies = [];
 const lasers = [];
 const towerImage = new Image();
 towerImage.src = "src/assets/tower2.png";
+const backgroundImage = new Image();
+backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
 let waveTimer = 30; // Timer für die nächste Welle in Sekunden
 let money = 100;
@@ -75,7 +77,7 @@ function spawnEnemy() {
 }
 
 function drawWaypoints() {
-  ctx.strokeStyle = "beige";
+  ctx.strokeStyle = "rgb(97,59,33)";
   ctx.lineWidth = 30;
   ctx.beginPath();
   waypoints.forEach((waypoint, index) => {
@@ -91,7 +93,7 @@ function drawWaypoints() {
 }
 
 function drawTowerPlaces() {
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "rgba(0,0,0,0.6)";
   tower_places.forEach((place) => {
     if (place.is_tower) {
       ctx.drawImage(towerImage, place.x, place.y, 30, 30);
@@ -107,6 +109,9 @@ function calculateDistance(x1, y1, x2, y2) {
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Hintergrundbild zeichnen
+  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
   // Zuerst die Waypoints zeichnen
   drawWaypoints();

@@ -1,8 +1,6 @@
-#canvas {
-  background: grey;
-}
-
 body {
   font-family: sans-serif;
   font-weight: bold;
+  background: linear-gradient(to bottom, black, grey);
+  color: white;
 }/*# sourceMappingURL=styles.css.map */
