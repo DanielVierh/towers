@@ -45,11 +45,6 @@ export class Orc {
             }
         }
 
-        // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
-        if (this.pos_x > 400) {
-            this.markedForDeletion = true;
-        }
-
         // Update frame index für die Animation
         this.frameTick++;
         if (this.frameTick >= this.frameSpeed) {
