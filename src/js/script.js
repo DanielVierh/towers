@@ -35,7 +35,7 @@ const tower_places = [
 const enemies = [];
 const lasers = [];
 const towerImage = new Image();
-towerImage.src = 'src/assets/tower3.png';
+towerImage.src = 'src/assets/tower2.png';
 
 function spawnEnemy() {
     const posX = -100;
@@ -100,11 +100,11 @@ function gameLoop() {
                 const distance = calculateDistance(enemy.pos_x, enemy.pos_y, place.x, place.y);
                 
                 // Zeichne den Radius um den Turm
-                ctx.beginPath();
-                ctx.arc(place.x + 15, place.y + 15, 80, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 0, 0, 0.1)';
-                ctx.lineWidth = .5;
-                ctx.stroke();
+                // ctx.beginPath();
+                // ctx.arc(place.x + 15, place.y + 15, 80, 0, Math.PI * 2);
+                // ctx.strokeStyle = 'rgba(255, 0, 0, 0.1)';
+                // ctx.lineWidth = .5;
+                // ctx.stroke();
                 
                 if (distance < 80) { // Radius von 80 Pixeln
                     enemy.health -= 1; // Schaden anwenden
