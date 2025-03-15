@@ -6,7 +6,7 @@ export class Laser {
         this.targetY = targetY;
         this.posX = startX;
         this.posY = startY;
-        this.speed = 10;
+        this.speed = 4;
         this.image = new Image();
         this.image.src = 'src/assets/laser.png';
         this.loaded = false;

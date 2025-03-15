@@ -1,5 +1,5 @@
 export class Orc {
-    constructor(pos_x, pos_y, width, height, img_src, scale = 1, waypoints, health) {
+    constructor(pos_x, pos_y, width, height, img_src, scale = 1, waypoints, health, velocity) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.width = width;
@@ -9,7 +9,7 @@ export class Orc {
         this.image.onload = () => {
             this.loaded = true;
         };
-        this.velocity = 2;
+        this.velocity = velocity;
         this.color = 'red';
         this.frameIndex = 0;
         this.frameCount = 7; // Anzahl der Frames in der Sprite
@@ -23,6 +23,8 @@ export class Orc {
         this.direction = 1; // 1 für vorwärts, -1 für rückwärts
         this.markedForDeletion = false; // Markierung für Löschung
         this.health = health;
+        this.is_hit = false;
+        this.hitFrameCounter = 0;
     }
 
     update() {
@@ -58,6 +60,12 @@ export class Orc {
 
     draw(ctx) {
         if (this.loaded) {
+            if (this.is_hit) {
+                this.hitFrameCounter++;
+                if (this.hitFrameCounter % 3 === 0) {
+                    return; // Skip drawing this frame
+                }
+            }
             const sx = this.frameIndex * this.frameWidth;
             const sy = 0;
             const scaledWidth = this.width * this.scale;

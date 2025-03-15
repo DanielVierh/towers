@@ -35,7 +35,7 @@ const tower_places = [
 const enemies = [];
 const lasers = [];
 const towerImage = new Image();
-towerImage.src = 'src/assets/tower2.png';
+towerImage.src = 'src/assets/tower3.png';
 
 function spawnEnemy() {
     const posX = -100;
@@ -45,7 +45,8 @@ function spawnEnemy() {
     const imgSrc = 'src/assets/orc.png';
     const scale = .6;
     const health = Math.floor(Math.random() * (250 - 90 + 1)) + 90;
-    enemies.push(new Orc(posX, posY, width, height, imgSrc, scale, waypoints, health));
+    const velocity = Math.random() * (5 - 1) + 1;
+    enemies.push(new Orc(posX, posY, width, height, imgSrc, scale, waypoints, health, velocity));
 }
 
 function drawWaypoints() {
@@ -91,6 +92,7 @@ function gameLoop() {
     // Dann die Orcs darüber zeichnen
     enemies.forEach((enemy, index) => {
         enemy.update();
+        enemy.is_hit = false; // Reset is_hit before checking towers
 
         // Überprüfen, ob der Orc in der Nähe eines Turms ist
         tower_places.forEach(place => {
@@ -100,13 +102,13 @@ function gameLoop() {
                 // Zeichne den Radius um den Turm
                 ctx.beginPath();
                 ctx.arc(place.x + 15, place.y + 15, 80, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.1)';
+                ctx.lineWidth = .5;
                 ctx.stroke();
                 
                 if (distance < 80) { // Radius von 80 Pixeln
                     enemy.health -= 1; // Schaden anwenden
-                    console.log(`Orc health: ${enemy.health}`);
+                    enemy.is_hit = true;
                     
                     if (enemy.health <= 0) {
                         enemy.markedForDeletion = true;
@@ -117,6 +119,10 @@ function gameLoop() {
                 }
             }
         });
+
+        if (!enemy.is_hit) {
+            enemy.hitFrameCounter = 0; // Reset the hit frame counter
+        }
 
         if (enemy.markedForDeletion) {
             enemies.splice(index, 1);
@@ -162,4 +168,4 @@ canvas.addEventListener('click', (event) => {
 gameLoop();
 
 // Spawn a new enemy every 2 seconds
-setInterval(spawnEnemy, 2000);
+setInterval(spawnEnemy, 1000);
