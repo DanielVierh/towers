@@ -7,6 +7,8 @@ const lbl_Money = document.getElementById("lbl_money");
 const lbl_Live = document.getElementById("lbl_live");
 const lbl_WaveTimer = document.getElementById("lbl_wave_timer");
 const lbl_wave = document.getElementById("lbl_wave");
+const gameOverModal = document.getElementById("gameOverModal");
+const closeModal = document.getElementById("closeModal");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -50,8 +52,6 @@ let wave = 0;
 let enemy_max_health = 250;
 let enemy_max_velocity = 5;
 
-
-//* Spawn Enemies
 function spawnEnemy() {
   for (let i = 1; i < max_enemy_amount; i++) {
     const posX = -100;
@@ -109,6 +109,10 @@ function calculateDistance(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
+function showGameOverModal() {
+  gameOverModal.style.display = "block";
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -128,7 +132,7 @@ function gameLoop() {
   // Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update();
-    // enemy.is_hit = false; // Reset is_hit before checking towers
+    enemy.is_hit = false; // Reset is_hit before checking towers
 
     // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
@@ -146,17 +150,10 @@ function gameLoop() {
           place.y
         );
 
-        // Zeichne den Radius um den Turm
-        // ctx.beginPath();
-        // ctx.arc(place.x + 15, place.y + 15, 80, 0, Math.PI * 2);
-        // ctx.strokeStyle = 'rgba(255, 0, 0, 0.1)';
-        // ctx.lineWidth = .5;
-        // ctx.stroke();
-
         if (distance < 80) {
           // Radius von 80 Pixeln
           enemy.health -= 1; // Schaden anwenden
-          // enemy.is_hit = true;
+          enemy.is_hit = true;
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
@@ -201,6 +198,11 @@ function gameLoop() {
     }
   });
 
+  if (live <= 0) {
+    showGameOverModal();
+    return; // Stop the game loop
+  }
+
   setTimeout(() => {
     gameLoop();
   }, 20);
@@ -220,7 +222,6 @@ function updateWaveTimer() {
     } else {
         max_enemy_amount += wave;
     }
-   
   }
 }
 
@@ -247,6 +248,18 @@ canvas.addEventListener("click", (event) => {
     }
   });
 });
+
+// Close the modal when the user clicks on <span> (x)
+closeModal.onclick = function() {
+  gameOverModal.style.display = "none";
+}
+
+// Close the modal when the user clicks anywhere outside of the modal
+window.onclick = function(event) {
+  if (event.target == gameOverModal) {
+    gameOverModal.style.display = "none";
+  }
+}
 
 // Start the game loop
 gameLoop();
