@@ -40,9 +40,9 @@ const lasers = [];
 const towerImage = new Image();
 towerImage.src = "src/assets/tower2.png";
 let live = 20;
-let waveTimer = 30; // Timer für die nächste Welle in Sekunden
+let waveTimer = 5; // Timer für die nächste Welle in Sekunden
 let money = 100;
-let max_enemy_amount = 10;
+let max_enemy_amount = 3;
 let wave = 0;
 
 function spawnEnemy() {
@@ -191,9 +191,10 @@ function updateWaveTimer() {
   waveTimer--;
   lbl_WaveTimer.innerHTML = `Nächste Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
-    waveTimer = 40; // Reset the timer for the next wave
+    waveTimer = 30; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
+    max_enemy_amount += wave;
   }
 }
 
