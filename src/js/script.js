@@ -1,4 +1,5 @@
 import { Orc } from './classes/Orc.js';
+import { Laser } from './classes/Laser.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -32,6 +33,7 @@ const tower_places = [
 ];
 
 const enemies = [];
+const lasers = [];
 const towerImage = new Image();
 towerImage.src = 'src/assets/tower2.png';
 
@@ -109,6 +111,9 @@ function gameLoop() {
                     if (enemy.health <= 0) {
                         enemy.markedForDeletion = true;
                     }
+
+                    // Erzeuge einen Laser
+                    lasers.push(new Laser(place.x + 15, place.y, enemy.pos_x, enemy.pos_y));
                 }
             }
         });
@@ -117,6 +122,17 @@ function gameLoop() {
             enemies.splice(index, 1);
         } else {
             enemy.draw(ctx);
+        }
+    });
+
+    // Update und zeichne die Laser
+    lasers.forEach((laser, index) => {
+        laser.update();
+        laser.draw(ctx);
+
+        // Entferne den Laser, wenn er das Ziel erreicht hat
+        if (laser.posX === laser.targetX && laser.posY === laser.targetY) {
+            lasers.splice(index, 1);
         }
     });
 
