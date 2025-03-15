@@ -128,7 +128,7 @@ function gameLoop() {
   // Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update();
-    enemy.is_hit = false; // Reset is_hit before checking towers
+    // enemy.is_hit = false; // Reset is_hit before checking towers
 
     // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
@@ -156,7 +156,7 @@ function gameLoop() {
         if (distance < 80) {
           // Radius von 80 Pixeln
           enemy.health -= 1; // Schaden anwenden
-          enemy.is_hit = true;
+          // enemy.is_hit = true;
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
