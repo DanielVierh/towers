@@ -42,7 +42,7 @@ function spawnEnemy() {
     const height = 80;
     const imgSrc = 'src/assets/orc.png';
     const scale = .6;
-    const health = 150;
+    const health = Math.floor(Math.random() * (250 - 90 + 1)) + 90;
     enemies.push(new Orc(posX, posY, width, height, imgSrc, scale, waypoints, health));
 }
 
