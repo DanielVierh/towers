@@ -6,6 +6,7 @@ const ctx = canvas.getContext("2d");
 const lbl_Money = document.getElementById("lbl_money");
 const lbl_Live = document.getElementById("lbl_live");
 const lbl_WaveTimer = document.getElementById("lbl_wave_timer");
+const lbl_wave = document.getElementById("lbl_wave");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -112,7 +113,8 @@ function gameLoop() {
   drawTowerPlaces();
 
   lbl_Money.innerHTML = `${money}€`;
-  lbl_Live.innerHTML = `${live} Leben`
+  lbl_Live.innerHTML = `${live} Leben`;
+  lbl_wave.innerHTML = `Welle: ${wave}`;
 
   // Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
@@ -189,7 +191,7 @@ function gameLoop() {
 
 function updateWaveTimer() {
   waveTimer--;
-  lbl_WaveTimer.innerHTML = `Nächste Welle in ${waveTimer}s`;
+  lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
     waveTimer = 30; // Reset the timer for the next wave
     spawnEnemy();
