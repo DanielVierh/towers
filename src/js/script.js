@@ -27,15 +27,15 @@ const waypoints = [
 ];
 
 const tower_places = [
-  { x: 70, y: 10, is_tower: false },
-  { x: 260, y: 10, is_tower: false },
-  { x: 160, y: 85, is_tower: false  },
-  { x: 90, y: 165, is_tower: false },
-  { x: 250, y: 245, is_tower: false },
-  { x: 130, y: 330, is_tower: false },
-  { x: 350, y: 330, is_tower: false  },
-  { x: 280, y: 165, is_tower: false  },
-  { x: 90, y: 245, is_tower: false  },
+  { x: 70, y: 10, is_tower: false, tower_damage_lvl: 1 },
+  { x: 260, y: 10, is_tower: false, tower_damage_lvl: 1 },
+  { x: 160, y: 85, is_tower: false, tower_damage_lvl: 1  },
+  { x: 90, y: 165, is_tower: false, tower_damage_lvl: 1 },
+  { x: 250, y: 245, is_tower: false, tower_damage_lvl: 1 },
+  { x: 130, y: 330, is_tower: false, tower_damage_lvl: 1 },
+  { x: 350, y: 330, is_tower: false, tower_damage_lvl: 1  },
+  { x: 280, y: 165, is_tower: false, tower_damage_lvl: 1  },
+  { x: 90, y: 245, is_tower: false, tower_damage_lvl: 1  },
 ];
 
 const enemies = [];
@@ -49,8 +49,8 @@ let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let money = 100;
 let max_enemy_amount = 3;
 let wave = 0;
-let enemy_max_health = 250;
-let enemy_max_velocity = 5;
+let enemy_max_health = 300;
+let enemy_max_velocity = 2;
 
 function spawnEnemy() {
   for (let i = 1; i < max_enemy_amount; i++) {
@@ -60,7 +60,7 @@ function spawnEnemy() {
     const height = 80;
     const imgSrc = "src/assets/orc.png";
     const scale = 0.6;
-    const health = Math.floor(Math.random() * (enemy_max_health - 90 + 1)) + 90;
+    const health = Math.floor(Math.random() * (enemy_max_health - (enemy_max_health / 2) + 1)) + (enemy_max_health / 2);
     const velocity = Math.random() * (enemy_max_velocity - 1) + 1;
     enemies.push(
       new Orc(
@@ -132,7 +132,7 @@ function gameLoop() {
   // Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update();
-    enemy.is_hit = false; // Reset is_hit before checking towers
+    // enemy.is_hit = false; // Reset is_hit before checking towers
 
     // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
@@ -152,8 +152,9 @@ function gameLoop() {
 
         if (distance < 80) {
           // Radius von 80 Pixeln
-          enemy.health -= 1; // Schaden anwenden
-          enemy.is_hit = true;
+          //* Schaden anwenden
+          enemy.health -= place.tower_damage_lvl; 
+          // enemy.is_hit = true;
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
@@ -176,9 +177,9 @@ function gameLoop() {
       }
     });
 
-    if (!enemy.is_hit) {
-      enemy.hitFrameCounter = 0; // Reset the hit frame counter
-    }
+    // if (!enemy.is_hit) {
+    //   enemy.hitFrameCounter = 0; // Reset the hit frame counter
+    // }
 
     if (enemy.markedForDeletion) {
       enemies.splice(index, 1);
@@ -239,10 +240,17 @@ canvas.addEventListener("click", (event) => {
       y <= place.y + 30
     ) {
       console.log("Tower place clicked:", place);
+      //! todo despite from money, open modal
         if(money >= 50) {
             if (!place.is_tower) {
                 place.is_tower = true;
                 money -= 50;
+            }else {
+              const ask_for_upgrade = window.confirm(`Turm lvl ${place.tower_damage_lvl}: Turm upgraden? - Kosten 300€`);
+              if(ask_for_upgrade && money >= 300) {
+                place.tower_damage_lvl += 1;
+                money -= 300;
+              }
             }
         }
     }
