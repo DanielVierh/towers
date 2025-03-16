@@ -19,6 +19,8 @@ export class Laser {
         this.image.onload = () => {
             this.loaded = true;
         };
+
+        this.rotation = 0; // Add rotation property
     }
 
     update() {
@@ -33,11 +35,17 @@ export class Laser {
             this.posX += (dx / distance) * this.speed;
             this.posY += (dy / distance) * this.speed;
         }
+
+        this.rotation += 0.1; // Update rotation
     }
 
     draw(ctx) {
         if (this.loaded) {
-            ctx.drawImage(this.image, this.posX, this.posY, 10, 10);
+            ctx.save();
+            ctx.translate(this.posX + 5, this.posY + 5); // Translate to the center of the laser
+            ctx.rotate(this.rotation); // Apply rotation
+            ctx.drawImage(this.image, -5, -5, 10, 10); // Draw the laser
+            ctx.restore();
         }
     }
 }

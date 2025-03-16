@@ -345,8 +345,8 @@ canvas.addEventListener("click", (event) => {
       } else {
         // Update the tower stats in the upgrade modal
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
-        towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
-        towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
+        towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl} / 3`;
+        towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
         mdl_upgrade.style.display = "flex";
       }
     }
@@ -397,13 +397,14 @@ const btn_Stronger = document.getElementById("btn_Stronger");
 const btn_SellTower = document.getElementById("btn_SellTower");
 
 btn_bigger_range.addEventListener("click", () => {
-  const upgrade_price = parseInt(
-    btn_bigger_range.getAttribute("data-upgrade_price")
-  );
-  if (money >= upgrade_price) {
+  const upgrade_price = parseInt(btn_bigger_range.getAttribute("data-upgrade_price"));
+  if (money >= upgrade_price && tower.range < 140) { // Begrenze die Reichweite auf 140 (80 + 3 * 20)
     tower.range += 20;
     money -= upgrade_price;
+    towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
     mdl_upgrade.style.display = "none";
+  } else if (tower.range >= 140) {
+    alert("Maximale Reichweite erreicht!");
   } else {
     alert("Nicht genug Geld für das Upgrade!");
   }
@@ -411,10 +412,13 @@ btn_bigger_range.addEventListener("click", () => {
 
 btn_Stronger.addEventListener("click", () => {
   const upgrade_price = parseInt(btn_Stronger.getAttribute("data-tower_price"));
-  if (money >= upgrade_price) {
+  if (money >= upgrade_price && tower.tower_damage_lvl < 3) { // Begrenze den Schaden auf Stufe 3
     tower.tower_damage_lvl += 1;
     money -= upgrade_price;
+    towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
     mdl_upgrade.style.display = "none";
+  } else if (tower.tower_damage_lvl >= 3) {
+    alert("Maximale Schadensstufe erreicht!");
   } else {
     alert("Nicht genug Geld für das Upgrade!");
   }
