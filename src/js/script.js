@@ -394,6 +394,7 @@ const towerTypeElement = document.getElementById("tower_type");
 const towerDamageLvlElement = document.getElementById("tower_damage_lvl");
 const towerRangeElement = document.getElementById("tower_range");
 const btn_Stronger = document.getElementById("btn_Stronger");
+const btn_SellTower = document.getElementById("btn_SellTower");
 
 btn_bigger_range.addEventListener("click", () => {
   const upgrade_price = parseInt(
@@ -416,6 +417,21 @@ btn_Stronger.addEventListener("click", () => {
     mdl_upgrade.style.display = "none";
   } else {
     alert("Nicht genug Geld für das Upgrade!");
+  }
+});
+
+btn_SellTower.addEventListener("click", () => {
+  if (tower && tower.tower_is_build) {
+    const sell_price = 20; // 50% des Kaufpreises zurückgeben
+    money += sell_price;
+    tower.tower_is_build = false;
+    tower.tower_type = "";
+    tower.tower_img = "";
+    tower.tower_damage_lvl = 1;
+    tower.range = 80;
+    mdl_upgrade.style.display = "none";
+  } else {
+    alert("Kein Turm zum Verkaufen ausgewählt!");
   }
 });
 
