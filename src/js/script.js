@@ -15,6 +15,10 @@ const btn_close_modal_towers = document.getElementById(
 );
 const btn_Slower = document.getElementById("btn_Slower");
 const btn_Destroyer = document.getElementById("btn_Destroyer");
+const btn_close_modal_upgrade = document.getElementById(
+  "btn_close_modal_upgrade"
+);
+const mdl_upgrade = document.getElementById("mdl_upgrade");
 const towerImages = new Map();
 
 canvas.width = 400;
@@ -41,6 +45,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 260,
@@ -49,6 +54,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 160,
@@ -57,6 +63,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 90,
@@ -65,6 +72,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 250,
@@ -73,6 +81,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 130,
@@ -81,6 +90,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 350,
@@ -89,6 +99,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 280,
@@ -97,6 +108,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
   {
     x: 90,
@@ -105,6 +117,7 @@ const tower_places = [
     tower_damage_lvl: 1,
     tower_type: "",
     tower_img: "",
+    range: 80,
   },
 ];
 
@@ -208,7 +221,6 @@ function gameLoop() {
   // Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update();
-    // enemy.is_hit = false; // Reset is_hit before checking towers
 
     // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
@@ -217,20 +229,25 @@ function gameLoop() {
     }
 
     // Überprüfen, ob der Orc in der Nähe eines Turms ist
-    tower_places.forEach((place) => {
-      if (place.tower_is_build) {
+    tower_places.forEach((tower) => {
+      if (tower.tower_is_build) {
         const distance = calculateDistance(
           enemy.pos_x,
           enemy.pos_y,
-          place.x,
-          place.y
+          tower.x,
+          tower.y
         );
+        // Zeichne den Bereich des Turms
+        ctx.beginPath();
+        ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-        if (distance < 80) {
+        if (distance < tower.range) {
           // Radius von 80 Pixeln
           //* Schaden anwenden
-          enemy.health -= place.tower_damage_lvl;
-          // enemy.is_hit = true;
+          enemy.health -= tower.tower_damage_lvl;
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
@@ -246,26 +263,22 @@ function gameLoop() {
           }
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
-          if (place.tower_type === "slower") {
+          if (tower.tower_type === "slower") {
             enemy.velocity = enemy.original_velocity * 0.5; // Verlangsamen auf 50% der ursprünglichen Geschwindigkeit
             // Erzeuge einen blauen Laser
             lasers.push(
-              new Laser(place.x + 15, place.y, enemy.pos_x, enemy.pos_y, 'blue')
+              new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
           } else {
             enemy.velocity = enemy.original_velocity; // Zurücksetzen auf die ursprüngliche Geschwindigkeit
             // Erzeuge einen roten Laser
             lasers.push(
-              new Laser(place.x + 15, place.y, enemy.pos_x, enemy.pos_y, 'red')
+              new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
             );
           }
         }
       }
     });
-
-    // if (!enemy.is_hit) {
-    //   enemy.hitFrameCounter = 0; // Reset the hit frame counter
-    // }
 
     if (enemy.markedForDeletion) {
       enemies.splice(index, 1);
@@ -327,28 +340,17 @@ canvas.addEventListener("click", (event) => {
       y >= place.y &&
       y <= place.y + 30
     ) {
-      console.log("Tower place clicked:", place);
-      mdl_towers.style.display = "flex";
       tower = place;
-      // if(money >= 50) {
 
-      //     if (!place.tower_is_build) {
-      //         place.tower_is_build = true;
-      //         money -= 50;
-      //     }else {
-      //       const ask_for_upgrade = window.confirm(`Turm lvl ${place.tower_damage_lvl}: Turm upgraden? - Kosten 300€`);
-      //       if(ask_for_upgrade && money >= 300) {
-      //         if(place.tower_damage_lvl <= 3) {
-      //           place.tower_damage_lvl += 1;
-      //           money -= 300;
-      //         }else {
-      //           alert('Max Upgrade Level erreicht')
-      //         }
-      //       }else {
-      //         alert('Zu wenig Geld')
-      //       }
-      //     }
-      // }
+      if (!place.tower_is_build) {
+        mdl_towers.style.display = "flex";
+      } else {
+        // Update the tower stats in the upgrade modal
+        towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
+        towerDamageLvlElement.innerHTML = `Schaden: ${tower.tower_damage_lvl}`;
+        towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
+        mdl_upgrade.style.display = "flex";
+      }
     }
   });
 });
@@ -388,6 +390,37 @@ btn_Destroyer.addEventListener("click", () => {
   }
 });
 
+//* Upgrades
+const btn_bigger_range = document.getElementById("btn_bigger_range");
+const towerTypeElement = document.getElementById("tower_type");
+const towerDamageLvlElement = document.getElementById("tower_damage_lvl");
+const towerRangeElement = document.getElementById("tower_range");
+const btn_Stronger = document.getElementById("btn_Stronger");
+
+btn_bigger_range.addEventListener("click", () => {
+  const upgrade_price = parseInt(
+    btn_bigger_range.getAttribute("data-upgrade_price")
+  );
+  if (money >= upgrade_price) {
+    tower.range += 20;
+    money -= upgrade_price;
+    mdl_upgrade.style.display = "none";
+  } else {
+    alert("Nicht genug Geld für das Upgrade!");
+  }
+});
+
+btn_Stronger.addEventListener("click", () => {
+  const upgrade_price = parseInt(btn_Stronger.getAttribute("data-tower_price"));
+  if (money >= upgrade_price) {
+    tower.tower_damage_lvl += 1;
+    money -= upgrade_price;
+    mdl_upgrade.style.display = "none";
+  } else {
+    alert("Nicht genug Geld für das Upgrade!");
+  }
+});
+
 // Close the modal when the user clicks on <span> (x)
 closeModal.onclick = function () {
   gameOverModal.style.display = "none";
@@ -408,4 +441,8 @@ setInterval(updateWaveTimer, 1000);
 
 btn_close_modal_towers.addEventListener("click", () => {
   mdl_towers.style.display = "none";
+});
+
+btn_close_modal_upgrade.addEventListener("click", () => {
+  mdl_upgrade.style.display = "none";
 });

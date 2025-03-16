@@ -28,16 +28,40 @@
 
         <div class="grid-wrapper">
             <div class="tile">
+                <img src="src/assets/tower_0.png">
+                <h4>Destroyer</h4>
+                <p>Standard Turm</p>
+                <div class="button-buy" data-tower_price="50"  data-tower_img = "src/assets/tower_0.png" id="btn_Destroyer">Kaufen 50€</div>
+            </div>
+            <div class="tile">
                 <img src="src/assets/tower_1.png">
                 <h4>Slower</h4>
                 <p>Verlangsamt die Geschwindigkeit der Gegner</p>
                 <div class="button-buy" id="btn_Slower" data-tower_price="50" data-tower_img = "src/assets/tower_1.png" >Kaufen 50€</div>
             </div>
+        </div>
+    </div>
+
+    <div id="mdl_upgrade" class="modal modal-upgrade" >
+        <div id="btn_close_modal_upgrade">x</div>
+        <h2>Upgrademenü</h2>
+
+        <div class="tower-stats">
+            <p id="tower_type">Typ: </p>
+            <p id="tower_damage_lvl">Schaden: </p>
+            <p id="tower_range">Reichweite: </p>
+          </div>
+
+        <div class="grid-wrapper">
             <div class="tile">
-                <img src="src/assets/tower_0.png">
-                <h4>Destroyer</h4>
-                <p>Standard Turm</p>
-                <div class="button-buy" data-tower_price="50"  data-tower_img = "src/assets/tower_0.png" id="btn_Destroyer">Kaufen 50€</div>
+                <h4>Reichweite erhöhen</h4>
+                <p>Der Tower hat eine vergrößerte Reichweite</p>
+                <div class="button-buy" id="btn_bigger_range" data-upgrade_price="300" >Kaufen 300€</div>
+            </div>
+            <div class="tile">
+                <h4>Stärke Upgrade</h4>
+                <p>Macht den Turm stärker</p>
+                <div class="button-buy" data-tower_price="500" id="btn_Stronger">Kaufen 500€</div>
             </div>
         </div>
     </div>
