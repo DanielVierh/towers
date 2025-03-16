@@ -312,12 +312,12 @@ function updateWaveTimer() {
   waveTimer--;
   lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
-    waveTimer = 15; // Reset the timer for the next wave
+    waveTimer = 30; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
     enemy_max_velocity += 0.2;
     if (wave >= 10) {
-      enemy_max_health += 30;
+      enemy_max_health += 20;
     } else {
       max_enemy_amount += wave;
       enemy_max_health += 15;
