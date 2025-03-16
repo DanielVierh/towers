@@ -68,6 +68,7 @@ body {
           background-color: rgb(24, 24, 65);
           padding: 10px 20px;
           border: 3px solid white;
+          cursor: pointer;
         }
 
         .button-sell {
@@ -75,6 +76,7 @@ body {
           padding: 10px 20px;
           border: 3px solid white;
           color: lightgreen;
+          cursor: pointer;
         }
       }
     }
@@ -85,6 +87,7 @@ body {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
   }
   
   .close:hover,

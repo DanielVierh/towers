@@ -315,14 +315,16 @@ function updateWaveTimer() {
     waveTimer = 15; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    enemy_max_health += 10;
     enemy_max_velocity += 0.2;
-    if (wave > 5) {
-      max_enemy_amount += Math.floor(wave / 2);
+    if (wave >= 10) {
+      enemy_max_health += 30;
     } else {
       max_enemy_amount += wave;
+      enemy_max_health += 15;
     }
   }
+  console.log('enemies', enemies);
+  
 }
 
 // Event-Listener for click on Tower Place

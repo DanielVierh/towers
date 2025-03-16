@@ -71,6 +71,7 @@ body {
   background-color: rgb(24, 24, 65);
   padding: 10px 20px;
   border: 3px solid white;
+  cursor: pointer;
 }
 .modal-towers .grid-wrapper .tile .button-sell,
 .modal-upgrade .grid-wrapper .tile .button-sell {
@@ -78,6 +79,7 @@ body {
   padding: 10px 20px;
   border: 3px solid white;
   color: lightgreen;
+  cursor: pointer;
 }
 
 .close {
@@ -85,6 +87,7 @@ body {
   float: right;
   font-size: 28px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .close:hover,
