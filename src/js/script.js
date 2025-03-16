@@ -216,7 +216,7 @@ function updateWaveTimer() {
     waveTimer = 15; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    enemy_max_health += 6;
+    enemy_max_health += 10;
     enemy_max_velocity += 0.1;
     if (wave > 5) {
         max_enemy_amount += Math.floor(wave / 2);
@@ -248,8 +248,14 @@ canvas.addEventListener("click", (event) => {
             }else {
               const ask_for_upgrade = window.confirm(`Turm lvl ${place.tower_damage_lvl}: Turm upgraden? - Kosten 300€`);
               if(ask_for_upgrade && money >= 300) {
-                place.tower_damage_lvl += 1;
-                money -= 300;
+                if(place.tower_damage_lvl <= 3) {
+                  place.tower_damage_lvl += 1;
+                  money -= 300;
+                }else {
+                  alert('Max Upgrade Level erreicht')
+                }
+              }else {
+                alert('Zu wenig Geld')
               }
             }
         }
