@@ -9,6 +9,13 @@ const lbl_WaveTimer = document.getElementById("lbl_wave_timer");
 const lbl_wave = document.getElementById("lbl_wave");
 const gameOverModal = document.getElementById("gameOverModal");
 const closeModal = document.getElementById("closeModal");
+const mdl_towers = document.getElementById("mdl_towers");
+const btn_close_modal_towers = document.getElementById(
+  "btn_close_modal_towers"
+);
+const btn_Slower = document.getElementById("btn_Slower");
+const btn_Destroyer = document.getElementById("btn_Destroyer");
+const towerImages = new Map();
 
 canvas.width = 400;
 canvas.height = 400;
@@ -27,21 +34,83 @@ const waypoints = [
 ];
 
 const tower_places = [
-  { x: 70, y: 10, is_tower: false, tower_damage_lvl: 1 },
-  { x: 260, y: 10, is_tower: false, tower_damage_lvl: 1 },
-  { x: 160, y: 85, is_tower: false, tower_damage_lvl: 1  },
-  { x: 90, y: 165, is_tower: false, tower_damage_lvl: 1 },
-  { x: 250, y: 245, is_tower: false, tower_damage_lvl: 1 },
-  { x: 130, y: 330, is_tower: false, tower_damage_lvl: 1 },
-  { x: 350, y: 330, is_tower: false, tower_damage_lvl: 1  },
-  { x: 280, y: 165, is_tower: false, tower_damage_lvl: 1  },
-  { x: 90, y: 245, is_tower: false, tower_damage_lvl: 1  },
+  {
+    x: 70,
+    y: 10,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 260,
+    y: 10,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 160,
+    y: 85,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 90,
+    y: 165,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 250,
+    y: 245,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 130,
+    y: 330,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 350,
+    y: 330,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 280,
+    y: 165,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
+  {
+    x: 90,
+    y: 245,
+    tower_is_build: false,
+    tower_damage_lvl: 1,
+    tower_type: "",
+    tower_img: "",
+  },
 ];
 
 const enemies = [];
 const lasers = [];
 const towerImage = new Image();
-towerImage.src = "src/assets/tower2.png";
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
@@ -60,7 +129,11 @@ function spawnEnemy() {
     const height = 80;
     const imgSrc = "src/assets/orc.png";
     const scale = 0.6;
-    const health = Math.floor(Math.random() * (enemy_max_health - (enemy_max_health / 2) + 1)) + (enemy_max_health / 2);
+    const health =
+      Math.floor(
+        Math.random() * (enemy_max_health - enemy_max_health / 2 + 1)
+      ) +
+      enemy_max_health / 2;
     const velocity = Math.random() * (enemy_max_velocity - 1) + 1;
     enemies.push(
       new Orc(
@@ -96,11 +169,14 @@ function drawWaypoints() {
 
 function drawTowerPlaces() {
   ctx.fillStyle = "rgba(0,0,0,0.6)";
-  tower_places.forEach((place) => {
-    if (place.is_tower) {
-      ctx.drawImage(towerImage, place.x, place.y, 30, 30);
+  tower_places.forEach((tower) => {
+    if (tower.tower_is_build) {
+      const towerImage = towerImages.get(tower.tower_img);
+      if (towerImage) {
+        ctx.drawImage(towerImage, tower.x, tower.y, 30, 30);
+      }
     } else {
-      ctx.fillRect(place.x, place.y, 30, 30);
+      ctx.fillRect(tower.x, tower.y, 30, 30);
     }
   });
 }
@@ -142,7 +218,7 @@ function gameLoop() {
 
     // Überprüfen, ob der Orc in der Nähe eines Turms ist
     tower_places.forEach((place) => {
-      if (place.is_tower) {
+      if (place.tower_is_build) {
         const distance = calculateDistance(
           enemy.pos_x,
           enemy.pos_y,
@@ -153,26 +229,36 @@ function gameLoop() {
         if (distance < 80) {
           // Radius von 80 Pixeln
           //* Schaden anwenden
-          enemy.health -= place.tower_damage_lvl; 
+          enemy.health -= place.tower_damage_lvl;
           // enemy.is_hit = true;
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
             console.log(wave);
-            
-            if(wave > 10) {
+
+            if (wave > 10) {
               money += 1;
-            }else if(wave >= 4) {
+            } else if (wave >= 4) {
               money += 2;
-            }else {
+            } else {
               money += 10;
             }
           }
 
-          // Erzeuge einen Laser
-          lasers.push(
-            new Laser(place.x + 15, place.y, enemy.pos_x, enemy.pos_y)
-          );
+          // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
+          if (place.tower_type === "slower") {
+            enemy.velocity = enemy.original_velocity * 0.5; // Verlangsamen auf 50% der ursprünglichen Geschwindigkeit
+            // Erzeuge einen blauen Laser
+            lasers.push(
+              new Laser(place.x + 15, place.y, enemy.pos_x, enemy.pos_y, 'blue')
+            );
+          } else {
+            enemy.velocity = enemy.original_velocity; // Zurücksetzen auf die ursprüngliche Geschwindigkeit
+            // Erzeuge einen roten Laser
+            lasers.push(
+              new Laser(place.x + 15, place.y, enemy.pos_x, enemy.pos_y, 'red')
+            );
+          }
         }
       }
     });
@@ -219,12 +305,14 @@ function updateWaveTimer() {
     enemy_max_health += 10;
     enemy_max_velocity += 0.1;
     if (wave > 5) {
-        max_enemy_amount += Math.floor(wave / 2);
+      max_enemy_amount += Math.floor(wave / 2);
     } else {
-        max_enemy_amount += wave;
+      max_enemy_amount += wave;
     }
   }
 }
+
+let tower = undefined;
 
 // Event-Listener for click on Tower Place
 canvas.addEventListener("click", (event) => {
@@ -240,43 +328,84 @@ canvas.addEventListener("click", (event) => {
       y <= place.y + 30
     ) {
       console.log("Tower place clicked:", place);
-      //! todo despite from money, open modal
-        if(money >= 50) {
-            if (!place.is_tower) {
-                place.is_tower = true;
-                money -= 50;
-            }else {
-              const ask_for_upgrade = window.confirm(`Turm lvl ${place.tower_damage_lvl}: Turm upgraden? - Kosten 300€`);
-              if(ask_for_upgrade && money >= 300) {
-                if(place.tower_damage_lvl <= 3) {
-                  place.tower_damage_lvl += 1;
-                  money -= 300;
-                }else {
-                  alert('Max Upgrade Level erreicht')
-                }
-              }else {
-                alert('Zu wenig Geld')
-              }
-            }
-        }
+      mdl_towers.style.display = "flex";
+      tower = place;
+      // if(money >= 50) {
+
+      //     if (!place.tower_is_build) {
+      //         place.tower_is_build = true;
+      //         money -= 50;
+      //     }else {
+      //       const ask_for_upgrade = window.confirm(`Turm lvl ${place.tower_damage_lvl}: Turm upgraden? - Kosten 300€`);
+      //       if(ask_for_upgrade && money >= 300) {
+      //         if(place.tower_damage_lvl <= 3) {
+      //           place.tower_damage_lvl += 1;
+      //           money -= 300;
+      //         }else {
+      //           alert('Max Upgrade Level erreicht')
+      //         }
+      //       }else {
+      //         alert('Zu wenig Geld')
+      //       }
+      //     }
+      // }
     }
   });
 });
 
+btn_Slower.addEventListener("click", () => {
+  const tower_price = btn_Slower.getAttribute("data-tower_price");
+  const tower_img = btn_Slower.getAttribute("data-tower_img");
+  if (money >= tower_price) {
+    tower.tower_type = "slower";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    tower.tower_damage_lvl = 0;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    money -= tower_price;
+    mdl_towers.style.display = "none";
+  }
+});
+
+btn_Destroyer.addEventListener("click", () => {
+  const tower_price = btn_Destroyer.getAttribute("data-tower_price");
+  const tower_img = btn_Destroyer.getAttribute("data-tower_img");
+  if (money >= tower_price) {
+    tower.tower_type = "destroyer";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    money -= tower_price;
+    mdl_towers.style.display = "none";
+  }
+});
+
 // Close the modal when the user clicks on <span> (x)
-closeModal.onclick = function() {
+closeModal.onclick = function () {
   gameOverModal.style.display = "none";
-}
+};
 
 // Close the modal when the user clicks anywhere outside of the modal
-window.onclick = function(event) {
+window.onclick = function (event) {
   if (event.target == gameOverModal) {
     gameOverModal.style.display = "none";
   }
-}
+};
 
 // Start the game loop
 gameLoop();
 
 // Update the wave timer every second
 setInterval(updateWaveTimer, 1000);
+
+btn_close_modal_towers.addEventListener("click", () => {
+  mdl_towers.style.display = "none";
+});

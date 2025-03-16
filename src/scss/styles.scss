@@ -33,6 +33,44 @@ body {
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
   }
+
+  .modal-towers {
+    background-color: rgb(10, 11, 27);
+    font-size: 1rem;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .grid-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+
+      .tile {
+        background-color: gray;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 1rem;
+
+        p {
+          font-size: .8rem;
+        }
+
+        img {
+          width: 80px;
+        }
+
+        .button-buy {
+          background-color: rgb(24, 24, 65);
+          padding: 10px 20px;
+          border: 3px solid white;
+        }
+      }
+    }
+  }
   
   .close {
     color: #aaa;

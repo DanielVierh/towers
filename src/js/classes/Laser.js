@@ -1,5 +1,5 @@
 export class Laser {
-    constructor(startX, startY, targetX, targetY) {
+    constructor(startX, startY, targetX, targetY, color) {
         this.startX = startX;
         this.startY = startY;
         this.targetX = targetX;
@@ -8,7 +8,13 @@ export class Laser {
         this.posY = startY;
         this.speed = 4;
         this.image = new Image();
-        this.image.src = 'src/assets/laser.png';
+        this.color = color;
+        if(this.color === 'blue') {
+            this.image.src = 'src/assets/laser_blue.png';
+        }else if( this.color === 'red') {
+            this.image.src = 'src/assets/laser.png';
+        }
+       
         this.loaded = false;
         this.image.onload = () => {
             this.loaded = true;

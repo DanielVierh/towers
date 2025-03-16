@@ -10,6 +10,7 @@ export class Orc {
             this.loaded = true;
         };
         this.velocity = velocity;
+        this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
         this.color = 'red';
         this.frameIndex = 0;
         this.frameCount = 7; // Anzahl der Frames in der Sprite
