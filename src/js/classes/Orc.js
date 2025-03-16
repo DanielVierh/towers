@@ -11,6 +11,7 @@ export class Orc {
         };
         this.velocity = velocity;
         this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
+        this.isSlowed = false; // Neue Eigenschaft, um zu verfolgen, ob der Gegner verlangsamt wurde
         this.color = 'red';
         this.frameIndex = 0;
         this.frameCount = 7; // Anzahl der Frames in der Sprite

@@ -127,12 +127,13 @@ const towerImage = new Image();
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
-let waveTimer = 10; // Timer für die nächste Welle in Sekunden
+let waveTimer = 20; // Timer für die nächste Welle in Sekunden
 let money = 100;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
 let enemy_max_velocity = 2;
+let tower = undefined;
 
 function spawnEnemy() {
   for (let i = 1; i < max_enemy_amount; i++) {
@@ -238,11 +239,11 @@ function gameLoop() {
           tower.y
         );
         // Zeichne den Bereich des Turms
-        ctx.beginPath();
-        ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        // ctx.beginPath();
+        // ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
+        // ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+        // ctx.lineWidth = 2;
+        // ctx.stroke();
 
         if (distance < tower.range) {
           // Radius von 80 Pixeln
@@ -251,7 +252,6 @@ function gameLoop() {
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
-            console.log(wave);
 
             if (wave > 10) {
               money += 1;
@@ -265,12 +265,12 @@ function gameLoop() {
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
             enemy.velocity = enemy.original_velocity * 0.5; // Verlangsamen auf 50% der ursprünglichen Geschwindigkeit
+            enemy.isSlowed = true;
             // Erzeuge einen blauen Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
           } else {
-            enemy.velocity = enemy.original_velocity; // Zurücksetzen auf die ursprüngliche Geschwindigkeit
             // Erzeuge einen roten Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
@@ -316,7 +316,7 @@ function updateWaveTimer() {
     spawnEnemy();
     wave++;
     enemy_max_health += 10;
-    enemy_max_velocity += 0.1;
+    enemy_max_velocity += 0.2;
     if (wave > 5) {
       max_enemy_amount += Math.floor(wave / 2);
     } else {
@@ -324,8 +324,6 @@ function updateWaveTimer() {
     }
   }
 }
-
-let tower = undefined;
 
 // Event-Listener for click on Tower Place
 canvas.addEventListener("click", (event) => {
@@ -347,7 +345,7 @@ canvas.addEventListener("click", (event) => {
       } else {
         // Update the tower stats in the upgrade modal
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
-        towerDamageLvlElement.innerHTML = `Schaden: ${tower.tower_damage_lvl}`;
+        towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
         mdl_upgrade.style.display = "flex";
       }
