@@ -428,7 +428,7 @@ btn_Stronger.addEventListener("click", () => {
 
 btn_SellTower.addEventListener("click", () => {
   if (tower && tower.tower_is_build) {
-    const sell_price = 20; // 50% des Kaufpreises zurückgeben
+    const sell_price = 30; // 50% des Kaufpreises zurückgeben
     money += sell_price;
     tower.tower_is_build = false;
     tower.tower_type = "";
