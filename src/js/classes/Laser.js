@@ -6,7 +6,7 @@ export class Laser {
         this.targetY = targetY;
         this.posX = startX;
         this.posY = startY;
-        this.speed = 4;
+        this.speed = 5;
         this.image = new Image();
         this.color = color;
         if(this.color === 'blue') {

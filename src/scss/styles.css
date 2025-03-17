@@ -45,6 +45,8 @@ body {
 .modal-towers .close-button,
 .modal-upgrade .close-button {
   background-color: red;
+  align-self: flex-end;
+  margin: 20px;
   color: white;
   border-radius: 50%;
   display: flex;
