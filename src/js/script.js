@@ -237,12 +237,6 @@ function gameLoop() {
           tower.x,
           tower.y
         );
-        // Zeichne den Bereich des Turms
-        // ctx.beginPath();
-        // ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
-        // ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
-        // ctx.lineWidth = 2;
-        // ctx.stroke();
 
         if (distance < tower.range) {
           // Radius von 80 Pixeln
@@ -263,7 +257,19 @@ function gameLoop() {
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
-            enemy.applySlowEffect(); // Verlangsamen des Gegners
+            let slow_val = 0.5;
+            let slow_time = 10000;
+            if (tower.tower_damage_lvl === 1) {
+              slow_val = 0.4;
+              slow_time = 12000;
+            } else if (tower.tower_damage_lvl === 2) {
+              slow_val = 0.3;
+              slow_time = 14000;
+            } else if (tower.tower_damage_lvl === 3) {
+              slow_val = 0.2;
+              slow_time = 16000;
+            }
+            enemy.applySlowEffect(slow_val, slow_time); // Verlangsamen des Gegners
             // Erzeuge einen blauen Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
