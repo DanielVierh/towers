@@ -256,6 +256,7 @@ function gameLoop() {
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
+              //* Slower Tower
             let slow_val = 0.5;
             let slow_time = 10000;
             if (tower.tower_damage_lvl === 1) {
@@ -274,13 +275,21 @@ function gameLoop() {
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
           } else if(tower.tower_type === 'toxic') {
-            //* Schaden anwenden
-            // enemy.health -= tower.tower_damage_lvl;
+            //* Toxic Tower
+            let toxic_power = 0.1;
+            if(tower.tower_damage_lvl === 1) {
+              toxic_power = 0.1;
+            }else if(tower.tower_damage_lvl === 2) {
+              toxic_power = 0.2;
+            }else if(tower.tower_damage_lvl === 3) {
+              toxic_power = 0.5;
+            }
             enemy.is_toxicated = true;
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "green")
             );
           }else {
+              //* Damage Tower
             //* Schaden anwenden
             enemy.health -= tower.tower_damage_lvl;
             // Erzeuge einen roten Laser
