@@ -127,7 +127,7 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 100;
+let money = 500000;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
@@ -354,6 +354,15 @@ canvas.addEventListener("click", (event) => {
         towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
         mdl_upgrade.style.display = "flex";
+        if(tower.tower_damage_lvl === 2) {
+          btn_Stronger.innerHTML = 'Kaufen 500€';
+          btn_Stronger.setAttribute('data-tower_price', '500');
+        }else if(tower.tower_damage_lvl === 3) {
+          btn_Stronger.innerHTML = 'Max Upgrade';
+        }else {
+          btn_Stronger.innerHTML = 'Kaufen 300€';
+          btn_Stronger.setAttribute('data-tower_price', '300');
+        }
       }
     }
   });
