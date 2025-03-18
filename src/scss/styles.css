@@ -91,6 +91,9 @@ body {
 .modal-towers .grid-wrapper .tile img,
 .modal-upgrade .grid-wrapper .tile img {
   width: 80px;
+  height: 80px;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 .modal-towers .grid-wrapper .tile .button-buy,
 .modal-upgrade .grid-wrapper .tile .button-buy {
