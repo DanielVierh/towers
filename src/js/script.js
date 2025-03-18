@@ -351,7 +351,7 @@ canvas.addEventListener("click", (event) => {
       } else {
         // Update the tower stats in the upgrade modal
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
-        towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl} / 3`;
+        towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
         mdl_upgrade.style.display = "flex";
         if(tower.tower_damage_lvl === 2) {
