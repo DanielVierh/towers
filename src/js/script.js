@@ -336,7 +336,7 @@ function updateWaveTimer() {
     waveTimer = 25; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    enemy_max_velocity += 0.2;
+    enemy_max_velocity += 0.1;
     if (wave >= 10) {
       enemy_max_health += 20;
     } else {
