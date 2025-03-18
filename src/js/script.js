@@ -127,7 +127,7 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 100;
+let money = 5000;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
@@ -240,8 +240,6 @@ function gameLoop() {
 
         if (distance < tower.range) {
           // Radius von 80 Pixeln
-          //* Schaden anwenden
-          enemy.health -= tower.tower_damage_lvl;
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
@@ -257,6 +255,8 @@ function gameLoop() {
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
+            console.log('is Slow Tower');
+            
             let slow_val = 0.5;
             let slow_time = 10000;
             if (tower.tower_damage_lvl === 1) {
@@ -275,6 +275,8 @@ function gameLoop() {
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
           } else {
+            //* Schaden anwenden
+            enemy.health -= tower.tower_damage_lvl;
             // Erzeuge einen roten Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
