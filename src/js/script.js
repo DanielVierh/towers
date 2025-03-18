@@ -316,13 +316,13 @@ function updateWaveTimer() {
     spawnEnemy();
     wave++;
     enemy_max_velocity += 0.2;
-    if (wave >= 15) {
+    if (wave >= 10) {
       enemy_max_health += 20;
-      money += wave;
     } else {
       max_enemy_amount += wave;
       enemy_max_health += 15;
     }
+    money += wave;
   }
   
 }

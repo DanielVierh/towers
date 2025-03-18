@@ -7,9 +7,18 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
   font-size: 2rem;
+  text-align: left;
+}
+
+.labels-wrapper {
+  width: 100%;
+  margin: 20px;
+}
+.labels-wrapper .labels {
+  font-size: 1.5rem;
 }
 
 .modal {
