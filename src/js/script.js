@@ -15,6 +15,7 @@ const btn_close_modal_towers = document.getElementById(
 );
 const btn_Slower = document.getElementById("btn_Slower");
 const btn_Destroyer = document.getElementById("btn_Destroyer");
+const btn_Toxic = document.getElementById("btn_Toxic");
 const btn_close_modal_upgrade = document.getElementById(
   "btn_close_modal_upgrade"
 );
@@ -272,7 +273,14 @@ function gameLoop() {
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
-          } else {
+          } else if(tower.tower_type === 'toxic') {
+            //* Schaden anwenden
+            // enemy.health -= tower.tower_damage_lvl;
+            enemy.is_toxicated = true;
+            lasers.push(
+              new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "green")
+            );
+          }else {
             //* Schaden anwenden
             enemy.health -= tower.tower_damage_lvl;
             // Erzeuge einen roten Laser
@@ -391,6 +399,23 @@ btn_Destroyer.addEventListener("click", () => {
   const tower_img = btn_Destroyer.getAttribute("data-tower_img");
   if (money >= tower_price) {
     tower.tower_type = "destroyer";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    money -= tower_price;
+    mdl_towers.style.display = "none";
+  }
+});
+
+btn_Toxic.addEventListener("click", () => {
+  const tower_price = btn_Toxic.getAttribute("data-tower_price");
+  const tower_img = btn_Toxic.getAttribute("data-tower_img");
+  if (money >= tower_price) {
+    tower.tower_type = "toxic";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
     if (!towerImages.has(tower_img)) {

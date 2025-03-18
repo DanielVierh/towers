@@ -13,6 +13,8 @@ export class Laser {
             this.image.src = 'src/assets/laser_blue.png';
         }else if( this.color === 'red') {
             this.image.src = 'src/assets/laser.png';
+        }else if(this.color === 'green') {
+            this.image.src = 'src/assets/laser_green.png';
         }
        
         this.loaded = false;

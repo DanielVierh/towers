@@ -29,6 +29,8 @@ export class Orc {
         this.maxHealth = health; // Speichern des maximalen Gesundheitswerts
         this.is_hit = false;
         this.hitFrameCounter = 0;
+        this.is_toxicated = false;
+        this.toxicated_lvl = 0.1;
     }
 
     applySlowEffect(slow_val, slow_time) {
@@ -71,6 +73,16 @@ export class Orc {
         if (this.frameTick >= this.frameSpeed) {
             this.frameTick = 0;
             this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+        }
+
+        //* toxicated
+        if(this.is_toxicated) {
+            setInterval(() => {
+                this.health -= this.toxicated_lvl;
+                if(this.health <= 0) {
+                    this.markedForDeletion = true;
+                }
+            }, 5000);
         }
     }
 
