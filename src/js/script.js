@@ -255,8 +255,6 @@ function gameLoop() {
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
-            console.log('is Slow Tower');
-            
             let slow_val = 0.5;
             let slow_time = 10000;
             if (tower.tower_damage_lvl === 1) {
