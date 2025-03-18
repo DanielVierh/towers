@@ -343,7 +343,7 @@ function updateWaveTimer() {
       max_enemy_amount += wave;
       enemy_max_health += 15;
     }
-    money += wave;
+    money += (wave + Math.floor(wave / 2));
   }
   
 }
