@@ -12,6 +12,8 @@ export class Orc {
         this.velocity = velocity;
         this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
         this.isSlowed = false; // Neue Eigenschaft, um zu verfolgen, ob der Gegner verlangsamt wurde
+        this.slowTime = 5000; // Zeit in Millisekunden, für die der Verlangsamungseffekt anhält
+        this.slowTimeout = null; // Timeout-ID für den Verlangsamungseffekt
         this.color = 'red';
         this.frameIndex = 0;
         this.frameCount = 7; // Anzahl der Frames in der Sprite
@@ -28,6 +30,18 @@ export class Orc {
         this.maxHealth = health; // Speichern des maximalen Gesundheitswerts
         this.is_hit = false;
         this.hitFrameCounter = 0;
+    }
+
+    applySlowEffect() {
+        if (this.slowTimeout) {
+            clearTimeout(this.slowTimeout); // Setze den Timer zurück, wenn der Gegner erneut getroffen wird
+        }
+        this.isSlowed = true;
+        this.velocity = this.original_velocity * 0.5; // Verlangsamen auf 50% der ursprünglichen Geschwindigkeit
+        this.slowTimeout = setTimeout(() => {
+            this.isSlowed = false;
+            this.velocity = this.original_velocity;
+        }, this.slowTime);
     }
 
     update() {

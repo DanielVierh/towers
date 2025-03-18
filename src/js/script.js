@@ -123,11 +123,10 @@ const tower_places = [
 
 const enemies = [];
 const lasers = [];
-const towerImage = new Image();
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
-let waveTimer = 20; // Timer für die nächste Welle in Sekunden
+let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let money = 100;
 let max_enemy_amount = 3;
 let wave = 0;
@@ -264,8 +263,7 @@ function gameLoop() {
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
-            enemy.velocity = enemy.original_velocity * 0.5; // Verlangsamen auf 50% der ursprünglichen Geschwindigkeit
-            enemy.isSlowed = true;
+            enemy.applySlowEffect(); // Verlangsamen des Gegners
             // Erzeuge einen blauen Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
