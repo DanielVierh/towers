@@ -26,6 +26,7 @@ canvas.width = 400;
 canvas.height = 400;
 
 const waypoints = [
+  {x: -50, y: 20},
   { x: 50, y: 20 },
   { x: 350, y: 20 },
   { x: 350, y: 100 },
@@ -137,7 +138,7 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 1500;
+let money = 150;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
@@ -145,7 +146,12 @@ let enemy_max_velocity = 2;
 let tower = undefined;
 
 function spawnEnemy() {
-  for (let i = 1; i < max_enemy_amount; i++) {
+  let enemyCount = 0;
+  const spawnInterval = setInterval(() => {
+    if (enemyCount >= max_enemy_amount) {
+      clearInterval(spawnInterval);
+      return;
+    }
     const posX = -100;
     const posY = 20;
     const width = 60;
@@ -171,7 +177,8 @@ function spawnEnemy() {
         velocity
       )
     );
-  }
+    enemyCount++;
+  }, 500);
 }
 
 function drawWaypoints() {
@@ -347,10 +354,14 @@ function updateWaveTimer() {
   waveTimer--;
   lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
-    waveTimer = 25; // Reset the timer for the next wave
+    let time_to_next_wave = 30;
+    if(wave >= 6) {
+      time_to_next_wave = 45;
+    }
+    waveTimer = time_to_next_wave; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    wave < 25 ? enemy_max_velocity += 0.1 : enemy_max_velocity = enemy_max_velocity;
+    wave < 10 ? enemy_max_velocity += 0.1 : enemy_max_velocity = enemy_max_velocity;
     if (wave >= 10) {
       enemy_max_health += 20;
     } else {
