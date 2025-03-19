@@ -138,7 +138,7 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 150;
+let money = 9150;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
@@ -197,15 +197,32 @@ function drawWaypoints() {
   ctx.stroke();
 }
 
+function getTowerColor(tower) {
+  switch (tower.tower_damage_lvl) {
+    case 1:
+      return "rgba(255, 255, 255, 0.6)"; // Weiß für Stufe 1
+    case 2:
+      return "rgb(255, 217, 0)"; // Grün für Stufe 2
+    case 3:
+      return "rgba(255, 0, 0, 0.6)"; // Rot für Stufe 3
+    default:
+      return "rgba(255, 255, 255, 0.6)";// Schwarz für Stufe 0
+  }
+}
+
 function drawTowerPlaces() {
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
   tower_places.forEach((tower) => {
     if (tower.tower_is_build) {
       const towerImage = towerImages.get(tower.tower_img);
       if (towerImage) {
         ctx.drawImage(towerImage, tower.x, tower.y, 30, 30);
       }
+      // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
+      ctx.strokeStyle = getTowerColor(tower);
+      ctx.lineWidth = 3;
+      ctx.strokeRect(tower.x, (tower.y + 33), 10, 3);
     } else {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
       ctx.fillRect(tower.x, tower.y, 30, 30);
     }
   });
@@ -368,7 +385,7 @@ function updateWaveTimer() {
       max_enemy_amount += wave;
       enemy_max_health += 15;
     }
-    money += (wave + Math.floor(wave / 2));
+    money += Math.floor(wave * 2);
   }
   
 }
@@ -538,3 +555,4 @@ btn_close_modal_towers.addEventListener("click", () => {
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
 });
+
