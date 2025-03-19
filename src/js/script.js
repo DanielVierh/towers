@@ -200,13 +200,13 @@ function drawWaypoints() {
 function getTowerColor(tower) {
   switch (tower.tower_damage_lvl) {
     case 1:
-      return "rgba(255, 255, 255, 0.6)"; // Weiß für Stufe 1
+      return "rgba(255, 255, 255, 0.2)"; // Weiß für Stufe 1
     case 2:
       return "rgb(255, 217, 0)"; // Grün für Stufe 2
     case 3:
       return "rgba(255, 0, 0, 0.6)"; // Rot für Stufe 3
     default:
-      return "rgba(255, 255, 255, 0.6)";// Schwarz für Stufe 0
+      return "rgba(255, 255, 255, 0.2)";// Schwarz für Stufe 0
   }
 }
 
