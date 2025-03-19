@@ -47,6 +47,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 260,
@@ -56,6 +57,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 160,
@@ -65,6 +67,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 90,
@@ -74,6 +77,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 250,
@@ -83,6 +87,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 130,
@@ -92,6 +97,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 350,
@@ -101,6 +107,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 280,
@@ -110,6 +117,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
   {
     x: 90,
@@ -119,6 +127,7 @@ const tower_places = [
     tower_type: "",
     tower_img: "",
     range: 80,
+    cooldown: 0,
   },
 ];
 
@@ -128,7 +137,7 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/backgr2.png";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 100;
+let money = 1500;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
@@ -205,6 +214,7 @@ function showGameOverModal() {
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const cooldown_time = 2;
 
   // Hintergrundbild zeichnen
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -231,7 +241,7 @@ function gameLoop() {
 
     // Überprüfen, ob der Orc in der Nähe eines Turms ist
     tower_places.forEach((tower) => {
-      if (tower.tower_is_build) {
+      if (tower.tower_is_build && tower.cooldown <= 0) {
         const distance = calculateDistance(
           enemy.pos_x,
           enemy.pos_y,
@@ -256,7 +266,6 @@ function gameLoop() {
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           if (tower.tower_type === "slower") {
-              //* Slower Tower
             let slow_val = 0.5;
             let slow_time = 10000;
             if (tower.tower_damage_lvl === 1) {
@@ -274,30 +283,35 @@ function gameLoop() {
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
-          } else if(tower.tower_type === 'toxic') {
-            //* Toxic Tower
+            tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
+          } else if (tower.tower_type === 'toxic') {
             let toxic_power = 0.1;
-            if(tower.tower_damage_lvl === 1) {
+            if (tower.tower_damage_lvl === 1) {
               toxic_power = 0.1;
-            }else if(tower.tower_damage_lvl === 2) {
+            } else if (tower.tower_damage_lvl === 2) {
               toxic_power = 0.2;
-            }else if(tower.tower_damage_lvl === 3) {
+            } else if (tower.tower_damage_lvl === 3) {
               toxic_power = 0.5;
             }
             enemy.is_toxicated = true;
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "green")
             );
-          }else {
-              //* Damage Tower
-            //* Schaden anwenden
+            tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
+          } else {
             enemy.health -= tower.tower_damage_lvl;
             // Erzeuge einen roten Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
             );
+            tower.cooldown = cooldown_time; // Setze die Abklingzeit auf 20 Frames
           }
         }
+      }
+
+      // Reduziere die Abklingzeit des Turms
+      if (tower.cooldown > 0) {
+        tower.cooldown--;
       }
     });
 
@@ -336,7 +350,7 @@ function updateWaveTimer() {
     waveTimer = 25; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    enemy_max_velocity += 0.1;
+    wave < 25 ? enemy_max_velocity += 0.1 : enemy_max_velocity = enemy_max_velocity;
     if (wave >= 10) {
       enemy_max_health += 20;
     } else {
