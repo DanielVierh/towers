@@ -309,13 +309,13 @@ function gameLoop() {
             );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
           } else if (tower.tower_type === 'toxic') {
-            let toxic_power = 0.1;
+            let toxic_power = 0.2;
             if (tower.tower_damage_lvl === 1) {
-              toxic_power = 0.1;
-            } else if (tower.tower_damage_lvl === 2) {
               toxic_power = 0.2;
-            } else if (tower.tower_damage_lvl === 3) {
+            } else if (tower.tower_damage_lvl === 2) {
               toxic_power = 0.5;
+            } else if (tower.tower_damage_lvl === 3) {
+              toxic_power = 1;
             }
             enemy.is_toxicated = true;
             lasers.push(
