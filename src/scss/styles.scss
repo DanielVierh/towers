@@ -90,9 +90,10 @@ body {
         }
 
         img {
-          width: 80px;
-          height: 80px;
+          width: 36px;
+          height: 72px;
           object-fit: cover;
+          object-position: top;
         }
 
         .button-buy {
