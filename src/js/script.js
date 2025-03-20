@@ -26,7 +26,7 @@ canvas.width = 400;
 canvas.height = 400;
 
 const waypoints = [
-  {x: -50, y: 20},
+  { x: -50, y: 20 },
   { x: 50, y: 20 },
   { x: 350, y: 20 },
   { x: 350, y: 100 },
@@ -206,7 +206,22 @@ function getTowerColor(tower) {
     case 3:
       return "rgba(255, 0, 0, 0.6)"; // Rot für Stufe 3
     default:
-      return "rgba(255, 255, 255, 0.2)";// Schwarz für Stufe 0
+      return "rgba(255, 255, 255, 0.2)"; // Schwarz für Stufe 0
+  }
+}
+
+function getRangeColor(tower) {
+  switch (tower.range) {
+    case 80:
+      return "rgba(255, 255, 255, 0.2)"; // Weiß für Stufe 1
+    case 100:
+      return "rgb(0, 255, 55)"; // Grün für Stufe 2
+    case 120:
+      return "rgb(255, 217, 0)"; // Rot für Stufe 3
+    case 140:
+      return "rgba(255, 0, 0, 0.6)"; // Rot für Stufe 4
+    default:
+      return "rgba(255, 255, 255, 0.2)"; // Schwarz für Stufe 0
   }
 }
 
@@ -220,7 +235,13 @@ function drawTowerPlaces() {
       // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
       ctx.strokeStyle = getTowerColor(tower);
       ctx.lineWidth = 3;
-      ctx.strokeRect(tower.x, (tower.y + 33), 10, 3);
+      ctx.strokeRect(tower.x + 18, tower.y + 33, 10, 3);
+
+      //Zeichne farbigen Rahmen für Turm Range
+      // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
+      ctx.strokeStyle = getRangeColor(tower);
+      ctx.lineWidth = 3;
+      ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
     } else {
       ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
       ctx.fillRect(tower.x, tower.y, 30, 30);
@@ -308,7 +329,7 @@ function gameLoop() {
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
-          } else if (tower.tower_type === 'toxic') {
+          } else if (tower.tower_type === "toxic") {
             let toxic_power = 0.2;
             if (tower.tower_damage_lvl === 1) {
               toxic_power = 0.2;
@@ -319,7 +340,13 @@ function gameLoop() {
             }
             enemy.is_toxicated = true;
             lasers.push(
-              new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "green")
+              new Laser(
+                tower.x + 15,
+                tower.y,
+                enemy.pos_x,
+                enemy.pos_y,
+                "green"
+              )
             );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
           } else {
@@ -372,13 +399,15 @@ function updateWaveTimer() {
   lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
-    if(wave >= 6) {
+    if (wave >= 6) {
       time_to_next_wave = 45;
     }
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     spawnEnemy();
     wave++;
-    wave < 10 ? enemy_max_velocity += 0.1 : enemy_max_velocity = enemy_max_velocity;
+    wave < 10
+      ? (enemy_max_velocity += 0.1)
+      : (enemy_max_velocity = enemy_max_velocity);
     if (wave >= 10) {
       enemy_max_health += 20;
     } else {
@@ -387,7 +416,6 @@ function updateWaveTimer() {
     }
     money += Math.floor(wave * 2);
   }
-  
 }
 
 // Event-Listener for click on Tower Place
@@ -413,14 +441,14 @@ canvas.addEventListener("click", (event) => {
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
         mdl_upgrade.style.display = "flex";
-        if(tower.tower_damage_lvl === 2) {
-          btn_Stronger.innerHTML = 'Kaufen 500€';
-          btn_Stronger.setAttribute('data-tower_price', '500');
-        }else if(tower.tower_damage_lvl === 3) {
-          btn_Stronger.innerHTML = 'Max Upgrade';
-        }else {
-          btn_Stronger.innerHTML = 'Kaufen 300€';
-          btn_Stronger.setAttribute('data-tower_price', '300');
+        if (tower.tower_damage_lvl === 2) {
+          btn_Stronger.innerHTML = "Kaufen 500€";
+          btn_Stronger.setAttribute("data-tower_price", "500");
+        } else if (tower.tower_damage_lvl === 3) {
+          btn_Stronger.innerHTML = "Max Upgrade";
+        } else {
+          btn_Stronger.innerHTML = "Kaufen 300€";
+          btn_Stronger.setAttribute("data-tower_price", "300");
         }
       }
     }
@@ -488,8 +516,11 @@ const btn_Stronger = document.getElementById("btn_Stronger");
 const btn_SellTower = document.getElementById("btn_SellTower");
 
 btn_bigger_range.addEventListener("click", () => {
-  const upgrade_price = parseInt(btn_bigger_range.getAttribute("data-upgrade_price"));
-  if (money >= upgrade_price && tower.range < 140) { // Begrenze die Reichweite auf 140 (80 + 3 * 20)
+  const upgrade_price = parseInt(
+    btn_bigger_range.getAttribute("data-upgrade_price")
+  );
+  if (money >= upgrade_price && tower.range < 140) {
+    // Begrenze die Reichweite auf 140 (80 + 3 * 20)
     tower.range += 20;
     money -= upgrade_price;
     towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
@@ -503,7 +534,8 @@ btn_bigger_range.addEventListener("click", () => {
 
 btn_Stronger.addEventListener("click", () => {
   const upgrade_price = parseInt(btn_Stronger.getAttribute("data-tower_price"));
-  if (money >= upgrade_price && tower.tower_damage_lvl < 3) { // Begrenze den Schaden auf Stufe 3
+  if (money >= upgrade_price && tower.tower_damage_lvl < 3) {
+    // Begrenze den Schaden auf Stufe 3
     tower.tower_damage_lvl += 1;
     money -= upgrade_price;
     towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
@@ -555,4 +587,3 @@ btn_close_modal_towers.addEventListener("click", () => {
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
 });
-
