@@ -81,22 +81,32 @@ body {
   padding: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
+  border-radius: 5px;
   font-size: 1rem;
+}
+.modal-towers .grid-wrapper .tile h4,
+.modal-upgrade .grid-wrapper .tile h4 {
+  margin: 5px 0;
 }
 .modal-towers .grid-wrapper .tile p,
 .modal-upgrade .grid-wrapper .tile p {
   font-size: 0.8rem;
+  text-align: center;
+  margin: 5px 0;
 }
 .modal-towers .grid-wrapper .tile img,
 .modal-upgrade .grid-wrapper .tile img {
-  width: 36px;
-  height: 72px;
+  width: 50px;
+  height: 52px;
   -o-object-fit: cover;
      object-fit: cover;
   -o-object-position: top;
      object-position: top;
+  background-color: rgba(13, 17, 76, 0.4705882353);
+  border-radius: 5px;
+  padding: 30px;
 }
 .modal-towers .grid-wrapper .tile .button-buy,
 .modal-upgrade .grid-wrapper .tile .button-buy {
@@ -127,4 +137,8 @@ body {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.modal-upgrade {
+  justify-content: center;
 }/*# sourceMappingURL=styles.css.map */
