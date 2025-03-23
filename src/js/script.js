@@ -182,7 +182,7 @@ function spawnEnemy() {
 }
 
 function drawWaypoints() {
-  ctx.strokeStyle = "rgb(97, 59, 33)";
+  ctx.strokeStyle = "rgba(241, 207, 113, 0.9)";
   ctx.lineWidth = 20;
   ctx.beginPath();
   waypoints.forEach((waypoint, index) => {
