@@ -243,7 +243,7 @@ function drawTowerPlaces() {
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
     } else {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(tower.x, tower.y, 30, 30);
     }
   });
