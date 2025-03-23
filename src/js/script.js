@@ -28,9 +28,9 @@ canvas.height = 400;
 const waypoints = [
   { x: -50, y: 20 },
   { x: 50, y: 20 },
-  { x: 350, y: 20 },
-  { x: 350, y: 100 },
-  { x: 30, y: 100 },
+  { x: 340, y: 20 },
+  { x: 340, y: 110 },
+  { x: 30, y: 110 },
   { x: 30, y: 180 },
   { x: 350, y: 180 },
   { x: 350, y: 260 },
@@ -42,7 +42,7 @@ const waypoints = [
 const tower_places = [
   {
     x: 70,
-    y: 10,
+    y: 15,
     tower_is_build: false,
     tower_damage_lvl: 1,
     tower_type: "",
@@ -51,8 +51,8 @@ const tower_places = [
     cooldown: 0,
   },
   {
-    x: 260,
-    y: 10,
+    x: 295,
+    y: 15,
     tower_is_build: false,
     tower_damage_lvl: 1,
     tower_type: "",
@@ -62,7 +62,7 @@ const tower_places = [
   },
   {
     x: 160,
-    y: 85,
+    y: 95,
     tower_is_build: false,
     tower_damage_lvl: 1,
     tower_type: "",
@@ -135,7 +135,7 @@ const tower_places = [
 const enemies = [];
 const lasers = [];
 const backgroundImage = new Image();
-backgroundImage.src = "src/assets/bg/backgr2.png";
+backgroundImage.src = "src/assets/bg/bg2.webp";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let money = 150;
@@ -182,8 +182,8 @@ function spawnEnemy() {
 }
 
 function drawWaypoints() {
-  ctx.strokeStyle = "rgb(97,59,33)";
-  ctx.lineWidth = 30;
+  ctx.strokeStyle = "rgb(97, 59, 33)";
+  ctx.lineWidth = 20;
   ctx.beginPath();
   waypoints.forEach((waypoint, index) => {
     const adjustedY = waypoint.y + 40; // Verschiebe die y-Koordinate um 50 Pixel nach unten
@@ -192,7 +192,7 @@ function drawWaypoints() {
     } else {
       ctx.lineTo(waypoint.x, adjustedY);
     }
-    ctx.arc(waypoint.x, adjustedY, 5, 0, Math.PI * 2);
+    ctx.arc(waypoint.x, adjustedY, 2, 0, Math.PI * 2);
   });
   ctx.stroke();
 }
