@@ -20,6 +20,7 @@ const btn_close_modal_upgrade = document.getElementById(
   "btn_close_modal_upgrade"
 );
 const mdl_upgrade = document.getElementById("mdl_upgrade");
+const btn_show_tower_range = document.getElementById("btn_show_tower_range");
 const towerImages = new Map();
 
 canvas.width = 400;
@@ -138,12 +139,13 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 150;
+let money = 9150;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
 let enemy_max_velocity = 2;
 let tower = undefined;
+let show_tower_range = false;
 
 function spawnEnemy() {
   let enemyCount = 0;
@@ -242,6 +244,25 @@ function drawTowerPlaces() {
       ctx.strokeStyle = getRangeColor(tower);
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
+
+      if (show_tower_range) {
+        console.log('show_tower_range');
+        
+        ctx.beginPath();
+        ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
+        if (tower.tower_type === "toxic") {
+          ctx.strokeStyle = "green"; // Grüner Kreis für toxic tower
+        } else if (tower.tower_type === "destroyer") {
+          ctx.strokeStyle = "red"; // Roter Kreis für destroyer tower
+        } else if (tower.tower_type === "slower") {
+          ctx.strokeStyle = "blue"; // Blauer Kreis für slower tower
+        } else {
+          ctx.strokeStyle = "rgb(255, 0, 0)"; // Standardfarbe
+        }
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.closePath();
+      }
     } else {
       ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(tower.x, tower.y, 30, 30);
@@ -586,4 +607,21 @@ btn_close_modal_towers.addEventListener("click", () => {
 
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
+});
+
+
+let rangeTimer;
+
+btn_show_tower_range.addEventListener('click', () => {
+  show_tower_range = true;
+
+  // Überprüfe, ob ein Timer bereits läuft, und lösche ihn
+  if (rangeTimer) {
+    clearTimeout(rangeTimer);
+  }
+
+  // Starte einen neuen Timer
+  rangeTimer = setTimeout(() => {
+    show_tower_range = false;
+  }, 10000);
 });

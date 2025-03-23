@@ -142,3 +142,13 @@ body {
   .modal-upgrade {
     justify-content: center;
   }
+
+  .button-tower-range {
+    position: fixed;
+    top: 420px;
+    right: 10px;
+    background-color: black;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1rem;
+  }
