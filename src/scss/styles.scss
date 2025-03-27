@@ -152,3 +152,42 @@ body {
     border-radius: 10px;
     font-size: 1rem;
   }
+
+  .start-modal {
+    display: none;
+
+    &.active {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(to bottom, rgb(41, 85, 41), rgb(37, 45, 37));
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      z-index: 999;
+    }
+  }
+
+  .button {
+    width: 300px;
+    padding: 10px 20px;
+    background-color: lightgreen;
+    color: white;
+    border-radius: 8px;
+    margin: 30px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 15px black, 0 0 15px black;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px black;
+    outline: 1px solid rgba(255, 255, 255, 0.595);
+    cursor: pointer;
+
+    &.hidden {
+      display: none;
+    }
+  }

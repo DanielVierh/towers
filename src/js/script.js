@@ -21,6 +21,9 @@ const btn_close_modal_upgrade = document.getElementById(
 );
 const mdl_upgrade = document.getElementById("mdl_upgrade");
 const btn_show_tower_range = document.getElementById("btn_show_tower_range");
+const menu_modal = document.getElementById("menu_modal");
+const btn_start_game = document.getElementById("btn_start_game");
+const btn_goto_menu = document.getElementById("btn_goto_menu");
 const towerImages = new Map();
 
 canvas.width = 400;
@@ -146,7 +149,7 @@ let enemy_max_health = 300;
 let enemy_max_velocity = 2;
 let tower = undefined;
 let show_tower_range = false;
-let game_is_running = true;
+let game_is_running = false;
 
 function spawnEnemy() {
   let enemyCount = 0;
@@ -247,8 +250,8 @@ function drawTowerPlaces() {
       ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
 
       if (show_tower_range) {
-        console.log('show_tower_range');
-        
+        console.log("show_tower_range");
+
         ctx.beginPath();
         ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
         if (tower.tower_type === "toxic") {
@@ -277,12 +280,11 @@ function calculateDistance(x1, y1, x2, y2) {
 
 function showGameOverModal() {
   gameOverModal.style.display = "block";
-  lbl_Live.innerHTML = '0 Leben';
+  lbl_Live.innerHTML = "0 Leben";
 }
 
 function gameLoop() {
-
-  if(game_is_running === false) {
+  if (game_is_running === false) {
     return;
   }
 
@@ -414,6 +416,7 @@ function gameLoop() {
 
   if (live <= 0) {
     showGameOverModal();
+    btn_goto_menu.classList.remove('hidden');
     return; // Stop the game loop
   }
 
@@ -422,14 +425,12 @@ function gameLoop() {
   }, 20);
 }
 
-
 function updateWaveTimer() {
-
-  if(live <= 0) {
+  if (live <= 0) {
     return;
   }
 
-  if(game_is_running === false) {
+  if (game_is_running === false) {
     return;
   }
 
@@ -612,12 +613,6 @@ window.onclick = function (event) {
   }
 };
 
-// Start the game loop
-gameLoop();
-
-// Update the wave timer every second
-setInterval(updateWaveTimer, 1000);
-
 btn_close_modal_towers.addEventListener("click", () => {
   mdl_towers.style.display = "none";
 });
@@ -626,10 +621,9 @@ btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
 });
 
-
 let rangeTimer;
 
-btn_show_tower_range.addEventListener('click', () => {
+btn_show_tower_range.addEventListener("click", () => {
   show_tower_range = true;
 
   // Überprüfe, ob ein Timer bereits läuft, und lösche ihn
@@ -642,3 +636,20 @@ btn_show_tower_range.addEventListener('click', () => {
     show_tower_range = false;
   }, 10000);
 });
+
+//* start Game
+btn_start_game.addEventListener("click", () => {
+  menu_modal.classList.remove("active");
+  game_is_running = true;
+
+  // Start the game loop
+  gameLoop();
+
+  // Update the wave timer every second
+  setInterval(updateWaveTimer, 1000);
+});
+
+//* Reload Page
+btn_goto_menu.addEventListener('click', ()=> {
+  window.location.reload();
+})
