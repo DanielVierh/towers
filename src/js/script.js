@@ -146,6 +146,7 @@ let enemy_max_health = 300;
 let enemy_max_velocity = 2;
 let tower = undefined;
 let show_tower_range = false;
+let game_is_running = true;
 
 function spawnEnemy() {
   let enemyCount = 0;
@@ -280,6 +281,11 @@ function showGameOverModal() {
 }
 
 function gameLoop() {
+
+  if(game_is_running === false) {
+    return;
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const cooldown_time = 2;
 
@@ -416,9 +422,14 @@ function gameLoop() {
   }, 20);
 }
 
+
 function updateWaveTimer() {
 
   if(live <= 0) {
+    return;
+  }
+
+  if(game_is_running === false) {
     return;
   }
 
