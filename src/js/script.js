@@ -276,6 +276,7 @@ function calculateDistance(x1, y1, x2, y2) {
 
 function showGameOverModal() {
   gameOverModal.style.display = "block";
+  lbl_Live.innerHTML = '0 Leben';
 }
 
 function gameLoop() {
@@ -416,12 +417,17 @@ function gameLoop() {
 }
 
 function updateWaveTimer() {
+
+  if(live <= 0) {
+    return;
+  }
+
   waveTimer--;
   lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
     if (wave >= 6) {
-      time_to_next_wave = 45;
+      time_to_next_wave = 40;
     }
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     spawnEnemy();
