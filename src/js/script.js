@@ -312,11 +312,10 @@ function gameLoop() {
       enemy.markedForDeletion = true;
       live--;
     
-      console.log("Red flash triggered"); // Debug-Ausgabe
       document.body.classList.add("red-flash");
       setTimeout(() => {
         document.body.classList.remove("red-flash");
-      }, 500); // Entferne die Klasse nach 300ms
+      }, 300);
     }
 
     // Überprüfen, ob der Orc in der Nähe eines Turms ist
@@ -426,6 +425,7 @@ function gameLoop() {
   if (live <= 0) {
     showGameOverModal();
     btn_goto_menu.classList.remove('hidden');
+    btn_pause.classList.add('hidden')
     return; // Stop the game loop
   }
 
@@ -518,6 +518,10 @@ btn_Slower.addEventListener("click", () => {
     }
     money -= tower_price;
     mdl_towers.style.display = "none";
+    if(game_is_running === false) {
+      game_is_running = true;
+      gameLoop();
+    }
   }
 });
 
@@ -535,6 +539,10 @@ btn_Destroyer.addEventListener("click", () => {
     }
     money -= tower_price;
     mdl_towers.style.display = "none";
+    if(game_is_running === false) {
+      game_is_running = true;
+      gameLoop();
+    }
   }
 });
 
@@ -552,6 +560,10 @@ btn_Toxic.addEventListener("click", () => {
     }
     money -= tower_price;
     mdl_towers.style.display = "none";
+    if(game_is_running === false) {
+      game_is_running = true;
+      gameLoop();
+    }
   }
 });
 
