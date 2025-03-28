@@ -24,6 +24,7 @@ const btn_show_tower_range = document.getElementById("btn_show_tower_range");
 const menu_modal = document.getElementById("menu_modal");
 const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
+const btn_pause = document.getElementById("btn_pause");
 const towerImages = new Map();
 
 canvas.width = 400;
@@ -142,7 +143,7 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 150;
+let money = 170;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 300;
@@ -250,7 +251,6 @@ function drawTowerPlaces() {
       ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
 
       if (show_tower_range) {
-        console.log("show_tower_range");
 
         ctx.beginPath();
         ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
@@ -289,7 +289,6 @@ function gameLoop() {
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const cooldown_time = 2;
 
   // Hintergrundbild zeichnen
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -340,6 +339,7 @@ function gameLoop() {
           }
 
           // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
+         //* Slower Tower
           if (tower.tower_type === "slower") {
             let slow_val = 0.5;
             let slow_time = 10000;
@@ -359,6 +359,7 @@ function gameLoop() {
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
+           //* Toxic Tower
           } else if (tower.tower_type === "toxic") {
             let toxic_power = 0.2;
             if (tower.tower_damage_lvl === 1) {
@@ -379,13 +380,15 @@ function gameLoop() {
               )
             );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
-          } else {
+          
+            //* Destroyer Tower
+          } else if(tower.tower_type === "destroyer") {
             enemy.health -= tower.tower_damage_lvl;
             // Erzeuge einen roten Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
             );
-            tower.cooldown = cooldown_time; // Setze die Abklingzeit auf 20 Frames
+            tower.cooldown = (1 + (tower.tower_damage_lvl * 4)); 
           }
         }
       }
@@ -653,3 +656,19 @@ btn_start_game.addEventListener("click", () => {
 btn_goto_menu.addEventListener('click', ()=> {
   window.location.reload();
 })
+
+//* Pause and continue
+btn_pause.addEventListener('click', () => {
+  if (game_is_running) {
+    // Spiel pausieren
+    game_is_running = false;
+    btn_pause.innerHTML = 'Weiter';
+  } else {
+    // Spiel fortsetzen
+    game_is_running = true;
+    btn_pause.innerHTML = 'Pause';
+
+    // Starte die gameLoop erneut
+    gameLoop();
+  }
+});
