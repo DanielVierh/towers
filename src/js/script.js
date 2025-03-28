@@ -311,6 +311,12 @@ function gameLoop() {
     if (enemy.pos_x > 400) {
       enemy.markedForDeletion = true;
       live--;
+    
+      console.log("Red flash triggered"); // Debug-Ausgabe
+      document.body.classList.add("red-flash");
+      setTimeout(() => {
+        document.body.classList.remove("red-flash");
+      }, 500); // Entferne die Klasse nach 300ms
     }
 
     // Überprüfen, ob der Orc in der Nähe eines Turms ist
