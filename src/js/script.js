@@ -519,8 +519,7 @@ btn_Slower.addEventListener("click", () => {
     money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
-      game_is_running = true;
-      gameLoop();
+      play_pause();
     }
   }
 });
@@ -540,8 +539,7 @@ btn_Destroyer.addEventListener("click", () => {
     money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
-      game_is_running = true;
-      gameLoop();
+      play_pause();
     }
   }
 });
@@ -561,8 +559,7 @@ btn_Toxic.addEventListener("click", () => {
     money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
-      game_is_running = true;
-      gameLoop();
+      play_pause();
     }
   }
 });
@@ -677,6 +674,10 @@ btn_goto_menu.addEventListener('click', ()=> {
 
 //* Pause and continue
 btn_pause.addEventListener('click', () => {
+  play_pause();
+});
+
+function play_pause() {
   if (game_is_running) {
     // Spiel pausieren
     game_is_running = false;
@@ -689,4 +690,4 @@ btn_pause.addEventListener('click', () => {
     // Starte die gameLoop erneut
     gameLoop();
   }
-});
+}
