@@ -146,8 +146,8 @@ let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let money = 200;
 let max_enemy_amount = 3;
 let wave = 0;
-let enemy_max_health = 300;
-let enemy_max_velocity = 2;
+let enemy_max_health = 200;
+let enemy_max_velocity = 1.5;
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
@@ -334,10 +334,10 @@ function gameLoop() {
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
 
-            if (wave > 10) {
-              money += 1;
-            } else if (wave >= 4) {
+            if (wave > 20) {
               money += 2;
+            } else if (wave >= 4) {
+              money += 4;
             } else {
               money += 10;
             }
