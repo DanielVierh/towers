@@ -237,7 +237,7 @@ function drawTowerPlaces() {
     if (tower.tower_is_build) {
       const towerImage = towerImages.get(tower.tower_img);
       if (towerImage) {
-        ctx.drawImage(towerImage, tower.x, tower.y, 30, 30);
+        ctx.drawImage(towerImage, tower.x, tower.y - 10, 40, 55);
       }
       // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
       ctx.strokeStyle = getTowerColor(tower);
