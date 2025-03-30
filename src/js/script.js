@@ -23,6 +23,7 @@ const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
 const btn_pause = document.getElementById("btn_pause");
 const lbl_energy = document.getElementById("lbl_energy");
+const game_audio = document.getElementById("game_audio");
 const towerImages = new Map();
 
 canvas.width = 400;
@@ -698,7 +699,7 @@ btn_show_tower_range.addEventListener("click", () => {
 btn_start_game.addEventListener("click", () => {
   menu_modal.classList.remove("active");
   game_is_running = true;
-
+  game_audio.play();
   // Start the game loop
   gameLoop();
 
@@ -721,10 +722,14 @@ function play_pause() {
     // Spiel pausieren
     game_is_running = false;
     btn_pause.innerHTML = 'Weiter';
+    game_audio.pause();
   } else {
     // Spiel fortsetzen
     game_is_running = true;
     btn_pause.innerHTML = 'Pause';
+    game_audio.play();
+    console.log(game_audio);
+    
 
     // Starte die gameLoop erneut
     gameLoop();
