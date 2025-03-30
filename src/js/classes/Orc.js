@@ -15,10 +15,10 @@ export class Orc {
         this.slowTimeout = null; // Timeout-ID für den Verlangsamungseffekt
         this.color = 'red';
         this.frameIndex = 0;
-        this.frameCount = 7; // Anzahl der Frames in der Sprite
-        this.frameWidth = 742 / this.frameCount; // Breite eines einzelnen Frames
+        this.frameCount = 5; // Anzahl der Frames in der Sprite
+        this.frameWidth = 119 / this.frameCount; // Breite eines einzelnen Frames
         this.frameHeight = this.height; // Höhe eines einzelnen Frames
-        this.frameSpeed = 5; // Geschwindigkeit der Animation
+        this.frameSpeed = 3; // Geschwindigkeit der Animation
         this.frameTick = 0;
         this.scale = scale; // Skalierungsfaktor
         this.waypoints = waypoints;

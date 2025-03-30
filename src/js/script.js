@@ -183,7 +183,7 @@ function spawnEnemy() {
     const posY = 20;
     const width = 60;
     const height = 80;
-    const imgSrc = "src/assets/orc.png";
+    const imgSrc = "src/assets/enemy_2 Kopie.png";
     const scale = 0.6;
     const health =
       Math.floor(
