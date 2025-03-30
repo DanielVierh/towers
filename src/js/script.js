@@ -488,7 +488,7 @@ function updateWaveTimer() {
     wave < 10
       ? (enemy_max_velocity += 0.1)
       : (enemy_max_velocity = enemy_max_velocity);
-    if (wave >= 10) {
+    if (wave >= 7) {
       enemy_max_health += 20;
     } else {
       max_enemy_amount += wave;
