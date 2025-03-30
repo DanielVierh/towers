@@ -480,7 +480,7 @@ function updateWaveTimer() {
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
     if (wave >= 6) {
-      time_to_next_wave = 40;
+      time_to_next_wave = 45;
     }
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     spawnEnemy();
