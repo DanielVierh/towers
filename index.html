@@ -9,6 +9,7 @@
 <body>
     <canvas id="canvas"></canvas>
     <div class="labels-wrapper">
+        <div class="labels" id="lbl_energy"></div>
         <div class="labels" id="lbl_money"></div>
         <div class="labels" id="lbl_live"></div>
         <div class="labels" id="lbl_wave"></div>
@@ -41,20 +42,31 @@
                 <img src="src/assets/tower_1.2.png">
                 <h4>Destroyer</h4>
                 <p>Ein einfacher Turm mit mittlerer Reichweite und Schaden</p>
+                <p>Benötigt 25 Energiepunkte</p>
                 <div class="button-buy" data-tower_price="50"  data-tower_img = "src/assets/tower_1.2.png" id="btn_Destroyer">Kaufen 50€</div>
             </div>
             <div class="tile">
                 <img src="src/assets/tower_2.2.png">
                 <h4>Slower</h4>
                 <p>Ein Turm, der die Geschwindigkeit der Gegner reduziert, sodass sie langsamer vorankommen</p>
+                <p>Benötigt 75 Energiepunkte</p>
                 <div class="button-buy" id="btn_Slower" data-tower_price="100" data-tower_img = "src/assets/tower_2.2.png" >Kaufen 100€</div>
             </div>
             <div class="tile">
                 <img src="src/assets/tower_3.2.png">
                 <h4>Toxic</h4>
                 <p>Ein Turm, der die Gegner vergiftet, diese nehmen im Verlauf Schaden</p>
+                <p>Benötigt 75 Energiepunkte</p>
                 <div class="button-buy" id="btn_Toxic" data-tower_price="300" data-tower_img = "src/assets/tower_3.2.png" >Kaufen 300€</div>
             </div>
+            <div class="tile">
+                <img src="src/assets/energy.png">
+                <h4>Kraftwerk</h4>
+                <p>Erzeugt Strom, um die Tower mit Energie zu versorgen</p>
+                <p>Erzeugt 100 Energiepunkte</p>
+                <div class="button-buy" id="btn_energy" data-tower_price="70" data-tower_img = "src/assets/energy.png" >Kaufen 70€</div>
+            </div>
+
         </div>
     </div>
 

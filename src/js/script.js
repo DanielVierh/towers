@@ -10,21 +10,19 @@ const lbl_wave = document.getElementById("lbl_wave");
 const gameOverModal = document.getElementById("gameOverModal");
 const closeModal = document.getElementById("closeModal");
 const mdl_towers = document.getElementById("mdl_towers");
-const btn_close_modal_towers = document.getElementById(
-  "btn_close_modal_towers"
-);
+const btn_close_modal_towers = document.getElementById("btn_close_modal_towers");
 const btn_Slower = document.getElementById("btn_Slower");
 const btn_Destroyer = document.getElementById("btn_Destroyer");
 const btn_Toxic = document.getElementById("btn_Toxic");
-const btn_close_modal_upgrade = document.getElementById(
-  "btn_close_modal_upgrade"
-);
+const btn_energy = document.getElementById("btn_energy");
+const btn_close_modal_upgrade = document.getElementById("btn_close_modal_upgrade");
 const mdl_upgrade = document.getElementById("mdl_upgrade");
 const btn_show_tower_range = document.getElementById("btn_show_tower_range");
 const menu_modal = document.getElementById("menu_modal");
 const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
 const btn_pause = document.getElementById("btn_pause");
+const lbl_energy = document.getElementById("lbl_energy");
 const towerImages = new Map();
 
 canvas.width = 400;
@@ -151,6 +149,7 @@ let enemy_max_velocity = 1.5;
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
+let energy_level = 0;
 
 function spawnEnemy() {
   let enemyCount = 0;
@@ -288,6 +287,16 @@ function gameLoop() {
     return;
   }
 
+  count_energy_level();
+  let low_energy_load_slowing_effect = 0;
+  if(energy_level < 0) {
+    console.log('unter 0');
+    low_energy_load_slowing_effect = 30;
+    lbl_energy.style.color = 'red'
+  }else {
+     lbl_energy.style.color = 'white'
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Hintergrundbild zeichnen
@@ -302,6 +311,7 @@ function gameLoop() {
   lbl_Money.innerHTML = `${money}€`;
   lbl_Live.innerHTML = `${live} Leben`;
   lbl_wave.innerHTML = `Welle: ${wave}`;
+  lbl_energy.innerHTML = `Energie ${energy_level}`
 
   // Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
@@ -393,7 +403,8 @@ function gameLoop() {
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
             );
-            tower.cooldown = (1 + (tower.tower_damage_lvl * 4)); 
+            
+            tower.cooldown = (1 + (tower.tower_damage_lvl * 4) + low_energy_load_slowing_effect); 
           }
         }
       }
@@ -521,6 +532,8 @@ btn_Slower.addEventListener("click", () => {
     if(game_is_running === false) {
       play_pause();
     }
+  }else {
+    alert('Nicht genug Geld')
   }
 });
 
@@ -541,6 +554,8 @@ btn_Destroyer.addEventListener("click", () => {
     if(game_is_running === false) {
       play_pause();
     }
+  }else {
+    alert('Nicht genug Geld')
   }
 });
 
@@ -561,6 +576,30 @@ btn_Toxic.addEventListener("click", () => {
     if(game_is_running === false) {
       play_pause();
     }
+  }else {
+    alert('Nicht genug Geld');
+  }
+});
+
+btn_energy.addEventListener("click", () => {
+  const tower_price = btn_energy.getAttribute("data-tower_price");
+  const tower_img = btn_energy.getAttribute("data-tower_img");
+  if (money >= tower_price) {
+    tower.tower_type = "energy";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    money -= tower_price;
+    mdl_towers.style.display = "none";
+    if(game_is_running === false) {
+      play_pause();
+    }
+  }else {
+    alert('Nicht genug Geld')
   }
 });
 
@@ -690,4 +729,35 @@ function play_pause() {
     // Starte die gameLoop erneut
     gameLoop();
   }
+}
+
+function count_energy_level() {
+  const energy_tower_amount = tower_type_amount(tower_places, 'energy');
+  energy_level = (energy_tower_amount * 100);
+
+  //* Every Destroyer Tower needs 25 Energy Points
+  const destroyer_energy = 25;
+  const destroyer_amount = tower_type_amount(tower_places, 'destroyer');
+  const destroyer_energy_amount = destroyer_energy * destroyer_amount;
+  //* Every Toxic Tower needs 75 Energy Points
+  const toxic_energy = 75;
+  const toxic_amount = tower_type_amount(tower_places, 'toxic');
+  const toxic_energy_amount = toxic_energy * toxic_amount;
+  //* Every Slower Tower needs 75 Energy Points
+  const slower_energy = 75;
+  const slower_amount = tower_type_amount(tower_places, 'slower');
+  const slower_energy_amount = slower_energy * slower_amount;
+
+  energy_level = energy_level - destroyer_energy_amount - toxic_energy_amount - slower_energy_amount;
+
+}
+
+function tower_type_amount(towers, towertype) {
+  let amount = 0;
+  towers.forEach((tower) => {
+    if(tower.tower_type === towertype) {
+      amount++;
+    }
+  });
+  return amount;
 }
