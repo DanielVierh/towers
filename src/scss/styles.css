@@ -200,4 +200,17 @@ body.red-flash {
 }
 .button.hidden {
   display: none;
+}
+
+#btn_mute {
+  position: fixed;
+  right: 50px;
+  top: 500px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: black;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }/*# sourceMappingURL=styles.css.map */

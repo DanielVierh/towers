@@ -18,6 +18,7 @@ const btn_energy = document.getElementById("btn_energy");
 const btn_close_modal_upgrade = document.getElementById("btn_close_modal_upgrade");
 const mdl_upgrade = document.getElementById("mdl_upgrade");
 const btn_show_tower_range = document.getElementById("btn_show_tower_range");
+const btn_mute = document.getElementById("btn_mute");
 const menu_modal = document.getElementById("menu_modal");
 const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
@@ -211,6 +212,7 @@ let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
 let energy_level = 0;
+let sound_is_on = true;
 
 function spawnEnemy() {
   let enemyCount = 0;
@@ -759,7 +761,9 @@ btn_show_tower_range.addEventListener("click", () => {
 btn_start_game.addEventListener("click", () => {
   menu_modal.classList.remove("active");
   game_is_running = true;
-  game_audio.play();
+  if(sound_is_on) {
+    game_audio.play();
+  }
   // Start the game loop
   gameLoop();
 
@@ -787,7 +791,9 @@ function play_pause() {
     // Spiel fortsetzen
     game_is_running = true;
     btn_pause.innerHTML = 'Pause';
-    game_audio.play();
+    if(sound_is_on) {
+      game_audio.play();
+    }
     console.log(game_audio);
     
 
@@ -826,3 +832,16 @@ function tower_type_amount(towers, towertype) {
   });
   return amount;
 }
+
+//* Toggle sound
+btn_mute.addEventListener('click', ()=> {
+  if(sound_is_on) {
+    game_audio.pause();
+    sound_is_on = false;
+    btn_mute.style.background = 'red';
+  }else {
+    game_audio.play();
+    sound_is_on = true;
+    btn_mute.style.background = 'black';
+  }
+})
