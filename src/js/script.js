@@ -212,7 +212,7 @@ let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
 let energy_level = 0;
-let sound_is_on = true;
+let sound_is_on = false;
 
 function spawnEnemy() {
   let enemyCount = 0;
