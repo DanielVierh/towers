@@ -572,6 +572,15 @@ canvas.addEventListener("click", (event) => {
           btn_Stronger.innerHTML = "Kaufen 300€";
           btn_Stronger.setAttribute("data-tower_price", "300");
         }
+
+        //* Hide Upgrades on energy tower
+        if(tower.tower_type === 'energy') {
+          btn_Stronger.style.display = 'none';
+          btn_bigger_range.style.display = 'none';
+        }else {
+          btn_Stronger.style.display = 'flex';
+          btn_bigger_range.style.display = 'flex';
+        }
       }
     }
   });
