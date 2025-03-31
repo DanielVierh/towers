@@ -46,7 +46,7 @@ export class Laser {
             ctx.save();
             ctx.translate(this.posX + 5, this.posY + 5); // Translate to the center of the laser
             ctx.rotate(this.rotation); // Apply rotation
-            ctx.drawImage(this.image, -5, -5, 10, 10); // Draw the laser
+            ctx.drawImage(this.image, -5, -5, 15, 25); // Draw the laser
             ctx.restore();
         }
     }
