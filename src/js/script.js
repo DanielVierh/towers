@@ -321,7 +321,7 @@ function drawTowerPlaces() {
         } else if (tower.tower_type === "slower") {
           ctx.strokeStyle = "blue"; // Blauer Kreis für slower tower
         } else {
-          ctx.strokeStyle = "rgb(255, 0, 0)"; // Standardfarbe
+          ctx.strokeStyle = "transparent"; // Standardfarbe
         }
         ctx.lineWidth = 3;
         ctx.stroke();
