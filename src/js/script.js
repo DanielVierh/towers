@@ -214,6 +214,10 @@ let game_is_running = false;
 let energy_level = 0;
 let sound_is_on = false;
 
+//*#########################################################
+//* spawnEnemy
+//*#########################################################
+
 function spawnEnemy() {
   let enemyCount = 0;
   const spawnInterval = setInterval(() => {
@@ -250,6 +254,10 @@ function spawnEnemy() {
   }, 500);
 }
 
+//*#########################################################
+//* draw Waypoints
+//*#########################################################
+
 function drawWaypoints() {
   ctx.strokeStyle = "rgba(241, 207, 113, 0.9)";
   ctx.lineWidth = 20;
@@ -266,6 +274,10 @@ function drawWaypoints() {
   ctx.stroke();
 }
 
+//*#########################################################
+//* getTowerColor
+//*#########################################################
+
 function getTowerColor(tower) {
   switch (tower.tower_damage_lvl) {
     case 1:
@@ -278,6 +290,10 @@ function getTowerColor(tower) {
       return "rgba(255, 255, 255, 0.2)"; // Schwarz für Stufe 0
   }
 }
+
+//*#########################################################
+//* getRangeColor
+//*#########################################################
 
 function getRangeColor(tower) {
   switch (tower.range) {
@@ -293,6 +309,10 @@ function getRangeColor(tower) {
       return "rgba(255, 255, 255, 0.2)"; // Schwarz für Stufe 0
   }
 }
+
+//*#########################################################
+//* drawTowerPlaces
+//*#########################################################
 
 function drawTowerPlaces() {
   tower_places.forEach((tower) => {
@@ -336,15 +356,26 @@ function drawTowerPlaces() {
   });
 }
 
+//*#########################################################
+//* calculate Distance
+//*#########################################################
+
 function calculateDistance(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
+
+//*#########################################################
+//* show Game Over Modal
+//*#########################################################
 
 function showGameOverModal() {
   gameOverModal.style.display = "block";
   lbl_Live.innerHTML = "0 Leben";
 }
 
+//*#########################################################
+//* GAMELOOP
+//*#########################################################
 function gameLoop() {
   if (game_is_running === false) {
     return;
@@ -508,6 +539,10 @@ function gameLoop() {
   }, 20);
 }
 
+//*#########################################################
+//* update Wave Timer
+//*#########################################################
+
 function updateWaveTimer() {
   if (live <= 0) {
     return;
@@ -540,7 +575,10 @@ function updateWaveTimer() {
   }
 }
 
-// Event-Listener for click on Tower Place
+//*#########################################################
+//* Event-Listener for click on Tower Place
+//*#########################################################
+// 
 canvas.addEventListener("click", (event) => {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -586,6 +624,10 @@ canvas.addEventListener("click", (event) => {
   });
 });
 
+//*#########################################################
+//* Set Tower Slower
+//*#########################################################
+
 btn_Slower.addEventListener("click", () => {
   const tower_price = btn_Slower.getAttribute("data-tower_price");
   const tower_img = btn_Slower.getAttribute("data-tower_img");
@@ -609,6 +651,10 @@ btn_Slower.addEventListener("click", () => {
   }
 });
 
+//*#########################################################
+//* Set Tower Destroyer
+//*#########################################################
+
 btn_Destroyer.addEventListener("click", () => {
   const tower_price = btn_Destroyer.getAttribute("data-tower_price");
   const tower_img = btn_Destroyer.getAttribute("data-tower_img");
@@ -630,6 +676,10 @@ btn_Destroyer.addEventListener("click", () => {
     alert('Nicht genug Geld')
   }
 });
+
+//*#########################################################
+//* Set Tower Toxic
+//*#########################################################
 
 btn_Toxic.addEventListener("click", () => {
   const tower_price = btn_Toxic.getAttribute("data-tower_price");
@@ -653,6 +703,10 @@ btn_Toxic.addEventListener("click", () => {
   }
 });
 
+//*#########################################################
+//* Set Tower Energy
+//*#########################################################
+
 btn_energy.addEventListener("click", () => {
   const tower_price = btn_energy.getAttribute("data-tower_price");
   const tower_img = btn_energy.getAttribute("data-tower_img");
@@ -674,6 +728,10 @@ btn_energy.addEventListener("click", () => {
     alert('Nicht genug Geld')
   }
 });
+
+//*#########################################################
+//* Upgrade Tower Range
+//*#########################################################
 
 //* Upgrades
 const btn_bigger_range = document.getElementById("btn_bigger_range");
@@ -700,6 +758,10 @@ btn_bigger_range.addEventListener("click", () => {
   }
 });
 
+
+//*#########################################################
+//* Upgrade Stronger Tower
+//*#########################################################
 btn_Stronger.addEventListener("click", () => {
   const upgrade_price = parseInt(btn_Stronger.getAttribute("data-tower_price"));
   if (money >= upgrade_price && tower.tower_damage_lvl < 3) {
@@ -715,6 +777,9 @@ btn_Stronger.addEventListener("click", () => {
   }
 });
 
+//*#########################################################
+//* Sell Tower
+//*#########################################################
 btn_SellTower.addEventListener("click", () => {
   if (tower && tower.tower_is_build) {
     const sell_price = 30; // 50% des Kaufpreises zurückgeben
@@ -730,25 +795,41 @@ btn_SellTower.addEventListener("click", () => {
   }
 });
 
-// Close the modal when the user clicks on <span> (x)
+//*#########################################################
+//*  Close the modal when the user clicks on <span> (x)
+//*#########################################################
+
 closeModal.onclick = function () {
   gameOverModal.style.display = "none";
 };
 
-// Close the modal when the user clicks anywhere outside of the modal
+//*#########################################################
+//*  Close the modal when the user clicks anywhere outside of the modal
+//*#########################################################
+// 
 window.onclick = function (event) {
   if (event.target == gameOverModal) {
     gameOverModal.style.display = "none";
   }
 };
 
+//*#########################################################
+//* close modal towers
+//*#########################################################
 btn_close_modal_towers.addEventListener("click", () => {
   mdl_towers.style.display = "none";
 });
 
+//*#########################################################
+//* close modal upgrade
+//*#########################################################
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
 });
+
+//*#########################################################
+//* show tower range
+//*#########################################################
 
 let rangeTimer;
 
@@ -766,7 +847,10 @@ btn_show_tower_range.addEventListener("click", () => {
   }, 10000);
 });
 
+//*#########################################################
 //* start Game
+//*#########################################################
+
 btn_start_game.addEventListener("click", () => {
   menu_modal.classList.remove("active");
   game_is_running = true;
@@ -780,16 +864,25 @@ btn_start_game.addEventListener("click", () => {
   setInterval(updateWaveTimer, 1000);
 });
 
+//*#########################################################
 //* Reload Page
+//*#########################################################
+
 btn_goto_menu.addEventListener('click', ()=> {
   window.location.reload();
 })
 
+//*#########################################################
 //* Pause and continue
+//*#########################################################
+
 btn_pause.addEventListener('click', () => {
   play_pause();
 });
 
+//*#########################################################
+//* play pause
+//*#########################################################
 function play_pause() {
   if (game_is_running) {
     // Spiel pausieren
@@ -810,6 +903,10 @@ function play_pause() {
     gameLoop();
   }
 }
+
+//*#########################################################
+//* count_energy_level 
+//*#########################################################
 
 function count_energy_level() {
   const energy_tower_amount = tower_type_amount(tower_places, 'energy');
@@ -832,6 +929,10 @@ function count_energy_level() {
 
 }
 
+//*#########################################################
+//* tower_type_amount
+//*#########################################################
+
 function tower_type_amount(towers, towertype) {
   let amount = 0;
   towers.forEach((tower) => {
@@ -842,7 +943,10 @@ function tower_type_amount(towers, towertype) {
   return amount;
 }
 
+//*#########################################################
 //* Toggle sound
+//*#########################################################
+
 btn_mute.addEventListener('click', ()=> {
   if(sound_is_on) {
     game_audio.pause();
