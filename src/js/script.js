@@ -357,6 +357,19 @@ function drawTowerPlaces() {
 }
 
 //*#########################################################
+//* Collision detection
+//*#########################################################
+function checkCollision(colliding_object_A, colliding_object_B) {
+  return (
+    colliding_object_A.pos_x < colliding_object_B.pos_x + colliding_object_B.width &&
+    colliding_object_A.pos_x + colliding_object_A.width > colliding_object_B.pos_x &&
+    colliding_object_A.pos_y < colliding_object_B.pos_y + colliding_object_B.height &&
+    colliding_object_A.pos_y + colliding_object_A.height > colliding_object_B.pos_y
+  );
+}
+
+
+//*#########################################################
 //* calculate Distance
 //*#########################################################
 
@@ -393,13 +406,13 @@ function gameLoop() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Hintergrundbild zeichnen
+  //* Hintergrundbild zeichnen
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-  // Zuerst die Waypoints zeichnen
+  //* Zuerst die Waypoints zeichnen
   drawWaypoints();
 
-  // Tower Places zeichnen
+  //* Tower Places zeichnen
   drawTowerPlaces();
 
   lbl_Money.innerHTML = `${money}€`;
@@ -407,11 +420,11 @@ function gameLoop() {
   lbl_wave.innerHTML = `Welle: ${wave}`;
   lbl_energy.innerHTML = `Energie ${energy_level}`
 
-  // Dann die Orcs darüber zeichnen
+  //* Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update();
 
-    // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
+    //* Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
       enemy.markedForDeletion = true;
       live--;
@@ -422,7 +435,7 @@ function gameLoop() {
       }, 300);
     }
 
-    // Überprüfen, ob der Orc in der Nähe eines Turms ist
+    //* Überprüfen, ob der Orc in der Nähe eines Turms ist
     tower_places.forEach((tower) => {
       if (tower.tower_is_build && tower.cooldown <= 0) {
         const distance = calculateDistance(
@@ -433,7 +446,7 @@ function gameLoop() {
         );
 
         if (distance < tower.range) {
-          // Radius von 80 Pixeln
+          //* Radius von 80 Pixeln
 
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
@@ -447,7 +460,7 @@ function gameLoop() {
             }
           }
 
-          // Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
+          //* Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
          //* Slower Tower
           if (tower.tower_type === "slower") {
             let slow_val = 0.5;
@@ -462,8 +475,8 @@ function gameLoop() {
               slow_val = 0.2;
               slow_time = 16000;
             }
-            enemy.applySlowEffect(slow_val, slow_time); // Verlangsamen des Gegners
-            // Erzeuge einen blauen Laser
+            enemy.applySlowEffect(slow_val, slow_time); //* Verlangsamen des Gegners
+            //* Erzeuge einen blauen Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
@@ -488,12 +501,12 @@ function gameLoop() {
                 "green"
               )
             );
-            tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
+            tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
           
             //* Destroyer Tower
           } else if(tower.tower_type === "destroyer") {
             enemy.health -= tower.tower_damage_lvl;
-            // Erzeuge einen roten Laser
+            // *Erzeuge einen roten Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
             );
@@ -503,7 +516,7 @@ function gameLoop() {
         }
       }
 
-      // Reduziere die Abklingzeit des Turms
+      //* Reduziere die Abklingzeit des Turms
       if (tower.cooldown > 0) {
         tower.cooldown--;
       }
@@ -516,12 +529,12 @@ function gameLoop() {
     }
   });
 
-  // Update und zeichne die Laser
+  //* Update und zeichne die Laser
   lasers.forEach((laser, index) => {
     laser.update();
     laser.draw(ctx);
 
-    // Entferne den Laser, wenn er das Ziel erreicht hat
+    //* Entferne den Laser, wenn er das Ziel erreicht hat
     if (laser.posX === laser.targetX && laser.posY === laser.targetY) {
       lasers.splice(index, 1);
     }

@@ -6,7 +6,7 @@ export class Laser {
         this.targetY = targetY;
         this.posX = startX;
         this.posY = startY;
-        this.speed = 5;
+        this.speed = 10;
         this.image = new Image();
         this.color = color;
         if(this.color === 'blue') {
@@ -44,7 +44,7 @@ export class Laser {
     draw(ctx) {
         if (this.loaded) {
             ctx.save();
-            ctx.translate(this.posX + 5, this.posY + 5); // Translate to the center of the laser
+            ctx.translate(this.posX, this.posY); // Translate to the center of the laser
             ctx.rotate(this.rotation); // Apply rotation
             ctx.drawImage(this.image, -5, -5, 15, 25); // Draw the laser
             ctx.restore();
