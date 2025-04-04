@@ -57,7 +57,7 @@ body.red-flash {
 
 .modal-towers,
 .modal-upgrade {
-  background: rgba(10, 11, 27, 0.7);
+  background: rgba(10, 11, 27, 0.9);
   font-size: 1rem;
   justify-content: flex-start;
   align-items: center;
@@ -89,7 +89,9 @@ body.red-flash {
 }
 .modal-towers .grid-wrapper .tile,
 .modal-upgrade .grid-wrapper .tile {
-  background-color: gray;
+  background: linear-gradient(45deg, rgb(24, 54, 50), transparent);
+  -webkit-backdrop-filter: blur(13px);
+          backdrop-filter: blur(13px);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -97,6 +99,7 @@ body.red-flash {
   align-items: center;
   border-radius: 5px;
   font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile h4,
 .modal-upgrade .grid-wrapper .tile h4 {
@@ -116,9 +119,11 @@ body.red-flash {
      object-fit: cover;
   -o-object-position: top;
      object-position: top;
-  background-color: rgba(13, 17, 76, 0.4705882353);
+  background-color: rgba(97, 97, 99, 0.4705882353);
   border-radius: 5px;
   padding: 30px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
+  border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile .button-buy,
 .modal-upgrade .grid-wrapper .tile .button-buy {
