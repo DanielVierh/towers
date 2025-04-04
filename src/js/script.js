@@ -25,7 +25,11 @@ const btn_goto_menu = document.getElementById("btn_goto_menu");
 const btn_pause = document.getElementById("btn_pause");
 const lbl_energy = document.getElementById("lbl_energy");
 const game_audio = document.getElementById("game_audio");
+const sel_difficulty = document.getElementById("sel_difficulty");
 const towerImages = new Map();
+const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="yellow" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+  <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+</svg>`
 
 canvas.width = 400;
 canvas.height = 400;
@@ -211,11 +215,12 @@ let enemy_max_velocity = 1.5;
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
+let energy_start_level = 0;
 let energy_level = 0;
 let sound_is_on = false;
 
 //*#########################################################
-//* spawnEnemy
+//* ANCHOR -spawnEnemy
 //*#########################################################
 
 function spawnEnemy() {
@@ -255,7 +260,7 @@ function spawnEnemy() {
 }
 
 //*#########################################################
-//* draw Waypoints
+//* ANCHOR -draw Waypoints
 //*#########################################################
 
 function drawWaypoints() {
@@ -275,7 +280,7 @@ function drawWaypoints() {
 }
 
 //*#########################################################
-//* getTowerColor
+//* ANCHOR -getTowerColor
 //*#########################################################
 
 function getTowerColor(tower) {
@@ -292,7 +297,7 @@ function getTowerColor(tower) {
 }
 
 //*#########################################################
-//* getRangeColor
+//* ANCHOR -getRangeColor
 //*#########################################################
 
 function getRangeColor(tower) {
@@ -311,7 +316,7 @@ function getRangeColor(tower) {
 }
 
 //*#########################################################
-//* drawTowerPlaces
+//* ANCHOR -drawTowerPlaces
 //*#########################################################
 
 function drawTowerPlaces() {
@@ -325,6 +330,23 @@ function drawTowerPlaces() {
       ctx.strokeStyle = getTowerColor(tower);
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 18, tower.y + 33, 10, 3);
+
+      if(energy_level < 0) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(tower.x + 5, tower.y, 30, 30);
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(low_energy_symbol, "image/svg+xml");
+        const svgElement = svgDoc.documentElement;
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const img = new Image();
+        const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(svgBlob);
+        img.onload = () => {
+          ctx.drawImage(img, tower.x + 5, tower.y + 5, 20, 20);
+          URL.revokeObjectURL(url);
+        };
+        img.src = url;
+      }
 
       //Zeichne farbigen Rahmen für Turm Range
       // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
@@ -357,7 +379,7 @@ function drawTowerPlaces() {
 }
 
 //*#########################################################
-//* Collision detection
+//* ANCHOR -Collision detection
 //*#########################################################
 function checkCollision(colliding_object_A, colliding_object_B) {
   return (
@@ -370,7 +392,7 @@ function checkCollision(colliding_object_A, colliding_object_B) {
 
 
 //*#########################################################
-//* calculate Distance
+//* ANCHOR -calculate Distance
 //*#########################################################
 
 function calculateDistance(x1, y1, x2, y2) {
@@ -378,7 +400,7 @@ function calculateDistance(x1, y1, x2, y2) {
 }
 
 //*#########################################################
-//* show Game Over Modal
+//* ANCHOR -show Game Over Modal
 //*#########################################################
 
 function showGameOverModal() {
@@ -387,7 +409,7 @@ function showGameOverModal() {
 }
 
 //*#########################################################
-//* GAMELOOP
+//* ANCHOR -GAMELOOP
 //*#########################################################
 function gameLoop() {
   if (game_is_running === false) {
@@ -397,8 +419,7 @@ function gameLoop() {
   count_energy_level();
   let low_energy_load_slowing_effect = 0;
   if(energy_level < 0) {
-    console.log('unter 0');
-    low_energy_load_slowing_effect = 30;
+    low_energy_load_slowing_effect = 50;
     lbl_energy.style.color = 'red'
   }else {
      lbl_energy.style.color = 'white'
@@ -483,25 +504,27 @@ function gameLoop() {
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
            //* Toxic Tower
           } else if (tower.tower_type === "toxic") {
-            let toxic_power = 0.2;
-            if (tower.tower_damage_lvl === 1) {
-              toxic_power = 0.2;
-            } else if (tower.tower_damage_lvl === 2) {
-              toxic_power = 0.5;
-            } else if (tower.tower_damage_lvl === 3) {
-              toxic_power = 1;
+            if(energy_level > 0) {
+              let toxic_power = 0.2;
+              if (tower.tower_damage_lvl === 1) {
+                toxic_power = 0.2;
+              } else if (tower.tower_damage_lvl === 2) {
+                toxic_power = 0.5;
+              } else if (tower.tower_damage_lvl === 3) {
+                toxic_power = 1;
+              }
+              enemy.is_toxicated = true;
+              lasers.push(
+                new Laser(
+                  tower.x + 15,
+                  tower.y,
+                  enemy.pos_x,
+                  enemy.pos_y,
+                  "green"
+                )
+              );
+              tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
             }
-            enemy.is_toxicated = true;
-            lasers.push(
-              new Laser(
-                tower.x + 15,
-                tower.y,
-                enemy.pos_x,
-                enemy.pos_y,
-                "green"
-              )
-            );
-            tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
           
             //* Destroyer Tower
           } else if(tower.tower_type === "destroyer") {
@@ -553,7 +576,7 @@ function gameLoop() {
 }
 
 //*#########################################################
-//* update Wave Timer
+//* ANCHOR -update Wave Timer
 //*#########################################################
 
 function updateWaveTimer() {
@@ -589,7 +612,7 @@ function updateWaveTimer() {
 }
 
 //*#########################################################
-//* Event-Listener for click on Tower Place
+//* ANCHOR -Event-Listener for click on Tower Place
 //*#########################################################
 // 
 canvas.addEventListener("click", (event) => {
@@ -638,7 +661,7 @@ canvas.addEventListener("click", (event) => {
 });
 
 //*#########################################################
-//* Set Tower Slower
+//* ANCHOR -Set Tower Slower
 //*#########################################################
 
 btn_Slower.addEventListener("click", () => {
@@ -665,7 +688,7 @@ btn_Slower.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* Set Tower Destroyer
+//* ANCHOR -Set Tower Destroyer
 //*#########################################################
 
 btn_Destroyer.addEventListener("click", () => {
@@ -691,7 +714,7 @@ btn_Destroyer.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* Set Tower Toxic
+//* ANCHOR -Set Tower Toxic
 //*#########################################################
 
 btn_Toxic.addEventListener("click", () => {
@@ -717,7 +740,7 @@ btn_Toxic.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* Set Tower Energy
+//* ANCHOR -Set Tower Energy
 //*#########################################################
 
 btn_energy.addEventListener("click", () => {
@@ -743,7 +766,7 @@ btn_energy.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* Upgrade Tower Range
+//* ANCHOR -Upgrade Tower Range
 //*#########################################################
 
 //* Upgrades
@@ -773,7 +796,7 @@ btn_bigger_range.addEventListener("click", () => {
 
 
 //*#########################################################
-//* Upgrade Stronger Tower
+//* ANCHOR -Upgrade Stronger Tower
 //*#########################################################
 btn_Stronger.addEventListener("click", () => {
   const upgrade_price = parseInt(btn_Stronger.getAttribute("data-tower_price"));
@@ -791,7 +814,7 @@ btn_Stronger.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* Sell Tower
+//* ANCHOR -Sell Tower
 //*#########################################################
 btn_SellTower.addEventListener("click", () => {
   if (tower && tower.tower_is_build) {
@@ -809,7 +832,7 @@ btn_SellTower.addEventListener("click", () => {
 });
 
 //*#########################################################
-//*  Close the modal when the user clicks on <span> (x)
+//* ANCHOR - Close the modal when the user clicks on <span> (x)
 //*#########################################################
 
 closeModal.onclick = function () {
@@ -817,7 +840,7 @@ closeModal.onclick = function () {
 };
 
 //*#########################################################
-//*  Close the modal when the user clicks anywhere outside of the modal
+//* ANCHOR - Close the modal when the user clicks anywhere outside of the modal
 //*#########################################################
 // 
 window.onclick = function (event) {
@@ -827,21 +850,21 @@ window.onclick = function (event) {
 };
 
 //*#########################################################
-//* close modal towers
+//* ANCHOR -close modal towers
 //*#########################################################
 btn_close_modal_towers.addEventListener("click", () => {
   mdl_towers.style.display = "none";
 });
 
 //*#########################################################
-//* close modal upgrade
+//* ANCHOR -close modal upgrade
 //*#########################################################
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
 });
 
 //*#########################################################
-//* show tower range
+//* ANCHOR -show tower range
 //*#########################################################
 
 let rangeTimer;
@@ -861,11 +884,15 @@ btn_show_tower_range.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* start Game
+//* ANCHOR -start Game
 //*#########################################################
 
 btn_start_game.addEventListener("click", () => {
   menu_modal.classList.remove("active");
+  const game_difficulty = sel_difficulty.value;
+
+  set_difficulty(game_difficulty);
+  
   game_is_running = true;
   if(sound_is_on) {
     game_audio.play();
@@ -878,7 +905,37 @@ btn_start_game.addEventListener("click", () => {
 });
 
 //*#########################################################
-//* Reload Page
+//* ANCHOR -set Game difficulty
+//*#########################################################
+function set_difficulty(game_difficulty) {
+  if(game_difficulty === 'very_easy') {
+    live = 30;
+    money = 1000;
+    enemy_max_health = 150;
+    energy_start_level = 100;
+  }
+  if(game_difficulty === 'easy') {
+    live = 25;
+    money = 250;
+    enemy_max_health = 170;
+    energy_start_level = 50;
+  }
+  if(game_difficulty === 'standard') {
+    live = 20;
+    money = 200;
+    enemy_max_health = 200;
+    energy_start_level = 0;
+  }
+  if(game_difficulty === 'hard') {
+    live = 15;
+    money = 200;
+    enemy_max_health = 250;
+    energy_start_level = -25;
+  }
+}
+
+//*#########################################################
+//* ANCHOR -Reload Page
 //*#########################################################
 
 btn_goto_menu.addEventListener('click', ()=> {
@@ -886,7 +943,7 @@ btn_goto_menu.addEventListener('click', ()=> {
 })
 
 //*#########################################################
-//* Pause and continue
+//* ANCHOR -Pause and continue
 //*#########################################################
 
 btn_pause.addEventListener('click', () => {
@@ -894,7 +951,7 @@ btn_pause.addEventListener('click', () => {
 });
 
 //*#########################################################
-//* play pause
+//* ANCHOR -play pause
 //*#########################################################
 function play_pause() {
   if (game_is_running) {
@@ -918,12 +975,12 @@ function play_pause() {
 }
 
 //*#########################################################
-//* count_energy_level 
+//* ANCHOR -count_energy_level 
 //*#########################################################
 
 function count_energy_level() {
   const energy_tower_amount = tower_type_amount(tower_places, 'energy');
-  energy_level = (energy_tower_amount * 100);
+  energy_level = (energy_tower_amount * 100) + energy_start_level;
 
   //* Every Destroyer Tower needs 25 Energy Points
   const destroyer_energy = 25;
@@ -943,7 +1000,7 @@ function count_energy_level() {
 }
 
 //*#########################################################
-//* tower_type_amount
+//* ANCHOR -tower_type_amount
 //*#########################################################
 
 function tower_type_amount(towers, towertype) {
@@ -957,7 +1014,7 @@ function tower_type_amount(towers, towertype) {
 }
 
 //*#########################################################
-//* Toggle sound
+//* ANCHOR -Toggle sound
 //*#########################################################
 
 btn_mute.addEventListener('click', ()=> {
