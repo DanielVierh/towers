@@ -114,14 +114,14 @@ body.red-flash {
 .modal-towers .grid-wrapper .tile img,
 .modal-upgrade .grid-wrapper .tile img {
   width: 50px;
-  height: 52px;
+  height: 68px;
   -o-object-fit: cover;
      object-fit: cover;
   -o-object-position: top;
      object-position: top;
   background-color: rgba(97, 97, 99, 0.4705882353);
   border-radius: 5px;
-  padding: 30px;
+  padding: 20px;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
