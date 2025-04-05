@@ -208,7 +208,6 @@ const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
 let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let money = 200;
 let max_enemy_amount = 3;
 let wave = 0;
 let enemy_max_health = 200;
@@ -219,6 +218,11 @@ let game_is_running = false;
 let energy_start_level = 0;
 let energy_level = 0;
 let sound_is_on = false;
+
+let save_obj = {
+  money: 200,
+  live: 20
+}
 
 //*#########################################################
 //* ANCHOR -spawnEnemy
@@ -437,7 +441,7 @@ function gameLoop() {
   //* Tower Places zeichnen
   drawTowerPlaces();
 
-  lbl_Money.innerHTML = `${money}€`;
+  lbl_Money.innerHTML = `${save_obj.money}€`;
   lbl_Live.innerHTML = `${live} Leben`;
   lbl_wave.innerHTML = `Welle: ${wave}`;
   lbl_energy.innerHTML = `Überschüssige Energie ${energy_level}`
@@ -482,7 +486,7 @@ function gameLoop() {
               earnedMoney = 10;
             }
           
-            money += earnedMoney;
+            save_obj.money += earnedMoney;
           
             // Füge ein Popup an der aktuellen Position des Gegners hinzu
             moneyPopups.push({
@@ -643,7 +647,7 @@ function updateWaveTimer() {
       max_enemy_amount += wave;
       enemy_max_health += 15;
     }
-    money += Math.floor(wave * 2);
+    save_obj.money += Math.floor(wave * 2);
   }
 }
 
@@ -670,7 +674,7 @@ canvas.addEventListener("click", (event) => {
         mdl_towers.style.display = "flex";
         const lbl_current_money = document.getElementById('lbl_current_money');
         const lbl_current_energy = document.getElementById('lbl_current_energy');
-        lbl_current_money.innerHTML = `${money} €`;
+        lbl_current_money.innerHTML = `${save_obj.money} €`;
         lbl_current_energy.innerHTML = `${energy_level}`;
 
       } else {
@@ -709,7 +713,7 @@ canvas.addEventListener("click", (event) => {
 btn_Slower.addEventListener("click", () => {
   const tower_price = btn_Slower.getAttribute("data-tower_price");
   const tower_img = btn_Slower.getAttribute("data-tower_img");
-  if (money >= tower_price) {
+  if (save_obj.money >= tower_price) {
     tower.tower_type = "slower";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
@@ -719,7 +723,7 @@ btn_Slower.addEventListener("click", () => {
       img.src = tower_img;
       towerImages.set(tower_img, img);
     }
-    money -= tower_price;
+    save_obj.money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
       play_pause();
@@ -736,7 +740,7 @@ btn_Slower.addEventListener("click", () => {
 btn_Destroyer.addEventListener("click", () => {
   const tower_price = btn_Destroyer.getAttribute("data-tower_price");
   const tower_img = btn_Destroyer.getAttribute("data-tower_img");
-  if (money >= tower_price) {
+  if (save_obj.money >= tower_price) {
     tower.tower_type = "destroyer";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
@@ -745,7 +749,7 @@ btn_Destroyer.addEventListener("click", () => {
       img.src = tower_img;
       towerImages.set(tower_img, img);
     }
-    money -= tower_price;
+    save_obj.money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
       play_pause();
@@ -762,7 +766,7 @@ btn_Destroyer.addEventListener("click", () => {
 btn_Toxic.addEventListener("click", () => {
   const tower_price = btn_Toxic.getAttribute("data-tower_price");
   const tower_img = btn_Toxic.getAttribute("data-tower_img");
-  if (money >= tower_price) {
+  if (save_obj.money >= tower_price) {
     tower.tower_type = "toxic";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
@@ -771,7 +775,7 @@ btn_Toxic.addEventListener("click", () => {
       img.src = tower_img;
       towerImages.set(tower_img, img);
     }
-    money -= tower_price;
+    save_obj.money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
       play_pause();
@@ -788,7 +792,7 @@ btn_Toxic.addEventListener("click", () => {
 btn_energy.addEventListener("click", () => {
   const tower_price = btn_energy.getAttribute("data-tower_price");
   const tower_img = btn_energy.getAttribute("data-tower_img");
-  if (money >= tower_price) {
+  if (save_obj.money >= tower_price) {
     tower.tower_type = "energy";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
@@ -797,7 +801,7 @@ btn_energy.addEventListener("click", () => {
       img.src = tower_img;
       towerImages.set(tower_img, img);
     }
-    money -= tower_price;
+    save_obj.money -= tower_price;
     mdl_towers.style.display = "none";
     if(game_is_running === false) {
       play_pause();
@@ -823,10 +827,10 @@ btn_bigger_range.addEventListener("click", () => {
   const upgrade_price = parseInt(
     btn_bigger_range.getAttribute("data-upgrade_price")
   );
-  if (money >= upgrade_price && tower.range < 140) {
+  if (save_obj.money >= upgrade_price && tower.range < 140) {
     // Begrenze die Reichweite auf 140 (80 + 3 * 20)
     tower.range += 20;
-    money -= upgrade_price;
+    save_obj.money -= upgrade_price;
     towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
     mdl_upgrade.style.display = "none";
   } else if (tower.range >= 140) {
@@ -842,10 +846,10 @@ btn_bigger_range.addEventListener("click", () => {
 //*#########################################################
 btn_Stronger.addEventListener("click", () => {
   const upgrade_price = parseInt(btn_Stronger.getAttribute("data-tower_price"));
-  if (money >= upgrade_price && tower.tower_damage_lvl < 3) {
+  if (save_obj.money >= upgrade_price && tower.tower_damage_lvl < 3) {
     // Begrenze den Schaden auf Stufe 3
     tower.tower_damage_lvl += 1;
-    money -= upgrade_price;
+    save_obj.money -= upgrade_price;
     towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
     mdl_upgrade.style.display = "none";
   } else if (tower.tower_damage_lvl >= 3) {
@@ -861,7 +865,7 @@ btn_Stronger.addEventListener("click", () => {
 btn_SellTower.addEventListener("click", () => {
   if (tower && tower.tower_is_build) {
     const sell_price = 30; // 50% des Kaufpreises zurückgeben
-    money += sell_price;
+    save_obj.money += sell_price;
     tower.tower_is_build = false;
     tower.tower_type = "";
     tower.tower_img = "";
@@ -952,25 +956,25 @@ btn_start_game.addEventListener("click", () => {
 function set_difficulty(game_difficulty) {
   if(game_difficulty === 'very_easy') {
     live = 30;
-    money = 1000;
+    save_obj.money = 1000;
     enemy_max_health = 150;
     energy_start_level = 100;
   }
   if(game_difficulty === 'easy') {
     live = 25;
-    money = 250;
+    save_obj.money = 250;
     enemy_max_health = 170;
     energy_start_level = 50;
   }
   if(game_difficulty === 'standard') {
     live = 20;
-    money = 200;
+    save_obj.money = 200;
     enemy_max_health = 200;
     energy_start_level = 0;
   }
   if(game_difficulty === 'hard') {
     live = 15;
-    money = 200;
+    save_obj.money = 200;
     enemy_max_health = 250;
     energy_start_level = -25;
   }
