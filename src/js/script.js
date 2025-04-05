@@ -638,7 +638,7 @@ canvas.addEventListener("click", (event) => {
         lbl_current_energy.innerHTML = `${energy_level}`;
 
       } else {
-        // Update the tower stats in the upgrade modal
+        //* Update the tower stats in the upgrade modal
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
