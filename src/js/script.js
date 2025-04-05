@@ -26,6 +26,8 @@ const btn_pause = document.getElementById("btn_pause");
 const lbl_energy = document.getElementById("lbl_energy");
 const game_audio = document.getElementById("game_audio");
 const sel_difficulty = document.getElementById("sel_difficulty");
+const btn_save_game = document.getElementById('btn_save_game');
+const btn_load_game = document.getElementById('btn_load_game');
 const towerImages = new Map();
 const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="yellow" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
   <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
@@ -48,181 +50,205 @@ const waypoints = [
   { x: 450, y: 340 },
 ];
 
-const tower_places = [
-  {
-    x: 70,
-    y: 15,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 295,
-    y: 15,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 150,
-    y: 95,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 90,
-    y: 165,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 250,
-    y: 245,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 130,
-    y: 330,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 350,
-    y: 330,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 300,
-    y: 330,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 180,
-    y: 330,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 280,
-    y: 165,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 90,
-    y: 245,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 300,
-    y: 245,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 195,
-    y: 245,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 360,
-    y: 60,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-  {
-    x: 210,
-    y: 95,
-    tower_is_build: false,
-    tower_damage_lvl: 1,
-    tower_type: "",
-    tower_img: "",
-    range: 80,
-    cooldown: 0,
-  },
-];
-
 const enemies = [];
 const lasers = [];
 const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
-let live = 20;
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
-let max_enemy_amount = 3;
-let wave = 0;
-let enemy_max_health = 200;
-let enemy_max_velocity = 1.5;
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
-let energy_start_level = 0;
-let energy_level = 0;
 let sound_is_on = false;
 
 let save_obj = {
   money: 200,
-  live: 20
+  live: 20,
+  enemy_max_health: 200,
+  max_enemy_amount: 3,
+  wave: 0,
+  enemy_max_velocity: 1.5,
+  energy_level: 0,
+  energy_start_level: 0,
+  tower_places: [
+    {
+      x: 70,
+      y: 15,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 295,
+      y: 15,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 150,
+      y: 95,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 90,
+      y: 165,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 250,
+      y: 245,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 130,
+      y: 330,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 350,
+      y: 330,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 300,
+      y: 330,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 180,
+      y: 330,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 280,
+      y: 165,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 90,
+      y: 245,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 300,
+      y: 245,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 195,
+      y: 245,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 360,
+      y: 60,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+    {
+      x: 210,
+      y: 95,
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    },
+  ],
+  level: 1
 }
+
+function initializeTowerImages() {
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_is_build && tower.tower_img) {
+      if (!towerImages.has(tower.tower_img)) {
+        const img = new Image();
+        img.src = tower.tower_img;
+        towerImages.set(tower.tower_img, img);
+      }
+    }
+  });
+}
+
+function saveGameToLocalStorage() {
+  localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
+}
+
+function loadGameFromLocalStorage() {
+  const savedGame = localStorage.getItem("towers_savegame");
+  if (savedGame) {
+    save_obj = JSON.parse(savedGame);
+    initializeTowerImages(); // Bilder der Türme nach dem Laden initialisieren
+  }
+}
+
 
 //*#########################################################
 //* ANCHOR -spawnEnemy
@@ -231,7 +257,7 @@ let save_obj = {
 function spawnEnemy() {
   let enemyCount = 0;
   const spawnInterval = setInterval(() => {
-    if (enemyCount >= max_enemy_amount) {
+    if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
       return;
     }
@@ -243,10 +269,10 @@ function spawnEnemy() {
     const scale = 0.6;
     const health =
       Math.floor(
-        Math.random() * (enemy_max_health - enemy_max_health / 2 + 1)
+        Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)
       ) +
-      enemy_max_health / 2;
-    const velocity = Math.random() * (enemy_max_velocity - 1) + 1;
+      save_obj.enemy_max_health / 2;
+    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1;
     enemies.push(
       new Orc(
         posX,
@@ -325,7 +351,7 @@ function getRangeColor(tower) {
 //*#########################################################
 
 function drawTowerPlaces() {
-  tower_places.forEach((tower) => {
+  save_obj.tower_places.forEach((tower) => {
     if (tower.tower_is_build) {
       const towerImage = towerImages.get(tower.tower_img);
       if (towerImage) {
@@ -336,7 +362,7 @@ function drawTowerPlaces() {
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 18, tower.y + 33, 10, 3);
 
-      if(energy_level < 0) {
+      if(save_obj.energy_level < 0) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(tower.x + 5, tower.y, 30, 30);
         const parser = new DOMParser();
@@ -423,7 +449,7 @@ function gameLoop() {
 
   count_energy_level();
   let low_energy_load_slowing_effect = 0;
-  if(energy_level < 0) {
+  if(save_obj.energy_level < 0) {
     low_energy_load_slowing_effect = 50;
     lbl_energy.style.color = 'red'
   }else {
@@ -442,9 +468,9 @@ function gameLoop() {
   drawTowerPlaces();
 
   lbl_Money.innerHTML = `${save_obj.money}€`;
-  lbl_Live.innerHTML = `${live} Leben`;
-  lbl_wave.innerHTML = `Welle: ${wave}`;
-  lbl_energy.innerHTML = `Überschüssige Energie ${energy_level}`
+  lbl_Live.innerHTML = `${save_obj.live} Leben`;
+  lbl_wave.innerHTML = `Welle: ${save_obj.wave}`;
+  lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`
 
   //* Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
@@ -453,7 +479,7 @@ function gameLoop() {
     //* Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
       enemy.markedForDeletion = true;
-      live--;
+      save_obj.live--;
     
       document.body.classList.add("red-flash");
       setTimeout(() => {
@@ -462,7 +488,7 @@ function gameLoop() {
     }
 
     //* Überprüfen, ob der Orc in der Nähe eines Turms ist
-    tower_places.forEach((tower) => {
+    save_obj.tower_places.forEach((tower) => {
       if (tower.tower_is_build && tower.cooldown <= 0) {
         const distance = calculateDistance(
           enemy.pos_x,
@@ -478,9 +504,9 @@ function gameLoop() {
             enemy.markedForDeletion = true;
 
             let earnedMoney = 0;
-            if (wave > 20) {
+            if (save_obj.wave > 20) {
               earnedMoney = 2;
-            } else if (wave >= 4) {
+            } else if (save_obj.wave >= 4) {
               earnedMoney = 4;
             } else {
               earnedMoney = 10;
@@ -520,7 +546,7 @@ function gameLoop() {
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
            //* Toxic Tower
           } else if (tower.tower_type === "toxic") {
-            if(energy_level > 0) {
+            if(save_obj.energy_level > 0) {
               let toxic_power = 0.2;
               if (tower.tower_damage_lvl === 1) {
                 toxic_power = 0.2;
@@ -582,7 +608,7 @@ function gameLoop() {
     }
   });
 
-  if (live <= 0) {
+  if (save_obj.live <= 0) {
     showGameOverModal();
     btn_goto_menu.classList.remove('hidden');
     btn_pause.classList.add('hidden')
@@ -620,7 +646,7 @@ function drawMoneyPopups() {
 //*#########################################################
 
 function updateWaveTimer() {
-  if (live <= 0) {
+  if (save_obj.live <= 0) {
     return;
   }
 
@@ -629,25 +655,25 @@ function updateWaveTimer() {
   }
 
   waveTimer--;
-  lbl_WaveTimer.innerHTML = `${wave + 1}. Welle in ${waveTimer}s`;
+  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s`;
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
-    if (wave >= 6) {
+    if (save_obj.wave >= 6) {
       time_to_next_wave = 45;
     }
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     spawnEnemy();
-    wave++;
-    wave < 10
-      ? (enemy_max_velocity += 0.1)
-      : (enemy_max_velocity = enemy_max_velocity);
-    if (wave >= 7) {
-      enemy_max_health += 20;
+    save_obj.wave++;
+    save_obj.wave < 10
+      ? (save_obj.enemy_max_velocity += 0.1)
+      : (save_obj.enemy_max_velocity = save_obj.enemy_max_velocity);
+    if (save_obj.wave >= 7) {
+      save_obj.enemy_max_health += 20;
     } else {
-      max_enemy_amount += wave;
-      enemy_max_health += 15;
+      save_obj.max_enemy_amount += save_obj.wave;
+      save_obj.enemy_max_health += 15;
     }
-    save_obj.money += Math.floor(wave * 2);
+    save_obj.money += Math.floor(save_obj.wave * 2);
   }
 }
 
@@ -660,7 +686,7 @@ canvas.addEventListener("click", (event) => {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
-  tower_places.forEach((place) => {
+  save_obj.tower_places.forEach((place) => {
     if (
       x >= place.x &&
       x <= place.x + 30 &&
@@ -675,7 +701,7 @@ canvas.addEventListener("click", (event) => {
         const lbl_current_money = document.getElementById('lbl_current_money');
         const lbl_current_energy = document.getElementById('lbl_current_energy');
         lbl_current_money.innerHTML = `${save_obj.money} €`;
-        lbl_current_energy.innerHTML = `${energy_level}`;
+        lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
 
       } else {
         //* Update the tower stats in the upgrade modal
@@ -930,10 +956,41 @@ btn_show_tower_range.addEventListener("click", () => {
 });
 
 //*#########################################################
+//* ANCHOR -btn_save_game
+//*#########################################################
+btn_save_game.addEventListener('click', ()=> {
+  saveGameToLocalStorage();
+  alert('Spiel wurde gespeichert');
+})
+
+//*#########################################################
+//* ANCHOR -btn_load_game
+//*#########################################################
+btn_load_game.addEventListener('click', ()=> {
+  loadGameFromLocalStorage();
+  menu_modal.classList.remove("active");
+  
+  game_is_running = true;
+  if(sound_is_on) {
+    game_audio.play();
+  }
+  // Start the game loop
+  gameLoop();
+
+  // Update the wave timer every second
+  setInterval(updateWaveTimer, 1000);
+})
+
+//*#########################################################
 //* ANCHOR -start Game
 //*#########################################################
 
 btn_start_game.addEventListener("click", () => {
+  start_game();
+});
+
+
+function start_game() {
   menu_modal.classList.remove("active");
   const game_difficulty = sel_difficulty.value;
 
@@ -948,35 +1005,35 @@ btn_start_game.addEventListener("click", () => {
 
   // Update the wave timer every second
   setInterval(updateWaveTimer, 1000);
-});
+}
 
 //*#########################################################
 //* ANCHOR -set Game difficulty
 //*#########################################################
 function set_difficulty(game_difficulty) {
   if(game_difficulty === 'very_easy') {
-    live = 30;
+    save_obj.live = 30;
     save_obj.money = 1000;
-    enemy_max_health = 150;
-    energy_start_level = 100;
+    save_obj.enemy_max_health = 150;
+    save_obj.energy_start_level = 100;
   }
   if(game_difficulty === 'easy') {
-    live = 25;
+    save_obj.live = 25;
     save_obj.money = 250;
-    enemy_max_health = 170;
-    energy_start_level = 50;
+    save_obj.enemy_max_health = 170;
+    save_obj.energy_start_level = 50;
   }
   if(game_difficulty === 'standard') {
-    live = 20;
+    save_obj.live = 20;
     save_obj.money = 200;
-    enemy_max_health = 200;
-    energy_start_level = 0;
+    save_obj.enemy_max_health = 200;
+    save_obj.energy_start_level = 0;
   }
   if(game_difficulty === 'hard') {
-    live = 15;
+    save_obj.live = 15;
     save_obj.money = 200;
-    enemy_max_health = 250;
-    energy_start_level = -25;
+    save_obj.enemy_max_health = 250;
+    save_obj.energy_start_level = -25;
   }
 }
 
@@ -1025,23 +1082,23 @@ function play_pause() {
 //*#########################################################
 
 function count_energy_level() {
-  const energy_tower_amount = tower_type_amount(tower_places, 'energy');
-  energy_level = (energy_tower_amount * 100) + energy_start_level;
+  const energy_tower_amount = tower_type_amount(save_obj.tower_places, 'energy');
+  save_obj.energy_level = (energy_tower_amount * 100) + save_obj.energy_start_level;
 
   //* Every Destroyer Tower needs 25 Energy Points
   const destroyer_energy = 25;
-  const destroyer_amount = tower_type_amount(tower_places, 'destroyer');
+  const destroyer_amount = tower_type_amount(save_obj.tower_places, 'destroyer');
   const destroyer_energy_amount = destroyer_energy * destroyer_amount;
   //* Every Toxic Tower needs 75 Energy Points
   const toxic_energy = 75;
-  const toxic_amount = tower_type_amount(tower_places, 'toxic');
+  const toxic_amount = tower_type_amount(save_obj.tower_places, 'toxic');
   const toxic_energy_amount = toxic_energy * toxic_amount;
   //* Every Slower Tower needs 75 Energy Points
   const slower_energy = 75;
-  const slower_amount = tower_type_amount(tower_places, 'slower');
+  const slower_amount = tower_type_amount(save_obj.tower_places, 'slower');
   const slower_energy_amount = slower_energy * slower_amount;
 
-  energy_level = energy_level - destroyer_energy_amount - toxic_energy_amount - slower_energy_amount;
+  save_obj.energy_level = save_obj.energy_level - destroyer_energy_amount - toxic_energy_amount - slower_energy_amount;
 
 }
 
