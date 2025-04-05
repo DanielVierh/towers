@@ -203,6 +203,7 @@ const tower_places = [
 
 const enemies = [];
 const lasers = [];
+const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
 let live = 20;
@@ -472,13 +473,24 @@ function gameLoop() {
           if (enemy.health <= 0) {
             enemy.markedForDeletion = true;
 
+            let earnedMoney = 0;
             if (wave > 20) {
-              money += 2;
+              earnedMoney = 2;
             } else if (wave >= 4) {
-              money += 4;
+              earnedMoney = 4;
             } else {
-              money += 10;
+              earnedMoney = 10;
             }
+          
+            money += earnedMoney;
+          
+            // Füge ein Popup an der aktuellen Position des Gegners hinzu
+            moneyPopups.push({
+              x: enemy.pos_x,
+              y: enemy.pos_y,
+              amount: `+${earnedMoney}`,
+              opacity: 1, // Start-Deckkraft
+            });
           }
 
           //* Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
@@ -552,6 +564,9 @@ function gameLoop() {
     }
   });
 
+  // Zeichne die Popups
+  drawMoneyPopups();
+
   //* Update und zeichne die Laser
   lasers.forEach((laser, index) => {
     laser.update();
@@ -573,6 +588,27 @@ function gameLoop() {
   setTimeout(() => {
     gameLoop();
   }, 20);
+}
+
+//*#########################################################
+//* ANCHOR -drawMoneyPopups
+//*#########################################################
+function drawMoneyPopups() {
+  moneyPopups.forEach((popup, index) => {
+    // Zeichne den Text
+    ctx.font = "18px Arial";
+    ctx.fillStyle = `rgba(0, 0, 0, ${popup.opacity})`; // Gelber Text mit Transparenz
+    ctx.fillText(popup.amount, popup.x, popup.y);
+
+    // Aktualisiere die Position und Deckkraft
+    popup.y -= 1; // Bewege das Popup nach oben
+    popup.opacity -= 0.02; // Verringere die Deckkraft
+
+    // Entferne das Popup, wenn es unsichtbar ist
+    if (popup.opacity <= 0) {
+      moneyPopups.splice(index, 1);
+    }
+  });
 }
 
 //*#########################################################
