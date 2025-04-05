@@ -612,7 +612,7 @@ function updateWaveTimer() {
 }
 
 //*#########################################################
-//* ANCHOR -Event-Listener for click on Tower Place
+//* ANCHOR -Open Modal for Tower Place
 //*#########################################################
 // 
 canvas.addEventListener("click", (event) => {
@@ -630,7 +630,13 @@ canvas.addEventListener("click", (event) => {
       tower = place;
 
       if (!place.tower_is_build) {
+        //*Open Modal for Baumenu and show current Money and Energy
         mdl_towers.style.display = "flex";
+        const lbl_current_money = document.getElementById('lbl_current_money');
+        const lbl_current_energy = document.getElementById('lbl_current_energy');
+        lbl_current_money.innerHTML = `${money} €`;
+        lbl_current_energy.innerHTML = `${energy_level}`;
+
       } else {
         // Update the tower stats in the upgrade modal
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;

@@ -63,6 +63,20 @@ body.red-flash {
   align-items: center;
   flex-direction: column;
 }
+.modal-towers .info_wrapper,
+.modal-upgrade .info_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0 40px;
+}
+.modal-towers .info_wrapper .info,
+.modal-upgrade .info_wrapper .info {
+  background-color: black;
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.436);
+}
 .modal-towers .close-button,
 .modal-upgrade .close-button {
   background-color: red;

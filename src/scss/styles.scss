@@ -66,6 +66,20 @@ body {
     align-items: center;
     flex-direction: column;
 
+    .info_wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0 40px;
+
+      .info {
+        background-color: black;
+        padding: 10px 20px;
+        border-radius: 20px;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.436);
+      }
+    }
+
     .close-button {
       background-color: red;
       align-self: flex-end;
