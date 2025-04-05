@@ -440,7 +440,7 @@ function gameLoop() {
   lbl_Money.innerHTML = `${money}€`;
   lbl_Live.innerHTML = `${live} Leben`;
   lbl_wave.innerHTML = `Welle: ${wave}`;
-  lbl_energy.innerHTML = `Energie ${energy_level}`
+  lbl_energy.innerHTML = `Überschüssige Energie ${energy_level}`
 
   //* Dann die Orcs darüber zeichnen
   enemies.forEach((enemy, index) => {
