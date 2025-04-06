@@ -39,10 +39,10 @@ body.red-flash {
 .labels-wrapper {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 5px;
   width: 100%;
-  max-width: 250px;
+  max-width: 3000px;
   padding: 10px;
   margin: 0;
   align-self: flex-start;
@@ -199,8 +199,8 @@ body.red-flash {
 
 .button-tower-range {
   position: fixed;
-  top: 420px;
-  right: 15px;
+  top: 510px;
+  right: 10px;
   background-color: black;
   padding: 5px;
   border-radius: 10px;
