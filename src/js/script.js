@@ -611,7 +611,8 @@ function gameLoop() {
   if (save_obj.live <= 0) {
     showGameOverModal();
     btn_goto_menu.classList.remove('hidden');
-    btn_pause.classList.add('hidden')
+    btn_pause.classList.add('hidden');
+    btn_save_game.classList.add('hidden')
     return; // Stop the game loop
   }
 
