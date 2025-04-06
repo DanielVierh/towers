@@ -272,3 +272,36 @@ body {
     justify-content: center;
     align-items: center;
   }
+
+  select {
+    appearance: none;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-transform: uppercase;
+
+    &:hover {
+      background-color: #444;
+    }
+
+    &:focus {
+      border-color: lightgreen;
+      box-shadow: 0 0 10px lightgreen;
+    }
+
+    option {
+      background-color: #333;
+      color: white;
+    }
+  }

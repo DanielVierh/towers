@@ -266,4 +266,36 @@ body.red-flash {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+select {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  margin: 10px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  text-transform: uppercase;
+}
+select:hover {
+  background-color: #444;
+}
+select:focus {
+  border-color: lightgreen;
+  box-shadow: 0 0 10px lightgreen;
+}
+select option {
+  background-color: #333;
+  color: white;
 }/*# sourceMappingURL=styles.css.map */
