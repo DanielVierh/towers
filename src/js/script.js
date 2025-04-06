@@ -1,6 +1,5 @@
 import { Orc } from "./classes/Orc.js";
 import { Laser } from "./classes/Laser.js";
-import { show_instructions } from './functions/show_instructions.js';
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -250,6 +249,10 @@ function loadGameFromLocalStorage() {
     initializeTowerImages(); // Bilder der Türme nach dem Laden initialisieren
   }
 }
+
+btn_show_instructions.addEventListener('click', ()=> {
+  window.location = 'instructions.html'
+})
 
 
 //*#########################################################
@@ -1134,10 +1137,3 @@ btn_mute.addEventListener('click', ()=> {
     btn_mute.style.background = 'black';
   }
 })
-
-//*#########################################################
-//* ANCHOR -Show Instructions
-//*#########################################################
-btn_show_instructions.addEventListener('click', ()=> {
-  show_instructions();
-});
