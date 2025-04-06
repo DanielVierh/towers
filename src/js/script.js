@@ -1,5 +1,6 @@
 import { Orc } from "./classes/Orc.js";
 import { Laser } from "./classes/Laser.js";
+import { show_instructions } from './functions/show_instructions.js';
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -31,7 +32,8 @@ const btn_load_game = document.getElementById('btn_load_game');
 const towerImages = new Map();
 const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="yellow" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
   <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
-</svg>`
+</svg>`;
+const btn_show_instructions = document.getElementById('btn_show_instructions');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -1132,3 +1134,10 @@ btn_mute.addEventListener('click', ()=> {
     btn_mute.style.background = 'black';
   }
 })
+
+//*#########################################################
+//* ANCHOR -Show Instructions
+//*#########################################################
+btn_show_instructions.addEventListener('click', ()=> {
+  show_instructions();
+});
