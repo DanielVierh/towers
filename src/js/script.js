@@ -357,7 +357,7 @@ function drawTowerPlaces() {
       if (towerImage) {
         ctx.drawImage(towerImage, tower.x, tower.y - 10, 40, 55);
       }
-      // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
+      //* Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
       ctx.strokeStyle = getTowerColor(tower);
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 18, tower.y + 33, 10, 3);
@@ -379,8 +379,8 @@ function drawTowerPlaces() {
         img.src = url;
       }
 
-      //Zeichne farbigen Rahmen für Turm Range
-      // Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
+      //* Zeichne farbigen Rahmen für Turm Range
+      //* Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
       ctx.strokeStyle = getRangeColor(tower);
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
@@ -546,7 +546,7 @@ function gameLoop() {
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
            //* Toxic Tower
           } else if (tower.tower_type === "toxic") {
-            if(save_obj.energy_level > 0) {
+            if(save_obj.energy_level >= 0) {
               let toxic_power = 0.2;
               if (tower.tower_damage_lvl === 1) {
                 toxic_power = 0.2;
