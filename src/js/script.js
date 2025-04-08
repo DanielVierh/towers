@@ -456,9 +456,11 @@ function gameLoop() {
   let low_energy_load_slowing_effect = 0;
   if(save_obj.energy_level < 0) {
     low_energy_load_slowing_effect = 50;
-    lbl_energy.style.color = 'red'
+    lbl_energy.style.color = 'black'
+    lbl_energy.style.background = 'red'
   }else {
      lbl_energy.style.color = 'white'
+     lbl_energy.style.background = 'black'
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -617,7 +619,8 @@ function gameLoop() {
     showGameOverModal();
     btn_goto_menu.classList.remove('hidden');
     btn_pause.classList.add('hidden');
-    btn_save_game.classList.add('hidden')
+    btn_save_game.classList.add('hidden');
+    lbl_Live.style.color = 'tomato'
     return; // Stop the game loop
   }
 
@@ -708,7 +711,6 @@ canvas.addEventListener("click", (event) => {
         const lbl_current_energy = document.getElementById('lbl_current_energy');
         lbl_current_money.innerHTML = `${save_obj.money} €`;
         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
-
       } else {
         //* Update the tower stats in the upgrade modal
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
@@ -730,13 +732,22 @@ canvas.addEventListener("click", (event) => {
         }else {
           btn_bigger_range.innerHTML = 'Kaufen 300€';
         }
-        //* Hide Upgrades on energy tower
+        //* Hide Range on energy tower
         if(tower.tower_type === 'energy') {
-          btn_Stronger.style.display = 'none';
+          btn_Stronger.innerHTML = 'Kaufen 500€';
+          btn_Stronger.setAttribute("data-tower_price", "500");
           btn_bigger_range.style.display = 'none';
+          document.getElementById('tile_upgrade_range').style.display = 'none';
+          document.getElementById('tower_stats').style.display = 'none';
+          document.getElementById('tile_upgrade_stronger_title').innerHTML = 'Mehr Brennstäbe';
+          document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erzeugt mehr Energie <br> +50' + low_energy_symbol;
         }else {
           btn_Stronger.style.display = 'flex';
           btn_bigger_range.style.display = 'flex';
+          document.getElementById('tile_upgrade_range').style.display = 'block';
+          document.getElementById('tower_stats').style.display = 'block';
+          document.getElementById('tile_upgrade_stronger_title').innerHTML = 'Stärke Upgrade';
+          document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erhöht die Stärke des Turms';
         }
       }
     }
@@ -1096,21 +1107,44 @@ function count_energy_level() {
   const energy_tower_amount = tower_type_amount(save_obj.tower_places, 'energy');
   save_obj.energy_level = (energy_tower_amount * 100) + save_obj.energy_start_level;
 
-  //* Every Destroyer Tower needs 25 Energy Points
+  //* Add energy for each upgrade level of energy towers
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === 'energy') {
+      save_obj.energy_level += (tower.tower_damage_lvl * 50) - 50; // +50 energy per upgrade level
+    }
+  });
+
+  //* Every Destroyer Tower needs 25 Energy Points, reduced by 10 per upgrade level
   const destroyer_energy = 25;
   const destroyer_amount = tower_type_amount(save_obj.tower_places, 'destroyer');
-  const destroyer_energy_amount = destroyer_energy * destroyer_amount;
-  //* Every Toxic Tower needs 75 Energy Points
+  let destroyer_energy_amount = 0;
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === 'destroyer') {
+      destroyer_energy_amount += Math.max(0, destroyer_energy + (tower.tower_damage_lvl * 10) - 10);
+    }
+  });
+
+  //* Every Toxic Tower needs 75 Energy Points, reduced by 10 per upgrade level
   const toxic_energy = 75;
   const toxic_amount = tower_type_amount(save_obj.tower_places, 'toxic');
-  const toxic_energy_amount = toxic_energy * toxic_amount;
-  //* Every Slower Tower needs 75 Energy Points
+  let toxic_energy_amount = 0;
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === 'toxic') {
+      toxic_energy_amount += Math.max(0, toxic_energy + (tower.tower_damage_lvl * 10) -10);
+    }
+  });
+
+  //* Every Slower Tower needs 75 Energy Points, reduced by 10 per upgrade level
   const slower_energy = 75;
   const slower_amount = tower_type_amount(save_obj.tower_places, 'slower');
-  const slower_energy_amount = slower_energy * slower_amount;
+  let slower_energy_amount = 0;
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === 'slower') {
+      slower_energy_amount += Math.max(0, slower_energy + (tower.tower_damage_lvl * 10) -10);
+    }
+  });
 
   save_obj.energy_level = save_obj.energy_level - destroyer_energy_amount - toxic_energy_amount - slower_energy_amount;
-
 }
 
 //*#########################################################
