@@ -719,12 +719,17 @@ canvas.addEventListener("click", (event) => {
           btn_Stronger.innerHTML = "Kaufen 500€";
           btn_Stronger.setAttribute("data-tower_price", "500");
         } else if (tower.tower_damage_lvl === 3) {
-          btn_Stronger.innerHTML = "Max Upgrade";
+          btn_Stronger.innerHTML = "Max. Upgrade";
         } else {
           btn_Stronger.innerHTML = "Kaufen 300€";
           btn_Stronger.setAttribute("data-tower_price", "300");
         }
-
+        //* Display "Max Range" on the purchase button or show the price
+        if(tower.range === 140) {
+          btn_bigger_range.innerHTML = 'Max. Reichweite';
+        }else {
+          btn_bigger_range.innerHTML = 'Kaufen 300€';
+        }
         //* Hide Upgrades on energy tower
         if(tower.tower_type === 'energy') {
           btn_Stronger.style.display = 'none';
