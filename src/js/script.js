@@ -740,14 +740,14 @@ canvas.addEventListener("click", (event) => {
           document.getElementById('tile_upgrade_range').style.display = 'none';
           document.getElementById('tower_stats').style.display = 'none';
           document.getElementById('tile_upgrade_stronger_title').innerHTML = 'Mehr Brennstäbe';
-          document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erzeugt mehr Energie <br> +50' + low_energy_symbol;
+          document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erzeugt mehr Energie <br> +50 ' + low_energy_symbol;
         }else {
           btn_Stronger.style.display = 'flex';
           btn_bigger_range.style.display = 'flex';
           document.getElementById('tile_upgrade_range').style.display = 'block';
           document.getElementById('tower_stats').style.display = 'block';
           document.getElementById('tile_upgrade_stronger_title').innerHTML = 'Stärke Upgrade';
-          document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erhöht die Stärke des Turms';
+          document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erhöht die Stärke des Turms <br> 25 '  + low_energy_symbol;
         }
       }
     }
@@ -901,7 +901,7 @@ btn_Stronger.addEventListener("click", () => {
     towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
     mdl_upgrade.style.display = "none";
   } else if (tower.tower_damage_lvl >= 3) {
-    alert("Maximale Schadensstufe erreicht!");
+    alert("Maximale Upgrade Stufe erreicht!");
   } else {
     alert("Nicht genug Geld für das Upgrade!");
   }
@@ -1114,33 +1114,33 @@ function count_energy_level() {
     }
   });
 
-  //* Every Destroyer Tower needs 25 Energy Points, reduced by 10 per upgrade level
+  //* Every Destroyer Tower needs 25 Energy Points, reduced by 25 per upgrade level
   const destroyer_energy = 25;
   const destroyer_amount = tower_type_amount(save_obj.tower_places, 'destroyer');
   let destroyer_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'destroyer') {
-      destroyer_energy_amount += Math.max(0, destroyer_energy + (tower.tower_damage_lvl * 10) - 10);
+      destroyer_energy_amount += Math.max(0, destroyer_energy + (tower.tower_damage_lvl * 25) - 25);
     }
   });
 
-  //* Every Toxic Tower needs 75 Energy Points, reduced by 10 per upgrade level
+  //* Every Toxic Tower needs 75 Energy Points, reduced by 25 per upgrade level
   const toxic_energy = 75;
   const toxic_amount = tower_type_amount(save_obj.tower_places, 'toxic');
   let toxic_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'toxic') {
-      toxic_energy_amount += Math.max(0, toxic_energy + (tower.tower_damage_lvl * 10) -10);
+      toxic_energy_amount += Math.max(0, toxic_energy + (tower.tower_damage_lvl * 25) -25);
     }
   });
 
-  //* Every Slower Tower needs 75 Energy Points, reduced by 10 per upgrade level
+  //* Every Slower Tower needs 75 Energy Points, reduced by 25 per upgrade level
   const slower_energy = 75;
   const slower_amount = tower_type_amount(save_obj.tower_places, 'slower');
   let slower_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'slower') {
-      slower_energy_amount += Math.max(0, slower_energy + (tower.tower_damage_lvl * 10) -10);
+      slower_energy_amount += Math.max(0, slower_energy + (tower.tower_damage_lvl * 25) -25);
     }
   });
 
