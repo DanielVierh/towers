@@ -37,7 +37,7 @@ const btn_show_instructions = document.getElementById('btn_show_instructions');
 canvas.width = 400;
 canvas.height = 400;
 
-const waypoints = [
+let waypoints = [
   { x: -50, y: 20 },
   { x: 50, y: 20 },
   { x: 340, y: 20 },
@@ -51,11 +51,29 @@ const waypoints = [
   { x: 450, y: 340 },
 ];
 
+// * Level 2
+// waypoints = [
+//   { x: -50, y: 80 },
+//   { x: 50, y: 80 },
+//   { x: 110, y: 80 },
+//   { x: 110, y: 0 },
+//   { x: 270, y: 0 },
+//   { x: 270, y: 110 },
+//   { x: 140, y: 110 },
+//   { x: 140, y: 190 },
+//   { x: 360, y: 190 },
+//   { x: 360, y: 250 },
+//   { x: 110, y: 250 },
+//   { x: 110, y: 330 },
+//   { x: 400, y: 330 },
+// ];
+
 const enemies = [];
 const lasers = [];
 const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
+// backgroundImage.src = "src/assets/bg/desert_bg.png";
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let tower = undefined;
 let show_tower_range = false;
