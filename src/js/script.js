@@ -721,7 +721,10 @@ canvas.addEventListener("click", (event) => {
       y <= place.y + 30
     ) {
       tower = place;
-
+      if(!game_is_running) {
+        game_is_running = true;
+      }
+      play_pause();
       if (!place.tower_is_build) {
         //*Open Modal for Baumenu and show current Money and Energy
         mdl_towers.style.display = "flex";
@@ -899,6 +902,7 @@ btn_bigger_range.addEventListener("click", () => {
     save_obj.money -= upgrade_price;
     towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
     mdl_upgrade.style.display = "none";
+    play_pause();
   } else if (tower.range >= 140) {
     alert("Maximale Reichweite erreicht!");
   } else {
@@ -918,6 +922,7 @@ btn_Stronger.addEventListener("click", () => {
     save_obj.money -= upgrade_price;
     towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
     mdl_upgrade.style.display = "none";
+    play_pause();
   } else if (tower.tower_damage_lvl >= 3) {
     alert("Maximale Upgrade Stufe erreicht!");
   } else {
@@ -938,6 +943,7 @@ btn_SellTower.addEventListener("click", () => {
     tower.tower_damage_lvl = 1;
     tower.range = 80;
     mdl_upgrade.style.display = "none";
+    play_pause();
   } else {
     alert("Kein Turm zum Verkaufen ausgewählt!");
   }
@@ -947,7 +953,7 @@ btn_SellTower.addEventListener("click", () => {
 //* ANCHOR - Close the modal when the user clicks on <span> (x)
 //*#########################################################
 
-closeModal.onclick = function () {
+closeModal.onclick = ()=> {
   gameOverModal.style.display = "none";
 };
 
@@ -955,7 +961,7 @@ closeModal.onclick = function () {
 //* ANCHOR - Close the modal when the user clicks anywhere outside of the modal
 //*#########################################################
 // 
-window.onclick = function (event) {
+window.onclick = (event)=> {
   if (event.target == gameOverModal) {
     gameOverModal.style.display = "none";
   }
@@ -966,6 +972,7 @@ window.onclick = function (event) {
 //*#########################################################
 btn_close_modal_towers.addEventListener("click", () => {
   mdl_towers.style.display = "none";
+  play_pause();
 });
 
 //*#########################################################
@@ -973,6 +980,7 @@ btn_close_modal_towers.addEventListener("click", () => {
 //*#########################################################
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
+  play_pause();
 });
 
 //*#########################################################
