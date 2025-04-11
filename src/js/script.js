@@ -768,8 +768,8 @@ canvas.addEventListener("click", (event) => {
         }else {
           btn_Stronger.style.display = 'flex';
           btn_bigger_range.style.display = 'flex';
-          document.getElementById('tile_upgrade_range').style.display = 'block';
-          document.getElementById('tower_stats').style.display = 'block';
+          document.getElementById('tile_upgrade_range').style.display = 'flex';
+          document.getElementById('tower_stats').style.display = 'flex';
           document.getElementById('tile_upgrade_stronger_title').innerHTML = 'Stärke Upgrade';
           document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erhöht die Stärke des Turms <br> 25 '  + low_energy_symbol;
         }

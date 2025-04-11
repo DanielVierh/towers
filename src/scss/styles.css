@@ -177,6 +177,9 @@ body.red-flash {
   border: 3px solid white;
   cursor: pointer;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .modal-towers .grid-wrapper .tile .button-sell,
 .modal-upgrade .grid-wrapper .tile .button-sell {
