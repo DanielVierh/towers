@@ -276,9 +276,11 @@ btn_show_instructions.addEventListener('click', ()=> {
 //*#########################################################
 //* ANCHOR -spawnEnemy
 //*#########################################################
+const creep_src = ['src/assets/creeps/creep_1', 'src/assets/creeps/creep_2', 'src/assets/creeps/creep_3', 'src/assets/creeps/creep_4', 'src/assets/creeps/creep_5'];
 
 function spawnEnemy() {
   let enemyCount = 0;
+  const random_creep = Math.floor(Math.random() * creep_src.length);
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -288,7 +290,6 @@ function spawnEnemy() {
     const posY = 20;
     const width = 60;
     const height = 50;
-    const imgSrc = "src/assets/orc.png";
     const scale = 1;
     const health =
       Math.floor(
@@ -296,7 +297,7 @@ function spawnEnemy() {
       ) +
       save_obj.enemy_max_health / 2;
     const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1;
-    const imgFolder = "src/assets/creeps/monster_6";
+    const imgFolder = creep_src[random_creep];
     enemies.push(
       new Creep(
         posX,

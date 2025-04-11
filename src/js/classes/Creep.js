@@ -49,12 +49,12 @@ export class Creep {
     update() {
         if (this.currentWaypointIndex < this.waypoints.length) {
             const target = this.waypoints[this.currentWaypointIndex];
-            const dx = (target.x - 40) - this.pos_x; // Korrigiere den Versatz um 40 Pixel
+            const dx = (target.x - 20) - this.pos_x; // Korrigiere den Versatz um 20 Pixel
             const dy = target.y - this.pos_y;
             const distance = Math.sqrt(dx * dx + dy * dy);
     
             if (distance < this.velocity) {
-                this.pos_x = target.x - 40; // Setze die korrigierte Zielposition
+                this.pos_x = target.x - 20; // Setze die korrigierte Zielposition
                 this.pos_y = target.y;
                 this.currentWaypointIndex++;
             } else {
