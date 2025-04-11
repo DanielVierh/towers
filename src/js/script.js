@@ -74,7 +74,7 @@ const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
 // backgroundImage.src = "src/assets/bg/desert_bg.png";
-let waveTimer = 10; // Timer für die nächste Welle in Sekunden
+let waveTimer = 1; // Timer für die nächste Welle in Sekunden
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
@@ -287,22 +287,23 @@ function spawnEnemy() {
     const posX = -100;
     const posY = 20;
     const width = 60;
-    const height = 80;
+    const height = 50;
     const imgSrc = "src/assets/orc.png";
-    const scale = 0.6;
+    const scale = 1;
     const health =
       Math.floor(
         Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)
       ) +
       save_obj.enemy_max_health / 2;
     const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1;
+    const imgFolder = "src/assets/creeps/monster_6";
     enemies.push(
       new Creep(
         posX,
         posY,
         width,
         height,
-        imgSrc,
+        imgFolder,
         scale,
         waypoints,
         health,

@@ -1,25 +1,9 @@
 export class Creep {
-    constructor(pos_x, pos_y, width, height, img_src, scale = 1, waypoints, health, velocity) {
+    constructor(pos_x, pos_y, width, height, img_folder, scale = 1, waypoints, health, velocity) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.width = width;
         this.height = height;
-        this.image = new Image();
-        this.image.src = img_src;
-        this.image.onload = () => {
-            this.loaded = true;
-        };
-        this.velocity = velocity;
-        this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
-        this.isSlowed = false; // Neue Eigenschaft, um zu verfolgen, ob der Gegner verlangsamt wurde
-        this.slowTimeout = null; // Timeout-ID für den Verlangsamungseffekt
-        this.color = 'red';
-        this.frameIndex = 0;
-        this.frameCount = 7; // Anzahl der Frames in der Sprite
-        this.frameWidth = 742 / this.frameCount; // Breite eines einzelnen Frames
-        this.frameHeight = this.height; // Höhe eines einzelnen Frames
-        this.frameSpeed = 5; // Geschwindigkeit der Animation
-        this.frameTick = 0;
         this.scale = scale; // Skalierungsfaktor
         this.waypoints = waypoints;
         this.currentWaypointIndex = 0;
@@ -31,6 +15,23 @@ export class Creep {
         this.hitFrameCounter = 0;
         this.is_toxicated = false;
         this.toxicated_lvl = 0.1;
+
+        this.velocity = velocity;
+        this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
+        this.isSlowed = false; // Neue Eigenschaft, um zu verfolgen, ob der Gegner verlangsamt wurde
+        this.slowTimeout = null; // Timeout-ID für den Verlangsamungseffekt
+
+        this.imageIndex = 0; // Aktuelles Bild für die Animation
+        this.imageFrames = []; // Array für die Bilder
+        this.frameSpeed = 5; // Geschwindigkeit der Animation
+        this.frameTick = 0;
+
+        // Lade alle Bilder aus dem Ordner
+        for (let i = 1; i <= 17; i++) {
+            const img = new Image();
+            img.src = `${img_folder}/frame_${i}.png`;
+            this.imageFrames.push(img);
+        }
     }
 
     applySlowEffect(slow_val, slow_time) {
@@ -48,12 +49,12 @@ export class Creep {
     update() {
         if (this.currentWaypointIndex < this.waypoints.length) {
             const target = this.waypoints[this.currentWaypointIndex];
-            const dx = target.x - this.pos_x;
+            const dx = (target.x - 40) - this.pos_x; // Korrigiere den Versatz um 40 Pixel
             const dy = target.y - this.pos_y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-
+    
             if (distance < this.velocity) {
-                this.pos_x = target.x;
+                this.pos_x = target.x - 40; // Setze die korrigierte Zielposition
                 this.pos_y = target.y;
                 this.currentWaypointIndex++;
             } else {
@@ -72,14 +73,14 @@ export class Creep {
         this.frameTick++;
         if (this.frameTick >= this.frameSpeed) {
             this.frameTick = 0;
-            this.frameIndex = (this.frameIndex + 1) % this.frameCount;
+            this.imageIndex = (this.imageIndex + 1) % this.imageFrames.length; // Nächstes Bild
         }
 
         //* toxicated
-        if(this.is_toxicated) {
+        if (this.is_toxicated) {
             setInterval(() => {
                 this.health -= this.toxicated_lvl;
-                if(this.health <= 0) {
+                if (this.health <= 0) {
                     this.markedForDeletion = true;
                 }
             }, 5000);
@@ -87,38 +88,36 @@ export class Creep {
     }
 
     draw(ctx) {
-        if (this.loaded) {
-            if (this.is_hit) {
-                this.hitFrameCounter++;
-                if (this.hitFrameCounter % 3 === 0) {
-                    return; // Skip drawing this frame
-                }
-            }
-            const sx = this.frameIndex * this.frameWidth;
-            const sy = 0;
+        const currentImage = this.imageFrames[this.imageIndex];
+        if (currentImage.complete) {
             const scaledWidth = this.width * this.scale;
             const scaledHeight = this.height * this.scale;
-
+    
             ctx.save();
             if (this.direction === -1) {
                 ctx.scale(-1, 1);
-                ctx.drawImage(this.image, sx, sy, this.frameWidth, this.frameHeight, -this.pos_x - scaledWidth, this.pos_y, scaledWidth, scaledHeight);
+                ctx.drawImage(currentImage, -this.pos_x - scaledWidth, this.pos_y, scaledWidth, scaledHeight);
             } else {
-                ctx.drawImage(this.image, sx, sy, this.frameWidth, this.frameHeight, this.pos_x, this.pos_y, scaledWidth, scaledHeight);
+                ctx.drawImage(currentImage, this.pos_x, this.pos_y, scaledWidth, scaledHeight);
             }
             ctx.restore();
-
+    
             // Zeichne die Lebensanzeige
             const healthBarWidth = 40;
             const healthBarHeight = 5;
             const healthBarX = this.pos_x + (scaledWidth / 2) - (healthBarWidth / 2);
             const healthBarY = this.pos_y - 10;
-
+    
             ctx.fillStyle = 'red';
             ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
+    
             ctx.fillStyle = 'green';
             ctx.fillRect(healthBarX, healthBarY, (this.health / this.maxHealth) * healthBarWidth, healthBarHeight);
+    
+            // **Zeichne einen Kasten um das Sprite**
+            // ctx.strokeStyle = 'blue'; // Farbe des Rahmens
+            // ctx.lineWidth = 2; // Breite des Rahmens
+            // ctx.strokeRect(this.pos_x, this.pos_y, scaledWidth, scaledHeight);
         }
     }
 }
