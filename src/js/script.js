@@ -1,4 +1,4 @@
-import { Orc } from "./classes/Orc.js";
+import { Creep } from "./classes/Creep.js";
 import { Laser } from "./classes/Laser.js";
 
 const canvas = document.getElementById("canvas");
@@ -297,7 +297,7 @@ function spawnEnemy() {
       save_obj.enemy_max_health / 2;
     const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1;
     enemies.push(
-      new Orc(
+      new Creep(
         posX,
         posY,
         width,
@@ -497,11 +497,11 @@ function gameLoop() {
   lbl_wave.innerHTML = `Welle: ${save_obj.wave}`;
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`
 
-  //* Dann die Orcs darüber zeichnen
+  //* Dann die Creeps darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update();
 
-    //* Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
+    //* Markiere den Creeps zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
       enemy.markedForDeletion = true;
       save_obj.live--;
@@ -512,7 +512,7 @@ function gameLoop() {
       }, 300);
     }
 
-    //* Überprüfen, ob der Orc in der Nähe eines Turms ist
+    //* Überprüfen, ob der Creeps in der Nähe eines Turms ist
     save_obj.tower_places.forEach((tower) => {
       if (tower.tower_is_build && tower.cooldown <= 0) {
         const distance = calculateDistance(

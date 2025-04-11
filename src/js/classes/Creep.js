@@ -1,4 +1,4 @@
-export class Orc {
+export class Creep {
     constructor(pos_x, pos_y, width, height, img_src, scale = 1, waypoints, health, velocity) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
@@ -63,7 +63,7 @@ export class Orc {
             }
         }
 
-        // Markiere den Orc zur Löschung, wenn er die Grenze überschreitet
+        // Markiere den Creep zur Löschung, wenn er die Grenze überschreitet
         if (this.pos_x > 400) {
             this.markedForDeletion = true;
         }
