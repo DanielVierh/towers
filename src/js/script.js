@@ -74,7 +74,7 @@ const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
 // backgroundImage.src = "src/assets/bg/desert_bg.png";
-let waveTimer = 1; // Timer für die nächste Welle in Sekunden
+let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
@@ -309,7 +309,7 @@ const creep_src = [
   },
   {
     src: 'src/assets/creeps/creep_5',
-    extra_velocity: -1,
+    extra_velocity: -0.7,
     extra_health: 400,
     scale: 0.1
   }
