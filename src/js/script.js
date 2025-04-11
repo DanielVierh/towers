@@ -755,13 +755,16 @@ canvas.addEventListener("click", (event) => {
         }
         //* Hide Range on energy tower
         if(tower.tower_type === 'energy') {
-          btn_Stronger.innerHTML = 'Kaufen 500€';
-          btn_Stronger.setAttribute("data-tower_price", "500");
+          btn_Stronger.innerHTML = 'Kaufen 300€';
+          btn_Stronger.setAttribute("data-tower_price", "300");
           btn_bigger_range.style.display = 'none';
           document.getElementById('tile_upgrade_range').style.display = 'none';
           document.getElementById('tower_stats').style.display = 'none';
           document.getElementById('tile_upgrade_stronger_title').innerHTML = 'Mehr Brennstäbe';
           document.getElementById('tile_upgrade_stronger_descr').innerHTML = 'Erzeugt mehr Energie <br> +50 ' + low_energy_symbol;
+          if(tower.tower_damage_lvl === 3) {
+            btn_Stronger.innerHTML = 'Max. Upgrade';
+          }
         }else {
           btn_Stronger.style.display = 'flex';
           btn_bigger_range.style.display = 'flex';
