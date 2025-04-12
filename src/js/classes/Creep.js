@@ -1,5 +1,5 @@
 export class Creep {
-    constructor(pos_x, pos_y, width, height, img_folder, scale = 1, waypoints, health, velocity) {
+    constructor(pos_x, pos_y, width, height, img_folder, scale = 1, waypoints, health, velocity, resistent) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.width = width;
@@ -15,6 +15,7 @@ export class Creep {
         this.hitFrameCounter = 0;
         this.is_toxicated = false;
         this.toxicated_lvl = 0.1;
+        this.resistent = resistent;
 
         this.velocity = velocity;
         this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
@@ -62,6 +63,8 @@ export class Creep {
                 this.pos_y += (dy / distance) * this.velocity;
                 this.direction = dx < 0 ? -1 : 1; // Setze die Richtung basierend auf dx
             }
+            // console.log(this);
+            
         }
 
         // Markiere den Creep zur Löschung, wenn er die Grenze überschreitet

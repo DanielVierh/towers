@@ -52,28 +52,28 @@ let waypoints = [
 ];
 
 // * Level 2
-// waypoints = [
-//   { x: -50, y: 80 },
-//   { x: 50, y: 80 },
-//   { x: 110, y: 80 },
-//   { x: 110, y: 0 },
-//   { x: 270, y: 0 },
-//   { x: 270, y: 110 },
-//   { x: 140, y: 110 },
-//   { x: 140, y: 190 },
-//   { x: 360, y: 190 },
-//   { x: 360, y: 250 },
-//   { x: 110, y: 250 },
-//   { x: 110, y: 330 },
-//   { x: 400, y: 330 },
-// ];
+waypoints = [
+  { x: -50, y: 80 },
+  { x: 50, y: 80 },
+  { x: 110, y: 80 },
+  { x: 110, y: 0 },
+  { x: 270, y: 0 },
+  { x: 270, y: 110 },
+  { x: 140, y: 110 },
+  { x: 140, y: 190 },
+  { x: 360, y: 190 },
+  { x: 360, y: 250 },
+  { x: 110, y: 250 },
+  { x: 110, y: 330 },
+  { x: 450, y: 330 },
+];
 
 const enemies = [];
 const lasers = [];
 const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
-// backgroundImage.src = "src/assets/bg/desert_bg.png";
+backgroundImage.src = "src/assets/bg/desert_bg.png";
 let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let tower = undefined;
 let show_tower_range = false;
@@ -277,41 +277,46 @@ btn_show_instructions.addEventListener('click', ()=> {
 //* ANCHOR -spawnEnemy
 //*#########################################################
 //* Creep 1: Flying creep
-//* Creep 2
-//* Creep 3
-//* Creep 4
-//* Creep 5
+//* Creep 2: Anti Toxic Creep
+//* Creep 3: Fast Creeps
+//* Creep 4: Raupen -- not able to slow down and toxi
+//* Creep 5: Boss - not able to slow down
 
 const creep_src = [
   {
     src: 'src/assets/creeps/creep_1',
-    extra_velocity: -.7,
+    extra_velocity: -.4,
     extra_health: -30,
-    scale: 0.1
+    scale: 0.1,
+    resistent: ['toxic', 'slower']
   },
   {
     src: 'src/assets/creeps/creep_2',
     extra_velocity: -0.3,
     extra_health: 50,
-    scale: 0.2
+    scale: 0.2,
+    resistent: ['toxic']
   },
   {
     src: 'src/assets/creeps/creep_3',
     extra_velocity: 1,
     extra_health: -100,
-    scale: 0
+    scale: 0,
+    resistent: []
   },
   {
     src: 'src/assets/creeps/creep_4',
     extra_velocity: -0.7,
     extra_health: 50,
-    scale: 0
+    scale: 0,
+    resistent: ['toxic', 'slower']
   },
   {
     src: 'src/assets/creeps/creep_5',
     extra_velocity: -0.7,
-    extra_health: 400,
-    scale: 0.1
+    extra_health: 250,
+    scale: 0.1,
+    resistent: ['slower']
   }
 ];
 
@@ -320,6 +325,7 @@ const creep_src = [
 function spawnEnemy() {
   let enemyCount = 0;
   const random_creep = Math.floor(Math.random() * creep_src.length);
+  // const random_creep = 3;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -333,7 +339,7 @@ function spawnEnemy() {
     const health =Math.floor(Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)) + save_obj.enemy_max_health / 2 + creep_src[random_creep].extra_health;
     const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + creep_src[random_creep].extra_velocity;
     const imgFolder = creep_src[random_creep].src;
-    console.log('imgFolder', imgFolder);
+    const resistent = creep_src[random_creep].resistent
     
     enemies.push(
       new Creep(
@@ -345,7 +351,8 @@ function spawnEnemy() {
         scale,
         waypoints,
         health,
-        velocity
+        velocity,
+        resistent
       )
     );
     enemyCount++;
@@ -602,13 +609,19 @@ function gameLoop() {
               slow_val = 0.2;
               slow_time = 16000;
             }
-            enemy.applySlowEffect(slow_val, slow_time); //* Verlangsamen des Gegners
+
+            //* Verlangsamen des Gegners, wenn nicht resistent            
+            if(!enemy.resistent.includes('slower')) {
+              enemy.applySlowEffect(slow_val, slow_time); 
+            }
+            
             //* Erzeuge einen blauen Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
             );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
-           //* Toxic Tower
+           
+            //* Toxic Tower
           } else if (tower.tower_type === "toxic") {
             if(save_obj.energy_level >= 0) {
               let toxic_power = 0.2;
@@ -619,7 +632,13 @@ function gameLoop() {
               } else if (tower.tower_damage_lvl === 3) {
                 toxic_power = 1;
               }
-              enemy.is_toxicated = true;
+
+              //* Toxicade Enemy
+              if(!enemy.resistent.includes('toxic')) {
+                enemy.is_toxicated = true;
+              }
+
+              //* Green Laser 
               lasers.push(
                 new Laser(
                   tower.x + 15,
@@ -634,7 +653,12 @@ function gameLoop() {
           
             //* Destroyer Tower
           } else if(tower.tower_type === "destroyer") {
-            enemy.health -= tower.tower_damage_lvl;
+
+            //* Harm Enemy
+            if(!enemy.resistent.includes('destroyer')) {
+              enemy.health -= tower.tower_damage_lvl;
+            }
+
             // *Erzeuge einen roten Laser
             lasers.push(
               new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
@@ -1159,7 +1183,6 @@ function play_pause() {
     if(sound_is_on) {
       game_audio.play();
     }
-    console.log(game_audio);
     
 
     // Starte die gameLoop erneut
