@@ -162,7 +162,7 @@ export class Creep {
         if (this.is_toxicated) {
             const dotX = healthBarX + healthBarWidth / 2; // Punkt zentrieren
             const dotY = healthBarY + healthBarHeight + 5; // Unter der Lebensanzeige
-            const dotRadius = 2; // Radius des Punkts
+            const dotRadius = 1; // Radius des Punkts
 
             ctx.beginPath();
             ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2); // Kreis zeichnen
