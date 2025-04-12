@@ -288,7 +288,7 @@ const creep_src = [
     extra_velocity: -.4,
     extra_health: -30,
     scale: 0.1,
-    resistent: ['toxic', 'slower']
+    resistent: ['slower']
   },
   {
     src: 'src/assets/creeps/creep_2',
@@ -325,7 +325,7 @@ const creep_src = [
 function spawnEnemy() {
   let enemyCount = 0;
   const random_creep = Math.floor(Math.random() * creep_src.length);
-  // const random_creep = 3;
+  // const random_creep = 2;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -545,7 +545,7 @@ function gameLoop() {
 
   //* Dann die Creeps darüber zeichnen
   enemies.forEach((enemy, index) => {
-    enemy.update();
+    enemy.update(save_obj, moneyPopups);
 
     //* Markiere den Creeps zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
@@ -613,12 +613,12 @@ function gameLoop() {
             //* Verlangsamen des Gegners, wenn nicht resistent            
             if(!enemy.resistent.includes('slower')) {
               enemy.applySlowEffect(slow_val, slow_time); 
+              //* Erzeuge einen blauen Laser
+              lasers.push(
+                new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
+              );
             }
             
-            //* Erzeuge einen blauen Laser
-            lasers.push(
-              new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "blue")
-            );
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
            
             //* Toxic Tower
@@ -633,21 +633,23 @@ function gameLoop() {
                 toxic_power = 1;
               }
 
-              //* Toxicade Enemy
+              //* Toxicade Enemy if not resistent
               if(!enemy.resistent.includes('toxic')) {
                 enemy.is_toxicated = true;
+
+                //* Green Laser 
+                  lasers.push(
+                    new Laser(
+                      tower.x + 15,
+                      tower.y,
+                      enemy.pos_x,
+                      enemy.pos_y,
+                      "green"
+                    )
+                  );
               }
 
-              //* Green Laser 
-              lasers.push(
-                new Laser(
-                  tower.x + 15,
-                  tower.y,
-                  enemy.pos_x,
-                  enemy.pos_y,
-                  "green"
-                )
-              );
+
               tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
             }
           
@@ -657,12 +659,11 @@ function gameLoop() {
             //* Harm Enemy
             if(!enemy.resistent.includes('destroyer')) {
               enemy.health -= tower.tower_damage_lvl;
+              // *Erzeuge einen roten Laser
+              lasers.push(
+                new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
+              );
             }
-
-            // *Erzeuge einen roten Laser
-            lasers.push(
-              new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
-            );
             
             tower.cooldown = (1 + (tower.tower_damage_lvl * 4) + low_energy_load_slowing_effect); 
           }
