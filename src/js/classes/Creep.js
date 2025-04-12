@@ -117,51 +117,59 @@ export class Creep {
   draw(ctx) {
     const currentImage = this.imageFrames[this.imageIndex];
     if (currentImage.complete) {
-      const scaledWidth = this.width * this.scale;
-      const scaledHeight = this.height * this.scale;
+        const scaledWidth = this.width * this.scale;
+        const scaledHeight = this.height * this.scale;
 
-      ctx.save();
-      if (this.direction === -1) {
-        ctx.scale(-1, 1);
-        ctx.drawImage(
-          currentImage,
-          -this.pos_x - scaledWidth,
-          this.pos_y,
-          scaledWidth,
-          scaledHeight
+        ctx.save();
+        if (this.direction === -1) {
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+                currentImage,
+                -this.pos_x - scaledWidth,
+                this.pos_y,
+                scaledWidth,
+                scaledHeight
+            );
+        } else {
+            ctx.drawImage(
+                currentImage,
+                this.pos_x,
+                this.pos_y,
+                scaledWidth,
+                scaledHeight
+            );
+        }
+        ctx.restore();
+
+        // Zeichne die Lebensanzeige
+        const healthBarWidth = 40;
+        const healthBarHeight = 5;
+        const healthBarX = this.pos_x + scaledWidth / 2 - healthBarWidth / 2;
+        const healthBarY = this.pos_y - 10;
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+        ctx.fillStyle = "green";
+        ctx.fillRect(
+            healthBarX,
+            healthBarY,
+            (this.health / this.maxHealth) * healthBarWidth,
+            healthBarHeight
         );
-      } else {
-        ctx.drawImage(
-          currentImage,
-          this.pos_x,
-          this.pos_y,
-          scaledWidth,
-          scaledHeight
-        );
-      }
-      ctx.restore();
 
-      // Zeichne die Lebensanzeige
-      const healthBarWidth = 40;
-      const healthBarHeight = 5;
-      const healthBarX = this.pos_x + scaledWidth / 2 - healthBarWidth / 2;
-      const healthBarY = this.pos_y - 10;
+        // Zeichne einen grünen Punkt, wenn der Gegner toxicated ist
+        if (this.is_toxicated) {
+            const dotX = healthBarX + healthBarWidth / 2; // Punkt zentrieren
+            const dotY = healthBarY + healthBarHeight + 5; // Unter der Lebensanzeige
+            const dotRadius = 2; // Radius des Punkts
 
-      ctx.fillStyle = "red";
-      ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
-      ctx.fillStyle = "green";
-      ctx.fillRect(
-        healthBarX,
-        healthBarY,
-        (this.health / this.maxHealth) * healthBarWidth,
-        healthBarHeight
-      );
-
-      // **Zeichne einen Kasten um das Sprite**
-      // ctx.strokeStyle = 'blue'; // Farbe des Rahmens
-      // ctx.lineWidth = 2; // Breite des Rahmens
-      // ctx.strokeRect(this.pos_x, this.pos_y, scaledWidth, scaledHeight);
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2); // Kreis zeichnen
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.closePath();
+        }
     }
-  }
+}
 }
