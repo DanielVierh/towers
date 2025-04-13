@@ -15,6 +15,8 @@ export class Laser {
             this.image.src = 'src/assets/laser.png';
         }else if(this.color === 'green') {
             this.image.src = 'src/assets/laser_green.png';
+        }else if(this.color === 'missle') {
+            this.image.src = 'src/assets/missle.png'; 
         }
        
         this.loaded = false;
@@ -29,7 +31,9 @@ export class Laser {
         const dx = this.targetX - this.posX;
         const dy = this.targetY - this.posY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-
+        if(this.color === 'missle') {
+            this.speed = 7;
+        }
         if (distance < this.speed) {
             this.posX = this.targetX;
             this.posY = this.targetY;

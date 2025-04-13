@@ -288,35 +288,35 @@ const creep_src = [
     extra_velocity: -.4,
     extra_health: -30,
     scale: 0.1,
-    resistent: ['slower']
+    resistent: ['slower', 'destroyer']
   },
   {
     src: 'src/assets/creeps/creep_2',
     extra_velocity: -0.3,
     extra_health: 50,
     scale: 0.2,
-    resistent: ['toxic']
+    resistent: ['toxic', 'anti_air']
   },
   {
     src: 'src/assets/creeps/creep_3',
     extra_velocity: 1,
     extra_health: -100,
     scale: 0,
-    resistent: []
+    resistent: ['anti_air']
   },
   {
     src: 'src/assets/creeps/creep_4',
     extra_velocity: -0.7,
     extra_health: 50,
     scale: 0,
-    resistent: ['toxic', 'slower']
+    resistent: ['toxic', 'slower', 'anti_air']
   },
   {
     src: 'src/assets/creeps/creep_5',
     extra_velocity: -0.7,
     extra_health: 250,
     scale: 0.1,
-    resistent: ['slower']
+    resistent: ['slower', 'anti_air']
   }
 ];
 
@@ -464,7 +464,9 @@ function drawTowerPlaces() {
           ctx.strokeStyle = "red"; // Roter Kreis für destroyer tower
         } else if (tower.tower_type === "slower") {
           ctx.strokeStyle = "blue"; // Blauer Kreis für slower tower
-        } else {
+        } else if(tower.tower_type === 'anti_air') {
+          ctx.strokeStyle = "grey"; // Grau für Anti Air
+        }else {
           ctx.strokeStyle = "transparent"; // Standardfarbe
         }
         ctx.lineWidth = 3;
@@ -648,14 +650,11 @@ function gameLoop() {
                     )
                   );
               }
-
-
               tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
             }
           
             //* Destroyer Tower
           } else if(tower.tower_type === "destroyer") {
-
             //* Harm Enemy
             if(!enemy.resistent.includes('destroyer')) {
               enemy.health -= tower.tower_damage_lvl;
@@ -664,8 +663,22 @@ function gameLoop() {
                 new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "red")
               );
             }
-            
+            //* Cool Down
             tower.cooldown = (1 + (tower.tower_damage_lvl * 4) + low_energy_load_slowing_effect); 
+
+            //* Anti Air Tower
+          }else if(tower.tower_type === "anti_air") {
+            //* Harm Enemy
+            if(!enemy.resistent.includes('anti_air')) {
+                enemy.health -= (tower.tower_damage_lvl * 70);
+                // *Erzeuge Missle 
+                lasers.push(
+                  new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "missle")
+                );
+            }
+            //* Cool Down
+            tower.cooldown = 50; 
+            
           }
         }
       }
@@ -904,6 +917,34 @@ btn_Toxic.addEventListener("click", () => {
   const tower_img = btn_Toxic.getAttribute("data-tower_img");
   if (save_obj.money >= tower_price) {
     tower.tower_type = "toxic";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    save_obj.money -= tower_price;
+    mdl_towers.style.display = "none";
+    if(game_is_running === false) {
+      play_pause();
+    }
+  }else {
+    alert('Nicht genug Geld');
+  }
+});
+
+//*#########################################################
+//* ANCHOR -Set Anti Air Tower
+//*#########################################################
+
+const btn_Anti_Air = document.getElementById('btn_Anti_Air');
+
+btn_Anti_Air.addEventListener("click", () => {
+  const tower_price = btn_Anti_Air.getAttribute("data-tower_price");
+  const tower_img = btn_Anti_Air.getAttribute("data-tower_img");
+  if (save_obj.money >= tower_price) {
+    tower.tower_type = "anti_air";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
     if (!towerImages.has(tower_img)) {
@@ -1216,6 +1257,16 @@ function count_energy_level() {
     }
   });
 
+  //* Every anti_air Tower needs 25 Energy Points, reduced by 25 per upgrade level
+  const anti_air_energy = 25;
+  const anti_air_amount = tower_type_amount(save_obj.tower_places, 'anti_air');
+  let anti_air_energy_amount = 0;
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === 'anti_air') {
+      anti_air_energy_amount += Math.max(0, anti_air_energy + (tower.tower_damage_lvl * 25) - 25);
+    }
+  });
+
   //* Every Toxic Tower needs 75 Energy Points, reduced by 25 per upgrade level
   const toxic_energy = 75;
   const toxic_amount = tower_type_amount(save_obj.tower_places, 'toxic');
@@ -1236,7 +1287,7 @@ function count_energy_level() {
     }
   });
 
-  save_obj.energy_level = save_obj.energy_level - destroyer_energy_amount - toxic_energy_amount - slower_energy_amount;
+  save_obj.energy_level = save_obj.energy_level - destroyer_energy_amount - toxic_energy_amount - slower_energy_amount - anti_air_energy_amount;
 }
 
 //*#########################################################
