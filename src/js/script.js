@@ -1042,18 +1042,21 @@ btn_Stronger.addEventListener("click", () => {
 //* ANCHOR -Sell Tower
 //*#########################################################
 btn_SellTower.addEventListener("click", () => {
-  if (tower && tower.tower_is_build) {
-    const sell_price = 30; // 50% des Kaufpreises zurückgeben
-    save_obj.money += sell_price;
-    tower.tower_is_build = false;
-    tower.tower_type = "";
-    tower.tower_img = "";
-    tower.tower_damage_lvl = 1;
-    tower.range = 80;
-    mdl_upgrade.style.display = "none";
-    play_pause();
-  } else {
-    alert("Kein Turm zum Verkaufen ausgewählt!");
+  const confirm = window.confirm('Soll der Turm wirklich verkauft werden?');
+  if(confirm) {
+    if (tower && tower.tower_is_build) {
+      const sell_price = 30; // 50% des Kaufpreises zurückgeben
+      save_obj.money += sell_price;
+      tower.tower_is_build = false;
+      tower.tower_type = "";
+      tower.tower_img = "";
+      tower.tower_damage_lvl = 1;
+      tower.range = 80;
+      mdl_upgrade.style.display = "none";
+      play_pause();
+    } else {
+      alert("Kein Turm zum Verkaufen ausgewählt!");
+    }
   }
 });
 
