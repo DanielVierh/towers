@@ -24,6 +24,7 @@ const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
 const btn_pause = document.getElementById("btn_pause");
 const lbl_energy = document.getElementById("lbl_energy");
+const tower_img = document.getElementById("tower_img");
 const game_audio = document.getElementById("game_audio");
 const sel_difficulty = document.getElementById("sel_difficulty");
 const btn_save_game = document.getElementById('btn_save_game');
@@ -810,7 +811,8 @@ canvas.addEventListener("click", (event) => {
         lbl_current_money.innerHTML = `${save_obj.money} €`;
         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
       } else {
-        //* Update the tower stats in the upgrade modal
+        //* ANCHOR - Open Modal for Upgrade the tower 
+        tower_img.src = tower.tower_img
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;

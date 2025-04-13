@@ -89,9 +89,12 @@ body {
     justify-content: flex-start;
     align-items: center;
     flex-direction: column;
+    overflow-y: scroll;
+    padding: 30px 0;
 
     .tower-stats {
       margin: 30px auto;
+      flex-direction: column;
     }
 
     .modal-title {
@@ -114,9 +117,11 @@ body {
     }
 
     .close-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
       background-color: red;
       align-self: flex-end;
-      margin: 20px;
       color: white;
       border-radius: 50%;
       display: flex;
@@ -124,17 +129,20 @@ body {
       align-items: center;
       text-align: center;
       padding: 10px;
-      width: 20px;
-      height: 20px;
+      width: 30px; /* Increased width for better centering */
+      height: 30px; /* Increased height for better centering */
       box-shadow: inset 0 0 10px black;
       text-shadow: 0 0 10px white;
       cursor: pointer;
+      font-size: 1.2rem; 
+      z-index: 9999999;
     }
 
     .grid-wrapper {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 5px;
+      margin: 50px auto;
 
       .tile {
         background: linear-gradient(45deg, rgb(24, 54, 50), transparent);
@@ -324,4 +332,11 @@ body {
 
   #lbl_live {
     color: lightgreen;
+  }
+
+  .tower-modal-img {
+    width: 70px;
+    height: auto;
+    object-fit: cover;
+    background: black;
   }
