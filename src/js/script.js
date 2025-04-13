@@ -286,9 +286,9 @@ const creep_src = [
   {
     src: 'src/assets/creeps/creep_1',
     extra_velocity: -.4,
-    extra_health: -30,
+    extra_health: 800,
     scale: 0.1,
-    resistent: ['slower', 'destroyer']
+    resistent: ['slower', 'toxic']
   },
   {
     src: 'src/assets/creeps/creep_2',
@@ -670,7 +670,7 @@ function gameLoop() {
           }else if(tower.tower_type === "anti_air") {
             //* Harm Enemy
             if(!enemy.resistent.includes('anti_air')) {
-                enemy.health -= (tower.tower_damage_lvl * 50);
+                enemy.health -= (tower.tower_damage_lvl * 70);
                 // *Erzeuge Missle 
                 lasers.push(
                   new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "missle")
