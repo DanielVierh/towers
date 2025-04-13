@@ -300,7 +300,7 @@ const creep_src = [
   {
     src: 'src/assets/creeps/creep_3',
     extra_velocity: 1,
-    extra_health: -100,
+    extra_health: -70,
     scale: 0,
     resistent: ['anti_air']
   },
@@ -314,7 +314,7 @@ const creep_src = [
   {
     src: 'src/assets/creeps/creep_5',
     extra_velocity: -0.7,
-    extra_health: 250,
+    extra_health: 300,
     scale: 0.1,
     resistent: ['slower', 'anti_air']
   }
@@ -325,7 +325,7 @@ const creep_src = [
 function spawnEnemy() {
   let enemyCount = 0;
   const random_creep = Math.floor(Math.random() * creep_src.length);
-  // const random_creep = 2;
+  // const random_creep = 0;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -670,7 +670,7 @@ function gameLoop() {
           }else if(tower.tower_type === "anti_air") {
             //* Harm Enemy
             if(!enemy.resistent.includes('anti_air')) {
-                enemy.health -= (tower.tower_damage_lvl * 70);
+                enemy.health -= (tower.tower_damage_lvl * 50);
                 // *Erzeuge Missle 
                 lasers.push(
                   new Laser(tower.x + 15, tower.y, enemy.pos_x, enemy.pos_y, "missle")
