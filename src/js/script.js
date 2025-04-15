@@ -277,47 +277,52 @@ btn_show_instructions.addEventListener('click', ()=> {
 //*#########################################################
 //* ANCHOR -spawnEnemy
 //*#########################################################
-//* Creep 1: Flying creep
+//* Creep 1: Air creep
 //* Creep 2: Anti Toxic Creep
 //* Creep 3: Fast Creeps
 //* Creep 4: Raupen -- not able to slow down and toxi
 //* Creep 5: Boss - not able to slow down
 
-const creep_src = [
+const creep_properties = [
   {
     src: 'src/assets/creeps/creep_1',
     extra_velocity: -.4,
     extra_health: 800,
     scale: 0.1,
-    resistent: ['slower', 'toxic']
+    resistent: ['slower', 'toxic'],
+    extra_money_amount: 3
   },
   {
     src: 'src/assets/creeps/creep_2',
     extra_velocity: -0.3,
     extra_health: 50,
     scale: 0.2,
-    resistent: ['toxic', 'anti_air']
+    resistent: ['toxic', 'anti_air'],
+    extra_money_amount: 1
   },
   {
     src: 'src/assets/creeps/creep_3',
     extra_velocity: 1,
-    extra_health: -70,
+    extra_health: -80,
     scale: 0,
-    resistent: ['anti_air']
+    resistent: ['anti_air'],
+    extra_money_amount: 5
   },
   {
     src: 'src/assets/creeps/creep_4',
     extra_velocity: -0.7,
     extra_health: 50,
     scale: 0,
-    resistent: ['toxic', 'slower', 'anti_air']
+    resistent: ['toxic', 'slower', 'anti_air'],
+    extra_money_amount: 0
   },
   {
     src: 'src/assets/creeps/creep_5',
     extra_velocity: -0.7,
     extra_health: 300,
     scale: 0.1,
-    resistent: ['slower', 'anti_air']
+    resistent: ['slower', 'anti_air'],
+    extra_money_amount: 8
   }
 ];
 
@@ -325,7 +330,7 @@ const creep_src = [
 
 function spawnEnemy() {
   let enemyCount = 0;
-  const random_creep = Math.floor(Math.random() * creep_src.length);
+  const random_creep = Math.floor(Math.random() * creep_properties.length);
   // const random_creep = 0;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
@@ -336,11 +341,12 @@ function spawnEnemy() {
     const posY = 20;
     const width = 60;
     const height = 50;
-    const scale = (1 + creep_src[random_creep].scale);
-    const health =Math.floor(Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)) + save_obj.enemy_max_health / 2 + creep_src[random_creep].extra_health;
-    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + creep_src[random_creep].extra_velocity;
-    const imgFolder = creep_src[random_creep].src;
-    const resistent = creep_src[random_creep].resistent
+    const scale = (1 + creep_properties[random_creep].scale);
+    const health =Math.floor(Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)) + save_obj.enemy_max_health / 2 + creep_properties[random_creep].extra_health;
+    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + creep_properties[random_creep].extra_velocity;
+    const imgFolder = creep_properties[random_creep].src;
+    const resistent = creep_properties[random_creep].resistent
+    const extra_money = creep_properties[random_creep].extra_money_amount;
     
     enemies.push(
       new Creep(
@@ -353,7 +359,8 @@ function spawnEnemy() {
         waypoints,
         health,
         velocity,
-        resistent
+        resistent,
+        extra_money
       )
     );
     enemyCount++;
@@ -585,6 +592,8 @@ function gameLoop() {
             } else {
               earnedMoney = 10;
             }
+
+            earnedMoney = earnedMoney += enemy.extra_money;
           
             save_obj.money += earnedMoney;
           

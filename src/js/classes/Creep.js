@@ -9,7 +9,8 @@ export class Creep {
     waypoints,
     health,
     velocity,
-    resistent
+    resistent,
+    extra_money
   ) {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
@@ -27,6 +28,7 @@ export class Creep {
     this.is_toxicated = false;
     this.toxicated_lvl = 0.1;
     this.resistent = resistent;
+    this.extra_money = extra_money;
 
     this.velocity = velocity;
     this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
