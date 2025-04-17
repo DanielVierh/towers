@@ -521,12 +521,6 @@ function gameLoop() {
     return;
   }
   
-  save_obj.tower_places.forEach((tower) => {
-    if (tower.tower_is_build) {
-      console.log(tower);
-    }
-  });
-  
   count_energy_level();
   let low_energy_load_slowing_effect = 0;
   if(save_obj.energy_level < 0) {
@@ -1157,7 +1151,6 @@ btn_load_game.addEventListener('click', ()=> {
 //*#########################################################
 
 btn_start_game.addEventListener("click", () => {
-  console.log(random_level());
   const level = random_level();
   save_obj.backgroundImage = level.background_img_path;
   backgroundImage.src = level.background_img_path;
