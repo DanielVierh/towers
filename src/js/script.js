@@ -310,7 +310,7 @@ const creep_properties = [
 function spawnEnemy() {
   let enemyCount = 0;
   const random_creep = Math.floor(Math.random() * creep_properties.length);
-  // const random_creep = 0;
+  // const random_creep = 4;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -596,19 +596,20 @@ function gameLoop() {
            
             //* Toxic Tower
           } else if (tower.tower_type === "toxic") {
+            let toxic_power = 0.1;
             if(save_obj.energy_level >= 0) {
-              let toxic_power = 0.2;
               if (tower.tower_damage_lvl === 1) {
+                toxic_power = 0.1;
+            } else if (tower.tower_damage_lvl === 2) {
                 toxic_power = 0.2;
-              } else if (tower.tower_damage_lvl === 2) {
+            } else if (tower.tower_damage_lvl === 3) {
                 toxic_power = 0.5;
-              } else if (tower.tower_damage_lvl === 3) {
-                toxic_power = 1;
-              }
+            }
 
               //* Toxicade Enemy if not resistent
               if(!enemy.resistent.includes('toxic')) {
                 enemy.is_toxicated = true;
+                enemy.toxicated_lvl = toxic_power;
 
                 //* Green Laser 
                   lasers.push(

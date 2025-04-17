@@ -10,7 +10,7 @@ export class Creep {
     health,
     velocity,
     resistent,
-    extra_money
+    extra_money,
   ) {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
@@ -97,7 +97,7 @@ export class Creep {
         const now = Date.now();
         if (!this.lastToxicEffect || now - this.lastToxicEffect >= 1000) { // Alle 1 Sekunde
             this.lastToxicEffect = now;
-            this.health -= (this.toxicated_lvl + 1);
+            this.health -= (this.toxicated_lvl * 50);
     
             if (this.health <= 0) {
                 // Generiere Geld, bevor der Creep gelöscht wird
