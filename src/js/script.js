@@ -1,7 +1,7 @@
 import { Creep } from "./classes/Creep.js";
 import { Laser } from "./classes/Laser.js";
 
-import { drawWaypoints } from './functions/level.js';
+import { drawWaypoints, random_level } from './functions/level.js';
 
 
 
@@ -56,196 +56,7 @@ let waypoints = [
   { x: 450, y: 340 },
 ];
 
-const levels = [
-  {
-    name: 'Grassland',
-    background_img_path: '',
-    waypoints: [  
-      { x: -50, y: 20 },
-      { x: 50, y: 20 },
-      { x: 340, y: 20 },
-      { x: 340, y: 110 },
-      { x: 30, y: 110 },
-      { x: 30, y: 180 },
-      { x: 350, y: 180 },
-      { x: 350, y: 260 },
-      { x: 30, y: 260 },
-      { x: 30, y: 340 },
-      { x: 450, y: 340 }
-    ],
-    tower_places: [
-      {
-        x: 70,
-        y: 15,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 295,
-        y: 15,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 150,
-        y: 95,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 90,
-        y: 165,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 250,
-        y: 245,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 130,
-        y: 330,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 350,
-        y: 330,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 300,
-        y: 330,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 180,
-        y: 330,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 280,
-        y: 165,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 90,
-        y: 245,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 300,
-        y: 245,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 195,
-        y: 245,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 360,
-        y: 60,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      },
-      {
-        x: 210,
-        y: 95,
-        tower_is_build: false,
-        tower_damage_lvl: 1,
-        tower_type: "",
-        tower_img: "",
-        range: 80,
-        cooldown: 0,
-      }
-    ]
-  },
-  {
-    name: 'Desert',
-    background_img_path: '',
-    waypoints: [
-      { x: -50, y: 80 },
-      { x: 50, y: 80 },
-      { x: 110, y: 80 },
-      { x: 110, y: 0 },
-      { x: 270, y: 0 },
-      { x: 270, y: 110 },
-      { x: 140, y: 110 },
-      { x: 140, y: 190 },
-      { x: 360, y: 190 },
-      { x: 360, y: 250 },
-      { x: 110, y: 250 },
-      { x: 110, y: 330 },
-      { x: 450, y: 330 }],
-    tower_places: []
-  }
-]
+
 
 // * Level 2
 // waypoints = [
@@ -437,7 +248,9 @@ let save_obj = {
       cooldown: 0,
     },
   ],
-  level: 1
+  level: 1,
+  waypoints: [],
+
 }
 
 function initializeTowerImages() {
@@ -556,7 +369,7 @@ function spawnEnemy() {
         height,
         imgFolder,
         scale,
-        waypoints,
+        save_obj.waypoints,
         health,
         velocity,
         resistent,
@@ -707,7 +520,13 @@ function gameLoop() {
   if (game_is_running === false) {
     return;
   }
-
+  
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_is_build) {
+      console.log(tower);
+    }
+  });
+  
   count_energy_level();
   let low_energy_load_slowing_effect = 0;
   if(save_obj.energy_level < 0) {
@@ -725,7 +544,7 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
   //* Zuerst die Waypoints zeichnen
-  drawWaypoints(ctx, waypoints);
+  drawWaypoints(ctx, save_obj.waypoints);
 
   //* Tower Places zeichnen
   drawTowerPlaces();
@@ -1321,7 +1140,7 @@ btn_save_game.addEventListener('click', ()=> {
 btn_load_game.addEventListener('click', ()=> {
   loadGameFromLocalStorage();
   menu_modal.classList.remove("active");
-  
+  backgroundImage.src = save_obj.backgroundImage;
   game_is_running = true;
   if(sound_is_on) {
     game_audio.play();
@@ -1338,6 +1157,12 @@ btn_load_game.addEventListener('click', ()=> {
 //*#########################################################
 
 btn_start_game.addEventListener("click", () => {
+  console.log(random_level());
+  const level = random_level();
+  save_obj.backgroundImage = level.background_img_path;
+  backgroundImage.src = level.background_img_path;
+  save_obj.waypoints = level.waypoints;
+  save_obj.tower_places = level.tower_places;
   start_game();
 });
 
