@@ -256,6 +256,8 @@ btn_show_instructions.addEventListener('click', ()=> {
 //* Creep 3: Fast Creeps
 //* Creep 4: Raupen -- not able to slow down and toxi
 //* Creep 5: Boss - not able to slow down
+//* Creep 6: Air - boss
+
 
 const creep_properties = [
   {
@@ -302,6 +304,15 @@ const creep_properties = [
     scale: 0.1,
     resistent: ['slower', 'anti_air'],
     extra_money_amount: 8
+  },
+  {
+    name: 'Air, boss',
+    src: 'src/assets/creeps/creep_6',
+    extra_velocity: 0,
+    extra_health: 350,
+    scale: 0.1,
+    resistent: ['slower', 'toxic'],
+    extra_money_amount: 8
   }
 ];
 
@@ -310,7 +321,7 @@ const creep_properties = [
 function spawnEnemy() {
   let enemyCount = 0;
   const random_creep = Math.floor(Math.random() * creep_properties.length);
-  // const random_creep = 4;
+  // const random_creep = 5;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
