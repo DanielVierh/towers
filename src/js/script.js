@@ -285,6 +285,7 @@ btn_show_instructions.addEventListener('click', ()=> {
 
 const creep_properties = [
   {
+    name: 'Air',
     src: 'src/assets/creeps/creep_1',
     extra_velocity: -.4,
     extra_health: 800,
@@ -293,6 +294,7 @@ const creep_properties = [
     extra_money_amount: 3
   },
   {
+    name: 'Ground, normal',
     src: 'src/assets/creeps/creep_2',
     extra_velocity: -0.3,
     extra_health: 50,
@@ -301,6 +303,7 @@ const creep_properties = [
     extra_money_amount: 1
   },
   {
+    name: 'Ground, fast',
     src: 'src/assets/creeps/creep_3',
     extra_velocity: 1,
     extra_health: -80,
@@ -309,6 +312,7 @@ const creep_properties = [
     extra_money_amount: 5
   },
   {
+    name: 'Ground, slow',
     src: 'src/assets/creeps/creep_4',
     extra_velocity: -0.7,
     extra_health: 50,
@@ -317,9 +321,10 @@ const creep_properties = [
     extra_money_amount: 0
   },
   {
+    name: 'Ground, boss',
     src: 'src/assets/creeps/creep_5',
     extra_velocity: -0.7,
-    extra_health: 300,
+    extra_health: 350,
     scale: 0.1,
     resistent: ['slower', 'anti_air'],
     extra_money_amount: 8
