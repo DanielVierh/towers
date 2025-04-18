@@ -361,6 +361,8 @@ const levels = [
   }
 ];
 
+
+//* Random Map
 export function random_level() {
     const rnd_index = Math.floor(Math.random() * levels.length);
     return levels[rnd_index];
