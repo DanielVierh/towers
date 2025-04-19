@@ -3,8 +3,6 @@
 //*#########################################################
 
 export function drawWaypoints(ctx, waypoints, waypoint_color) {
-  console.log('WAYPOINT_COLOR', waypoint_color);
-  
   ctx.strokeStyle = waypoint_color;
   ctx.lineWidth = 20;
   ctx.beginPath();
