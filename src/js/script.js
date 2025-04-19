@@ -510,6 +510,13 @@ function gameLoop() {
      lbl_energy.style.background = 'black'
   }
 
+  //* DEBUG - Log Set Towers
+  // save_obj.tower_places.forEach((tower, index) => {
+  //   if (tower.tower_is_build) {
+  //     console.log(`Tower ${index + 1}:`, tower);
+  //   }
+  // });
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   //* Hintergrundbild zeichnen

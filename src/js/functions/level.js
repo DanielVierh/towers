@@ -368,23 +368,23 @@ const levels = [
     background_img_path: 'src/assets/bg/bg_snow.png',
     waypoint_color: 'rgba(255, 255, 255, 0.9)',
     waypoints: [
-      { x: -50, y: 80 },
-      { x: 50, y: 80 },
-      { x: 110, y: 80 },
+      { x: -50, y: 65 },
+      { x: 50, y: 65 },
+      { x: 110, y: 65 },
       { x: 110, y: 0 },
       { x: 270, y: 0 },
       { x: 270, y: 110 },
       { x: 140, y: 110 },
-      { x: 140, y: 190 },
-      { x: 360, y: 190 },
-      { x: 360, y: 250 },
-      { x: 110, y: 250 },
+      { x: 140, y: 170 },
+      { x: 270, y: 170 },
+      { x: 270, y: 230 },
+      { x: 110, y: 230 },
       { x: 110, y: 330 },
       { x: 450, y: 330 }],
     tower_places: [
       {
-        x: 60,
-        y: 15,
+        x: 5,
+        y: 60,
         tower_is_build: false,
         tower_damage_lvl: 1,
         tower_type: "",
@@ -393,8 +393,8 @@ const levels = [
         cooldown: 0,
       },
       {
-        x: 295,
-        y: 15,
+        x: 300,
+        y: 150,
         tower_is_build: false,
         tower_damage_lvl: 1,
         tower_type: "",
@@ -473,8 +473,8 @@ const levels = [
         cooldown: 0,
       },
       {
-        x: 200,
-        y: 175,
+        x: 360,
+        y: 185,
         tower_is_build: false,
         tower_damage_lvl: 1,
         tower_type: "",
@@ -494,7 +494,7 @@ const levels = [
       },
       {
         x: 300,
-        y: 245,
+        y: 85,
         tower_is_build: false,
         tower_damage_lvl: 1,
         tower_type: "",
@@ -503,8 +503,8 @@ const levels = [
         cooldown: 0,
       },
       {
-        x: 165,
-        y: 245,
+        x: 50,
+        y: 270,
         tower_is_build: false,
         tower_damage_lvl: 1,
         tower_type: "",
@@ -714,6 +714,6 @@ const levels = [
 //* Random Map
 export function random_level() {
     const rnd_index = Math.floor(Math.random() * levels.length);
-    // const rnd_index = 3;
+    // const rnd_index = 2;
     return levels[rnd_index];
 }
