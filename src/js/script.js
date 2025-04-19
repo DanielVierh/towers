@@ -52,6 +52,7 @@ let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
 let sound_is_on = false;
+let waypoint_color = 'rgba(241, 207, 113, 0.9)';
 
 let save_obj = {
   money: 200,
@@ -216,7 +217,7 @@ let save_obj = {
   ],
   level: 1,
   waypoints: [],
-
+  waypoint_color: ''
 }
 
 function initializeTowerImages() {
@@ -515,7 +516,7 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
   //* Zuerst die Waypoints zeichnen
-  drawWaypoints(ctx, save_obj.waypoints);
+  drawWaypoints(ctx, save_obj.waypoints, waypoint_color);
 
   //* Tower Places zeichnen
   drawTowerPlaces();
@@ -1113,6 +1114,7 @@ btn_load_game.addEventListener('click', ()=> {
   loadGameFromLocalStorage();
   menu_modal.classList.remove("active");
   backgroundImage.src = save_obj.backgroundImage;
+  waypoint_color = save_obj.waypoint_color;
   game_is_running = true;
   if(sound_is_on) {
     game_audio.play();
@@ -1134,6 +1136,8 @@ btn_start_game.addEventListener("click", () => {
   backgroundImage.src = level.background_img_path;
   save_obj.waypoints = level.waypoints;
   save_obj.tower_places = level.tower_places;
+  save_obj.waypoint_color = level.waypoint_color;
+  waypoint_color = level.waypoint_color
   start_game();
 });
 
