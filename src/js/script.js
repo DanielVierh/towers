@@ -33,11 +33,13 @@ const game_audio = document.getElementById("game_audio");
 const sel_difficulty = document.getElementById("sel_difficulty");
 const btn_save_game = document.getElementById('btn_save_game');
 const btn_load_game = document.getElementById('btn_load_game');
+const mdl_traps = document.getElementById('mdl_traps');
 const towerImages = new Map();
 const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="yellow" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
   <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
 </svg>`;
 const btn_show_instructions = document.getElementById('btn_show_instructions');
+const btn_mine = document.getElementById('btn_mine');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -267,7 +269,7 @@ const creep_properties = [
     extra_velocity: -.4,
     extra_health: 800,
     scale: 0.1,
-    resistent: ['slower', 'toxic'],
+    resistent: ['slower', 'toxic', 'mine'],
     extra_money_amount: 3
   },
   {
@@ -312,7 +314,7 @@ const creep_properties = [
     extra_velocity: 0,
     extra_health: 350,
     scale: 0.1,
-    resistent: ['slower', 'toxic'],
+    resistent: ['slower', 'toxic', 'mine'],
     extra_money_amount: 8
   }
 ];
@@ -447,6 +449,8 @@ function drawTowerPlaces() {
           ctx.strokeStyle = "blue"; // Blauer Kreis für slower tower
         } else if(tower.tower_type === 'anti_air') {
           ctx.strokeStyle = "grey"; // Grau für Anti Air
+        }else if(tower.tower_type === 'mine') {
+          ctx.strokeStyle = "black"; // Grau für Anti Air
         }else {
           ctx.strokeStyle = "transparent"; // Standardfarbe
         }
@@ -657,7 +661,7 @@ function gameLoop() {
             //* Cool Down
             tower.cooldown = (1 + (tower.tower_damage_lvl * 4) + low_energy_load_slowing_effect); 
 
-            //* Anti Air Tower
+            //* >>> Anti Air Tower <<<
           }else if(tower.tower_type === "anti_air") {
             //* Harm Enemy
             if(!enemy.resistent.includes('anti_air')) {
@@ -670,6 +674,21 @@ function gameLoop() {
             //* Cool Down
             tower.cooldown = 50; 
             
+          //* >>> Mine <<<
+          }else if(tower.tower_type === 'mine') {
+            if (!enemy.resistent.includes('mine')) {
+              enemy.health = 0;
+
+              setTimeout(() => {
+              // Explosion-Animation anzeigen
+              drawExplosionAnimation(tower.x, tower.y);
+          
+              // Mine entfernen
+              tower.tower_is_build = false;
+              tower.tower_type = "";
+              tower.tower_img = "";
+              }, 200);
+            }
           }
         }
       }
@@ -713,6 +732,35 @@ function gameLoop() {
   setTimeout(() => {
     gameLoop();
   }, 20);
+}
+
+function drawExplosionAnimation(x, y) {
+  let frame = 1; // Start bei Frame 1
+  const totalFrames = 10; // Insgesamt 10 Frames
+  const frameInterval = 50; // Zeit zwischen Frames in Millisekunden
+
+  const explosionInterval = setInterval(() => {
+    const explosionImage = new Image();
+    explosionImage.src = `src/assets/mine/Explosion_${frame}.png`; // Pfad zu den Bildern
+
+    explosionImage.onload = () => {
+      // Lösche den Bereich um die Explosion herum
+      ctx.clearRect(x - 40, y - 40, 120, 120);
+
+      // Zeichne das aktuelle Frame der Explosion
+      ctx.drawImage(explosionImage, x - 40, y - 40, 80, 80);
+    };
+
+    frame++;
+
+    // Stoppe die Animation, wenn alle Frames gezeichnet wurden
+    if (frame > totalFrames) {
+      clearInterval(explosionInterval);
+
+      // Lösche den Bereich nach der Explosion
+      ctx.clearRect(x - 40, y - 40, 120, 120);
+    }
+  }, frameInterval);
 }
 
 //*#########################################################
@@ -793,6 +841,12 @@ canvas.addEventListener("click", (event) => {
         game_is_running = true;
       }
       play_pause();
+
+      //* Modal for traps
+      if(place.is_trap) {
+        mdl_traps.style.display = "flex";
+        return;
+      }
       if (!place.tower_is_build) {
         //*Open Modal for Baumenu and show current Money and Energy
         mdl_towers.style.display = "flex";
@@ -866,6 +920,33 @@ btn_Slower.addEventListener("click", () => {
     }
     save_obj.money -= tower_price;
     mdl_towers.style.display = "none";
+    if(game_is_running === false) {
+      play_pause();
+    }
+  }else {
+    alert('Nicht genug Geld')
+  }
+});
+
+//*#########################################################
+//* ANCHOR -Set Mine
+//*#########################################################
+
+btn_mine.addEventListener("click", () => {
+  const tower_price = btn_mine.getAttribute("data-tower_price");
+  const tower_img = btn_mine.getAttribute("data-tower_img");
+  if (save_obj.money >= tower_price) {
+    tower.tower_type = "mine";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    tower.tower_damage_lvl = 3;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    save_obj.money -= tower_price;
+    mdl_traps.style.display = "none";
     if(game_is_running === false) {
       play_pause();
     }
@@ -1075,6 +1156,15 @@ window.onclick = (event)=> {
 //*#########################################################
 btn_close_modal_towers.addEventListener("click", () => {
   mdl_towers.style.display = "none";
+  play_pause();
+});
+
+//*#########################################################
+//* ANCHOR -close modal traps
+//*#########################################################
+const btn_close_modal_traps = document.getElementById('btn_close_modal_traps');
+btn_close_modal_traps.addEventListener("click", () => {
+  mdl_traps.style.display = "none";
   play_pause();
 });
 

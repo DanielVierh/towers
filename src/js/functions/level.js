@@ -39,6 +39,17 @@ const levels = [
     ],
     tower_places: [
       {
+        x: 230,
+        y: 365,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+        is_trap: true
+      },
+      {
         x: 70,
         y: 15,
         tower_is_build: false,
@@ -209,6 +220,17 @@ const levels = [
       { x: 110, y: 330 },
       { x: 450, y: 330 }],
     tower_places: [
+      {
+        x: 330,
+        y: 355,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+        is_trap: true
+      },
       {
         x: 60,
         y: 15,
@@ -555,6 +577,17 @@ const levels = [
     ],
     tower_places: [
       {
+        x: 345,
+        y: 355,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+        is_trap: true
+      },
+      {
         x: 60,
         y: 15,
         tower_is_build: false,
@@ -712,6 +745,6 @@ const levels = [
 //* Random Map
 export function random_level() {
     const rnd_index = Math.floor(Math.random() * levels.length);
-    // const rnd_index = 2;
+    // const rnd_index = 3;
     return levels[rnd_index];
 }
