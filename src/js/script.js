@@ -327,14 +327,18 @@ let next_round_creep_index = 2;
 
 function initialize_Creeps_for_next_round() {
   //* If first round
-  if(current_creep_index === undefined) {
+  if (current_creep_index === undefined) {
     current_creep_index = next_round_creep_index;
-    next_round_creep_index = Math.floor(Math.random() * creep_properties.length);
-    spawnEnemy()
-  }else {
+    next_round_creep_index = save_obj.wave < 10 
+      ? Math.floor(Math.random() * (creep_properties.length - 2)) + 2 
+      : Math.floor(Math.random() * creep_properties.length);
+    spawnEnemy();
+  } else {
     current_creep_index = next_round_creep_index;
-    next_round_creep_index = Math.floor(Math.random() * creep_properties.length);
-    spawnEnemy()
+    next_round_creep_index = save_obj.wave < 10 
+      ? Math.floor(Math.random() * (creep_properties.length - 2)) + 2 
+      : Math.floor(Math.random() * creep_properties.length);
+    spawnEnemy();
   }
 }
 
