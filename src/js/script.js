@@ -264,13 +264,22 @@ btn_show_instructions.addEventListener('click', ()=> {
 
 const creep_properties = [
   {
-    name: 'Air',
+    name: 'Air, normal',
     src: 'src/assets/creeps/creep_1',
     extra_velocity: -.4,
     extra_health: 800,
     scale: 0.1,
     resistent: ['slower', 'toxic', 'mine'],
     extra_money_amount: 3
+  },
+  {
+    name: 'Air, boss',
+    src: 'src/assets/creeps/creep_6',
+    extra_velocity: 0,
+    extra_health: 1150,
+    scale: 0.1,
+    resistent: ['slower', 'toxic', 'mine'],
+    extra_money_amount: 8
   },
   {
     name: 'Ground, normal',
@@ -307,24 +316,32 @@ const creep_properties = [
     scale: 0.1,
     resistent: ['slower', 'anti_air'],
     extra_money_amount: 8
-  },
-  {
-    name: 'Air, boss',
-    src: 'src/assets/creeps/creep_6',
-    extra_velocity: 0,
-    extra_health: 350,
-    scale: 0.1,
-    resistent: ['slower', 'toxic', 'mine'],
-    extra_money_amount: 8
   }
 ];
 
+//*#########################################################
+//* ANCHOR - Initialize Creeps for this and next round
+//*########################################################
+let current_creep_index = undefined;
+let next_round_creep_index = 2;
 
+function initialize_Creeps_for_next_round() {
+  //* If first round
+  if(current_creep_index === undefined) {
+    current_creep_index = next_round_creep_index;
+    next_round_creep_index = Math.floor(Math.random() * creep_properties.length);
+    spawnEnemy()
+  }else {
+    current_creep_index = next_round_creep_index;
+    next_round_creep_index = Math.floor(Math.random() * creep_properties.length);
+    spawnEnemy()
+  }
+}
 
 function spawnEnemy() {
   let enemyCount = 0;
-  const random_creep = Math.floor(Math.random() * creep_properties.length);
-  // const random_creep = 5;
+  const creep_index = current_creep_index;
+  // const creep_index = 5;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -334,12 +351,12 @@ function spawnEnemy() {
     const posY = 20;
     const width = 60;
     const height = 50;
-    const scale = (1 + creep_properties[random_creep].scale);
-    const health =Math.floor(Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)) + save_obj.enemy_max_health / 2 + creep_properties[random_creep].extra_health;
-    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + creep_properties[random_creep].extra_velocity;
-    const imgFolder = creep_properties[random_creep].src;
-    const resistent = creep_properties[random_creep].resistent
-    const extra_money = creep_properties[random_creep].extra_money_amount;
+    const scale = (1 + creep_properties[creep_index].scale);
+    const health =Math.floor(Math.random() * (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)) + save_obj.enemy_max_health / 2 + creep_properties[creep_index].extra_health;
+    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + creep_properties[creep_index].extra_velocity;
+    const imgFolder = creep_properties[creep_index].src;
+    const resistent = creep_properties[creep_index].resistent
+    const extra_money = creep_properties[creep_index].extra_money_amount;
     
     enemies.push(
       new Creep(
@@ -534,7 +551,9 @@ function gameLoop() {
 
   lbl_Money.innerHTML = `${save_obj.money}€`;
   lbl_Live.innerHTML = `${save_obj.live} Leben`;
-  lbl_wave.innerHTML = `Welle: ${save_obj.wave}`;
+  if(current_creep_index !== undefined) {
+    lbl_wave.innerHTML = `Welle: ${save_obj.wave} ${creep_properties[current_creep_index].name}`;
+  }
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`
 
   //* Dann die Creeps darüber zeichnen
@@ -677,17 +696,19 @@ function gameLoop() {
           //* >>> Mine <<<
           }else if(tower.tower_type === 'mine') {
             if (!enemy.resistent.includes('mine')) {
-              enemy.health = 0;
-
               setTimeout(() => {
-              // Explosion-Animation anzeigen
-              drawExplosionAnimation(tower.x, tower.y);
-          
-              // Mine entfernen
-              tower.tower_is_build = false;
-              tower.tower_type = "";
-              tower.tower_img = "";
-              }, 200);
+                enemy.health = 0;
+
+                setTimeout(() => {
+                // Explosion-Animation anzeigen
+                drawExplosionAnimation(tower.x, tower.y);
+            
+                // Mine entfernen
+                tower.tower_is_build = false;
+                tower.tower_type = "";
+                tower.tower_img = "";
+                }, 200);
+              }, 500);
             }
           }
         }
@@ -798,14 +819,14 @@ function updateWaveTimer() {
   }
 
   waveTimer--;
-  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s`;
+  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${creep_properties[next_round_creep_index].name}`;
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
     if (save_obj.wave >= 6) {
       time_to_next_wave = 45;
     }
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
-    spawnEnemy();
+    initialize_Creeps_for_next_round();
     save_obj.wave++;
     save_obj.wave < 10
       ? (save_obj.enemy_max_velocity += 0.1)
@@ -1234,7 +1255,7 @@ btn_start_game.addEventListener("click", () => {
   save_obj.waypoints = level.waypoints;
   save_obj.tower_places = level.tower_places;
   save_obj.waypoint_color = level.waypoint_color;
-  waypoint_color = level.waypoint_color
+  waypoint_color = level.waypoint_color;
   start_game();
 });
 
