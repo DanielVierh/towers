@@ -939,7 +939,7 @@ btn_mine.addEventListener("click", () => {
     tower.tower_type = "mine";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
-    tower.tower_damage_lvl = 3;
+    tower.tower_damage_lvl = 0;
     if (!towerImages.has(tower_img)) {
       const img = new Image();
       img.src = tower_img;

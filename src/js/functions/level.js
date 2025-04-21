@@ -20,7 +20,7 @@ export function drawWaypoints(ctx, waypoints, waypoint_color) {
 
 
 const levels = [
-  {
+  { //* ANCHOR - Level: Grassland
     name: 'Grassland',
     background_img_path: 'src/assets/bg/bg2.webp',
     waypoint_color: 'rgba(241, 207, 113, 0.9)',
@@ -201,7 +201,7 @@ const levels = [
       }
     ]
   },
-  {
+  { //* ANCHOR - Desert:
     name: 'Desert',
     background_img_path: 'src/assets/bg/desert_bg.png',
     waypoint_color: 'rgba(231, 137, 55, 0.9)',
@@ -383,7 +383,7 @@ const levels = [
       }
     ]
   },
-  {
+  {//* ANCHOR - Snow:
     name: 'Snow',
     background_img_path: 'src/assets/bg/bg_snow.png',
     waypoint_color: 'rgba(255, 255, 255, 0.9)',
@@ -402,6 +402,17 @@ const levels = [
       { x: 110, y: 330 },
       { x: 450, y: 330 }],
     tower_places: [
+      {
+        x: 345,
+        y: 352,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+        is_trap: true
+      },
       {
         x: 5,
         y: 60,
@@ -554,7 +565,7 @@ const levels = [
       }
     ]
   },
-  {
+  {//* ANCHOR - Swamp:
     name: 'Swamp',
     background_img_path: 'src/assets/bg/bg_swamp.png',
     waypoint_color: 'rgba(62, 39, 3, 0.9)',
@@ -745,6 +756,6 @@ const levels = [
 //* Random Map
 export function random_level() {
     const rnd_index = Math.floor(Math.random() * levels.length);
-    // const rnd_index = 3;
+    // const rnd_index = 2;
     return levels[rnd_index];
 }
