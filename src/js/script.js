@@ -835,7 +835,7 @@ function updateWaveTimer() {
     save_obj.wave < 10
       ? (save_obj.enemy_max_velocity += 0.1)
       : (save_obj.enemy_max_velocity = save_obj.enemy_max_velocity);
-    if (save_obj.wave >= 7) {
+    if (save_obj.wave >= 8) {
       save_obj.enemy_max_health += 20;
     } else {
       save_obj.max_enemy_amount += save_obj.wave;
