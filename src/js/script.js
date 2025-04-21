@@ -520,7 +520,8 @@ function showGameOverModal() {
   lbl_Live.innerHTML = "0 Leben";
   if(!assign_XP) {
     save_obj.XP += Math.floor(XP / 2);
-    lbl_XP.innerHTML = ` +${XP} XP (${save_obj.XP} XP)`;
+    lbl_XP.innerHTML = ` +${Math.floor(XP / 2)} XP (${save_obj.XP} XP)`;
+    assign_XP = true;
   }
 }
 

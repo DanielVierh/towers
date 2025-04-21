@@ -45,7 +45,7 @@ const levels = [
         tower_damage_lvl: 1,
         tower_type: "",
         tower_img: "",
-        range: 80,
+        range: 40,
         cooldown: 0,
         is_trap: true
       },
@@ -227,7 +227,7 @@ const levels = [
         tower_damage_lvl: 1,
         tower_type: "",
         tower_img: "",
-        range: 80,
+        range: 40,
         cooldown: 0,
         is_trap: true
       },
@@ -409,7 +409,7 @@ const levels = [
         tower_damage_lvl: 1,
         tower_type: "",
         tower_img: "",
-        range: 80,
+        range: 40,
         cooldown: 0,
         is_trap: true
       },
@@ -594,7 +594,7 @@ const levels = [
         tower_damage_lvl: 1,
         tower_type: "",
         tower_img: "",
-        range: 80,
+        range: 40,
         cooldown: 0,
         is_trap: true
       },
