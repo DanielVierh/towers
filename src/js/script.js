@@ -40,6 +40,7 @@ const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" he
 </svg>`;
 const btn_show_instructions = document.getElementById('btn_show_instructions');
 const btn_mine = document.getElementById('btn_mine');
+const lbl_XP = document.getElementById('lbl_XP');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -55,6 +56,8 @@ let show_tower_range = false;
 let game_is_running = false;
 let sound_is_on = false;
 let waypoint_color = 'rgba(241, 207, 113, 0.9)';
+let XP = 0;
+let assign_XP = false;
 
 let save_obj = {
   money: 200,
@@ -219,7 +222,8 @@ let save_obj = {
   ],
   level: 1,
   waypoints: [],
-  waypoint_color: ''
+  waypoint_color: '',
+  XP: 0
 }
 
 function initializeTowerImages() {
@@ -514,6 +518,10 @@ function calculateDistance(x1, y1, x2, y2) {
 function showGameOverModal() {
   gameOverModal.style.display = "block";
   lbl_Live.innerHTML = "0 Leben";
+  if(!assign_XP) {
+    save_obj.XP += Math.floor(XP / 2);
+    lbl_XP.innerHTML = ` +${XP} XP (${save_obj.XP} XP)`;
+  }
 }
 
 //*#########################################################
@@ -601,6 +609,7 @@ function gameLoop() {
             }
 
             earnedMoney = earnedMoney += enemy.extra_money;
+            XP += 1;
           
             save_obj.money += earnedMoney;
           

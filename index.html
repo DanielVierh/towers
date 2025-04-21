@@ -52,6 +52,7 @@
             <span class="close" id="closeModal">&times;</span>
             <h2>Game Over</h2>
             <p>Das Spiel ist vorbei!</p>
+            <p id="lbl_XP"></p>
         </div>
     </div>
 
@@ -59,6 +60,8 @@
         <h2>Tower</h2>
         <div class="button" id="btn_start_game">Neues Spiel</div>
         <div class="button" id="btn_load_game">Spiel laden</div>
+        <div class="button" id="btn_open_skill_menu">Skill</div>
+
         <h5>Schwierigkeit</h5>
         <select name="difficulty" id="sel_difficulty">
             <option value="very_easy">Sehr Einfach</option>
@@ -68,6 +71,10 @@
         </select>
         <div class="button" id="btn_show_instructions">Anleitung</div>
     </div>
+
+    <!-- <div class="modal modal-skill" id="mdl_skill_tree">
+
+    </div> -->
 
     <div id="mdl_towers" class="modal modal-towers" >
         <div class="close-button" id="btn_close_modal_towers">x</div>
@@ -153,7 +160,7 @@
             <p id="tower_type">Typ: </p>
             <p id="tower_damage_lvl">Schaden: </p>
             <p id="tower_range">Reichweite: </p>
-          </div>
+        </div>
 
         <div class="grid-wrapper">
             <div class="tile" id="tile_upgrade_range">
