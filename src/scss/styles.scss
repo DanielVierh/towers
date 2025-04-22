@@ -340,3 +340,61 @@ body {
     object-fit: cover;
     background: black;
   }
+
+  .modal-sel-lvl {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgb(0, 0, 0);
+    color: white;
+    z-index: 99999999;
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .grid-wrapper {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 600px;
+
+      .tile {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        img {
+          width: 150px;
+          height: 150px;
+          object-fit: cover;
+          border-radius: 50%;
+          margin-bottom: 10px;
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        h4 {
+          font-size: 1rem;
+          color: white;
+          margin: 0;
+        }
+      }
+    }
+  }

@@ -1,7 +1,7 @@
 import { Creep } from "./classes/Creep.js";
 import { Laser } from "./classes/Laser.js";
 
-import { drawWaypoints, random_level } from './functions/level.js';
+import { drawWaypoints, set_level} from './functions/level.js';
 
 
 
@@ -41,6 +41,12 @@ const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" he
 const btn_show_instructions = document.getElementById('btn_show_instructions');
 const btn_mine = document.getElementById('btn_mine');
 const lbl_XP = document.getElementById('lbl_XP');
+const modal_select_lvl = document.getElementById('modal_select_lvl');
+const level_0 = document.getElementById('level_0');
+const level_1 = document.getElementById('level_1');
+const level_2 = document.getElementById('level_2');
+const level_3 = document.getElementById('level_3');
+const level_random = document.getElementById('level_random');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -1262,8 +1268,38 @@ btn_load_game.addEventListener('click', ()=> {
 //* ANCHOR -start Game
 //*#########################################################
 
+level_0.addEventListener('click', () => {
+  const level_details = set_level('0');
+  initialize_game(level_details);
+});
+
+level_1.addEventListener('click', () => {
+  const level_details = set_level('1');
+  initialize_game(level_details);
+});
+
+level_2.addEventListener('click', () => {
+  const level_details = set_level('2');
+  initialize_game(level_details);
+});
+
+level_3.addEventListener('click', () => {
+  const level_details = set_level('3');
+  initialize_game(level_details);
+});
+
+level_random.addEventListener('click', () => {
+  const level_details = set_level('level_rnd');
+  initialize_game(level_details);
+});
+
 btn_start_game.addEventListener("click", () => {
-  const level = random_level();
+  modal_select_lvl.style.display = 'flex';
+});
+
+function initialize_game(level_details) {
+  modal_select_lvl.style.display = 'none';
+  const level = level_details;
   save_obj.backgroundImage = level.background_img_path;
   backgroundImage.src = level.background_img_path;
   save_obj.waypoints = level.waypoints;
@@ -1271,7 +1307,7 @@ btn_start_game.addEventListener("click", () => {
   save_obj.waypoint_color = level.waypoint_color;
   waypoint_color = level.waypoint_color;
   start_game();
-});
+}
 
 
 function start_game() {

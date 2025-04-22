@@ -1,3 +1,5 @@
+
+
 //*#########################################################
 //* ANCHOR -draw Waypoints
 //*#########################################################
@@ -753,8 +755,21 @@ const levels = [
 ];
 
 
+
+export function set_level(lvl_id) {
+  let level_details = undefined;
+  if(lvl_id === 'level_rnd') {
+    level_details = random_level();
+  }else {
+    level_details = levels[lvl_id]
+  }
+
+  return level_details;
+}
+
+
 //* Random Map
-export function random_level() {
+function random_level() {
     const rnd_index = Math.floor(Math.random() * levels.length);
     // const rnd_index = 2;
     return levels[rnd_index];
