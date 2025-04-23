@@ -354,8 +354,8 @@ function initialize_Creeps_for_next_round() {
 
 function spawnEnemy() {
   let enemyCount = 0;
-  // const creep_index = current_creep_index;
-  const creep_index = 0;
+  const creep_index = current_creep_index;
+  // const creep_index = 0;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
