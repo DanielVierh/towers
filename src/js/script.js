@@ -297,7 +297,7 @@ const creep_properties = [
     extra_velocity: -0.3,
     extra_health: 50,
     scale: 0.2,
-    resistent: ['toxic', 'anti_air'],
+    resistent: ['toxic', 'anti_air', 'air_mine'],
     extra_money_amount: 1
   },
   {
@@ -306,7 +306,7 @@ const creep_properties = [
     extra_velocity: 1,
     extra_health: -80,
     scale: 0,
-    resistent: ['anti_air'],
+    resistent: ['anti_air', 'air_mine'],
     extra_money_amount: 5
   },
   {
@@ -315,7 +315,7 @@ const creep_properties = [
     extra_velocity: -0.7,
     extra_health: 50,
     scale: 0,
-    resistent: ['toxic', 'slower', 'anti_air'],
+    resistent: ['toxic', 'slower', 'anti_air', 'air_mine'],
     extra_money_amount: 0
   },
   {
@@ -324,7 +324,7 @@ const creep_properties = [
     extra_velocity: -0.7,
     extra_health: 350,
     scale: 0.1,
-    resistent: ['slower', 'anti_air'],
+    resistent: ['slower', 'anti_air', 'air_mine'],
     extra_money_amount: 8
   }
 ];
@@ -354,8 +354,8 @@ function initialize_Creeps_for_next_round() {
 
 function spawnEnemy() {
   let enemyCount = 0;
-  const creep_index = current_creep_index;
-  // const creep_index = 5;
+  // const creep_index = current_creep_index;
+  const creep_index = 0;
   const spawnInterval = setInterval(() => {
     if (enemyCount >= save_obj.max_enemy_amount) {
       clearInterval(spawnInterval);
@@ -481,6 +481,8 @@ function drawTowerPlaces() {
         } else if(tower.tower_type === 'anti_air') {
           ctx.strokeStyle = "grey"; // Grau für Anti Air
         }else if(tower.tower_type === 'mine') {
+          ctx.strokeStyle = "black"; // Grau für Anti Air
+        }else if(tower.tower_type === 'air_mine') {
           ctx.strokeStyle = "black"; // Grau für Anti Air
         }else {
           ctx.strokeStyle = "transparent"; // Standardfarbe
@@ -721,7 +723,23 @@ function gameLoop() {
 
                 setTimeout(() => {
                 // Explosion-Animation anzeigen
-                drawExplosionAnimation(tower.x, tower.y);
+                 triggerExplosion(tower.x, tower.y);
+            
+                // Mine entfernen
+                tower.tower_is_build = false;
+                tower.tower_type = "";
+                tower.tower_img = "";
+                }, 200);
+              }, 500);
+            }
+          }else if( tower.tower_type === 'air_mine') {
+            if (!enemy.resistent.includes('air_mine')) {
+              setTimeout(() => {
+                enemy.health = 0;
+
+                setTimeout(() => {
+                // Explosion-Animation anzeigen
+                 triggerExplosion(tower.x, tower.y);
             
                 // Mine entfernen
                 tower.tower_is_build = false;
@@ -770,36 +788,83 @@ function gameLoop() {
     return; // Stop the game loop
   }
 
+ // Explosionen zeichnen
+ activeExplosions.forEach((explosion, index) => {
+  if (explosion.frame < explosionFrames.length) {
+    // Zeichne das aktuelle Frame der Explosion
+    ctx.drawImage(
+      explosionFrames[explosion.frame],
+      explosion.x - 40,
+      explosion.y - 40,
+      80,
+      80
+    );
+    explosion.frame++; // Nächstes Frame
+  } else {
+    // Entferne die Explosion, wenn alle Frames gezeichnet wurden
+    activeExplosions.splice(index, 1);
+  }
+});
+
   setTimeout(() => {
     gameLoop();
   }, 20);
 }
 
+const activeExplosions = [];
+const explosionFrames = [];
+
+function preloadExplosionImages() {
+  for (let i = 1; i <= 10; i++) {
+    const img = new Image();
+    img.src = `src/assets/mine/Explosion_${i}.png`;
+    explosionFrames.push(img);
+  }
+}
+
+function triggerExplosion(x, y) {
+  activeExplosions.push({
+    x: x,
+    y: y,
+    frame: 0, // Start bei Frame 0
+  });
+}
+
+// Rufe diese Funktion beim Start des Spiels auf
+preloadExplosionImages();
+
 function drawExplosionAnimation(x, y) {
-  let frame = 1; // Start bei Frame 1
-  const totalFrames = 10; // Insgesamt 10 Frames
+  // Überprüfen, ob die Explosion bereits aktiv ist
+  const explosionKey = `${x}-${y}`;
+  if (activeExplosions.includes(explosionKey)) {
+    return; // Explosion läuft bereits
+  }
+
+  // Explosion als aktiv markieren
+  activeExplosions.push(explosionKey);
+
+  let frame = 0; // Start bei Frame 0
+  const totalFrames = explosionFrames.length; // Anzahl der Frames
   const frameInterval = 50; // Zeit zwischen Frames in Millisekunden
 
   const explosionInterval = setInterval(() => {
-    const explosionImage = new Image();
-    explosionImage.src = `src/assets/mine/Explosion_${frame}.png`; // Pfad zu den Bildern
-
-    explosionImage.onload = () => {
+    if (frame < totalFrames) {
       // Lösche den Bereich um die Explosion herum
       ctx.clearRect(x - 40, y - 40, 120, 120);
 
       // Zeichne das aktuelle Frame der Explosion
-      ctx.drawImage(explosionImage, x - 40, y - 40, 80, 80);
-    };
-
-    frame++;
-
-    // Stoppe die Animation, wenn alle Frames gezeichnet wurden
-    if (frame > totalFrames) {
+      ctx.drawImage(explosionFrames[frame], x - 40, y - 40, 80, 80);
+      frame++;
+      console.log('frame', frame);
+    } else {
+      // Stoppe die Animation nach dem letzten Frame
       clearInterval(explosionInterval);
 
-      // Lösche den Bereich nach der Explosion
-      ctx.clearRect(x - 40, y - 40, 120, 120);
+      // Entferne die Explosion aus der aktiven Liste
+      const index = activeExplosions.indexOf(explosionKey);
+      if (index > -1) {
+        activeExplosions.splice(index, 1);
+      }
     }
   }, frameInterval);
 }
@@ -978,6 +1043,33 @@ btn_mine.addEventListener("click", () => {
   const tower_img = btn_mine.getAttribute("data-tower_img");
   if (save_obj.money >= tower_price) {
     tower.tower_type = "mine";
+    tower.tower_img = tower_img;
+    tower.tower_is_build = true;
+    tower.tower_damage_lvl = 0;
+    if (!towerImages.has(tower_img)) {
+      const img = new Image();
+      img.src = tower_img;
+      towerImages.set(tower_img, img);
+    }
+    save_obj.money -= tower_price;
+    mdl_traps.style.display = "none";
+    if(game_is_running === false) {
+      play_pause();
+    }
+  }else {
+    alert('Nicht genug Geld')
+  }
+});
+
+//*#########################################################
+//* ANCHOR -Set Air Mine
+//*#########################################################
+const btn_air_mine = document.getElementById('btn_air_mine');
+btn_air_mine.addEventListener("click", () => {
+  const tower_price = btn_air_mine.getAttribute("data-tower_price");
+  const tower_img = btn_air_mine.getAttribute("data-tower_img");
+  if (save_obj.money >= tower_price) {
+    tower.tower_type = "air_mine";
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
     tower.tower_damage_lvl = 0;
