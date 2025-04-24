@@ -1012,26 +1012,7 @@ canvas.addEventListener("click", (event) => {
 //*#########################################################
 
 btn_Slower.addEventListener("click", () => {
-  const tower_price = btn_Slower.getAttribute("data-tower_price");
-  const tower_img = btn_Slower.getAttribute("data-tower_img");
-  if (save_obj.money >= tower_price) {
-    tower.tower_type = "slower";
-    tower.tower_img = tower_img;
-    tower.tower_is_build = true;
-    tower.tower_damage_lvl = 0;
-    if (!towerImages.has(tower_img)) {
-      const img = new Image();
-      img.src = tower_img;
-      towerImages.set(tower_img, img);
-    }
-    save_obj.money -= tower_price;
-    mdl_towers.style.display = "none";
-    if(game_is_running === false) {
-      play_pause();
-    }
-  }else {
-    alert('Nicht genug Geld')
-  }
+  set_Tower(btn_Slower, 'slower', 1, mdl_towers);
 });
 
 //*#########################################################
@@ -1039,53 +1020,16 @@ btn_Slower.addEventListener("click", () => {
 //*#########################################################
 
 btn_mine.addEventListener("click", () => {
-  const tower_price = btn_mine.getAttribute("data-tower_price");
-  const tower_img = btn_mine.getAttribute("data-tower_img");
-  if (save_obj.money >= tower_price) {
-    tower.tower_type = "mine";
-    tower.tower_img = tower_img;
-    tower.tower_is_build = true;
-    tower.tower_damage_lvl = 0;
-    if (!towerImages.has(tower_img)) {
-      const img = new Image();
-      img.src = tower_img;
-      towerImages.set(tower_img, img);
-    }
-    save_obj.money -= tower_price;
-    mdl_traps.style.display = "none";
-    if(game_is_running === false) {
-      play_pause();
-    }
-  }else {
-    alert('Nicht genug Geld')
-  }
+  set_Tower(btn_mine, 'mine', 0, mdl_traps)
 });
 
 //*#########################################################
 //* ANCHOR -Set Air Mine
 //*#########################################################
 const btn_air_mine = document.getElementById('btn_air_mine');
+
 btn_air_mine.addEventListener("click", () => {
-  const tower_price = btn_air_mine.getAttribute("data-tower_price");
-  const tower_img = btn_air_mine.getAttribute("data-tower_img");
-  if (save_obj.money >= tower_price) {
-    tower.tower_type = "air_mine";
-    tower.tower_img = tower_img;
-    tower.tower_is_build = true;
-    tower.tower_damage_lvl = 0;
-    if (!towerImages.has(tower_img)) {
-      const img = new Image();
-      img.src = tower_img;
-      towerImages.set(tower_img, img);
-    }
-    save_obj.money -= tower_price;
-    mdl_traps.style.display = "none";
-    if(game_is_running === false) {
-      play_pause();
-    }
-  }else {
-    alert('Nicht genug Geld')
-  }
+  set_Tower(btn_air_mine, 'air_mine', 0, mdl_traps)
 });
 
 //*#########################################################
@@ -1093,25 +1037,7 @@ btn_air_mine.addEventListener("click", () => {
 //*#########################################################
 
 btn_Destroyer.addEventListener("click", () => {
-  const tower_price = btn_Destroyer.getAttribute("data-tower_price");
-  const tower_img = btn_Destroyer.getAttribute("data-tower_img");
-  if (save_obj.money >= tower_price) {
-    tower.tower_type = "destroyer";
-    tower.tower_img = tower_img;
-    tower.tower_is_build = true;
-    if (!towerImages.has(tower_img)) {
-      const img = new Image();
-      img.src = tower_img;
-      towerImages.set(tower_img, img);
-    }
-    save_obj.money -= tower_price;
-    mdl_towers.style.display = "none";
-    if(game_is_running === false) {
-      play_pause();
-    }
-  }else {
-    alert('Nicht genug Geld')
-  }
+  set_Tower(btn_Destroyer, 'destroyer', 1, mdl_towers)
 });
 
 //*#########################################################
@@ -1119,25 +1045,7 @@ btn_Destroyer.addEventListener("click", () => {
 //*#########################################################
 
 btn_Toxic.addEventListener("click", () => {
-  const tower_price = btn_Toxic.getAttribute("data-tower_price");
-  const tower_img = btn_Toxic.getAttribute("data-tower_img");
-  if (save_obj.money >= tower_price) {
-    tower.tower_type = "toxic";
-    tower.tower_img = tower_img;
-    tower.tower_is_build = true;
-    if (!towerImages.has(tower_img)) {
-      const img = new Image();
-      img.src = tower_img;
-      towerImages.set(tower_img, img);
-    }
-    save_obj.money -= tower_price;
-    mdl_towers.style.display = "none";
-    if(game_is_running === false) {
-      play_pause();
-    }
-  }else {
-    alert('Nicht genug Geld');
-  }
+  set_Tower(btn_Toxic, 'toxic', 1, mdl_towers)
 });
 
 //*#########################################################
@@ -1147,25 +1055,7 @@ btn_Toxic.addEventListener("click", () => {
 const btn_Anti_Air = document.getElementById('btn_Anti_Air');
 
 btn_Anti_Air.addEventListener("click", () => {
-  const tower_price = btn_Anti_Air.getAttribute("data-tower_price");
-  const tower_img = btn_Anti_Air.getAttribute("data-tower_img");
-  if (save_obj.money >= tower_price) {
-    tower.tower_type = "anti_air";
-    tower.tower_img = tower_img;
-    tower.tower_is_build = true;
-    if (!towerImages.has(tower_img)) {
-      const img = new Image();
-      img.src = tower_img;
-      towerImages.set(tower_img, img);
-    }
-    save_obj.money -= tower_price;
-    mdl_towers.style.display = "none";
-    if(game_is_running === false) {
-      play_pause();
-    }
-  }else {
-    alert('Nicht genug Geld');
-  }
+  set_Tower(btn_Anti_Air, 'anti_air', 1, mdl_towers)
 });
 
 //*#########################################################
@@ -1173,26 +1063,35 @@ btn_Anti_Air.addEventListener("click", () => {
 //*#########################################################
 
 btn_energy.addEventListener("click", () => {
-  const tower_price = btn_energy.getAttribute("data-tower_price");
-  const tower_img = btn_energy.getAttribute("data-tower_img");
+  set_Tower(btn_energy, 'energy', 1, mdl_towers)
+});
+
+//*#########################################################
+//* ANCHOR -Set Tower Function
+//*#########################################################
+
+function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
+  const tower_price = tower_btn.getAttribute("data-tower_price");
+  const tower_img = tower_btn.getAttribute("data-tower_img");
   if (save_obj.money >= tower_price) {
-    tower.tower_type = "energy";
+    tower.tower_type = tower_type;
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
+    tower.tower_damage_lvl = tower_damage_lvl;
     if (!towerImages.has(tower_img)) {
       const img = new Image();
       img.src = tower_img;
       towerImages.set(tower_img, img);
     }
     save_obj.money -= tower_price;
-    mdl_towers.style.display = "none";
+    closing_modal.style.display = "none";
     if(game_is_running === false) {
       play_pause();
     }
   }else {
     alert('Nicht genug Geld')
   }
-});
+}
 
 //*#########################################################
 //* ANCHOR -Upgrade Tower Range
