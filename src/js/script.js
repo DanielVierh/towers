@@ -723,14 +723,14 @@ function gameLoop() {
 
                 setTimeout(() => {
                 // Explosion-Animation anzeigen
-                 triggerExplosion(tower.x, tower.y);
+                 triggerExplosion(tower.x + 20, tower.y);
             
                 // Mine entfernen
                 tower.tower_is_build = false;
                 tower.tower_type = "";
                 tower.tower_img = "";
-                }, 200);
-              }, 500);
+                }, 50);
+              }, 10);
             }
           }else if( tower.tower_type === 'air_mine') {
             if (!enemy.resistent.includes('air_mine')) {
@@ -739,14 +739,14 @@ function gameLoop() {
 
                 setTimeout(() => {
                 // Explosion-Animation anzeigen
-                 triggerExplosion(tower.x, tower.y);
+                 triggerExplosion(tower.x + 20, tower.y);
             
                 // Mine entfernen
                 tower.tower_is_build = false;
                 tower.tower_type = "";
                 tower.tower_img = "";
-                }, 200);
-              }, 500);
+                }, 50);
+              }, 10);
             }
           }
         }
