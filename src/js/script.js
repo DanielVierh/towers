@@ -229,8 +229,9 @@ let save_obj = {
   level: 1,
   waypoints: [],
   waypoint_color: '',
-  XP: 0
-}
+  XP: 0,
+  save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
+};
 
 function initializeTowerImages() {
   save_obj.tower_places.forEach((tower) => {
@@ -245,6 +246,9 @@ function initializeTowerImages() {
 }
 
 function saveGameToLocalStorage() {
+  const now = new Date();
+  const formattedDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} - ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  save_obj.save_date = formattedDate;
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
 
@@ -252,13 +256,21 @@ function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
-    initializeTowerImages(); // Bilder der Türme nach dem Laden initialisieren
+    if(save_obj.save_date !== undefined) {
+      btn_load_game.style.flexDirection = 'column'
+      btn_load_game.innerHTML = `Spiel Laden <p style="font-size: .7rem;" >${save_obj.save_date}</p>`;
+    }
+    initializeTowerImages(); 
   }
 }
 
 btn_show_instructions.addEventListener('click', ()=> {
   window.location = 'instructions.html'
 })
+
+window.onload = () => {
+  loadGameFromLocalStorage()
+}
 
 
 //*#########################################################
