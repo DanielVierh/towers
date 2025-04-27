@@ -47,6 +47,7 @@ const level_1 = document.getElementById('level_1');
 const level_2 = document.getElementById('level_2');
 const level_3 = document.getElementById('level_3');
 const level_random = document.getElementById('level_random');
+const btn_close_modal_lvl = document.getElementById('btn_close_modal_lvl');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -1449,4 +1450,11 @@ btn_mute.addEventListener('click', ()=> {
     sound_is_on = true;
     btn_mute.style.background = 'black';
   }
+})
+
+//*#########################################################
+//* ANCHOR -Close new game level modal
+//*#########################################################
+btn_close_modal_lvl.addEventListener('click', ()=> {
+  window.location.reload();
 })
