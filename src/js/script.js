@@ -845,41 +845,6 @@ function triggerExplosion(x, y) {
 // Rufe diese Funktion beim Start des Spiels auf
 preloadExplosionImages();
 
-function drawExplosionAnimation(x, y) {
-  // Überprüfen, ob die Explosion bereits aktiv ist
-  const explosionKey = `${x}-${y}`;
-  if (activeExplosions.includes(explosionKey)) {
-    return; // Explosion läuft bereits
-  }
-
-  // Explosion als aktiv markieren
-  activeExplosions.push(explosionKey);
-
-  let frame = 0; // Start bei Frame 0
-  const totalFrames = explosionFrames.length; // Anzahl der Frames
-  const frameInterval = 50; // Zeit zwischen Frames in Millisekunden
-
-  const explosionInterval = setInterval(() => {
-    if (frame < totalFrames) {
-      // Lösche den Bereich um die Explosion herum
-      ctx.clearRect(x - 40, y - 40, 120, 120);
-
-      // Zeichne das aktuelle Frame der Explosion
-      ctx.drawImage(explosionFrames[frame], x - 40, y - 40, 80, 80);
-      frame++;
-      console.log('frame', frame);
-    } else {
-      // Stoppe die Animation nach dem letzten Frame
-      clearInterval(explosionInterval);
-
-      // Entferne die Explosion aus der aktiven Liste
-      const index = activeExplosions.indexOf(explosionKey);
-      if (index > -1) {
-        activeExplosions.splice(index, 1);
-      }
-    }
-  }, frameInterval);
-}
 
 //*#########################################################
 //* ANCHOR -drawMoneyPopups
@@ -1419,7 +1384,6 @@ function count_energy_level() {
 
   //* Every Destroyer Tower needs 25 Energy Points, reduced by 25 per upgrade level
   const destroyer_energy = 25;
-  const destroyer_amount = tower_type_amount(save_obj.tower_places, 'destroyer');
   let destroyer_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'destroyer') {
@@ -1429,7 +1393,6 @@ function count_energy_level() {
 
   //* Every anti_air Tower needs 25 Energy Points, reduced by 25 per upgrade level
   const anti_air_energy = 25;
-  const anti_air_amount = tower_type_amount(save_obj.tower_places, 'anti_air');
   let anti_air_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'anti_air') {
@@ -1439,7 +1402,6 @@ function count_energy_level() {
 
   //* Every Toxic Tower needs 75 Energy Points, reduced by 25 per upgrade level
   const toxic_energy = 75;
-  const toxic_amount = tower_type_amount(save_obj.tower_places, 'toxic');
   let toxic_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'toxic') {
@@ -1449,7 +1411,6 @@ function count_energy_level() {
 
   //* Every Slower Tower needs 75 Energy Points, reduced by 25 per upgrade level
   const slower_energy = 75;
-  const slower_amount = tower_type_amount(save_obj.tower_places, 'slower');
   let slower_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'slower') {
