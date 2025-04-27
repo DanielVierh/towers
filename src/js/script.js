@@ -940,6 +940,10 @@ canvas.addEventListener("click", (event) => {
         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
       } else {
         //* ANCHOR - Open Modal for Upgrade the tower 
+        const lbl_upgr_current_money = document.getElementById('lbl_upgr_current_money');
+        const lbl_upgr_current_energy = document.getElementById('lbl_upgr_current_energy');
+        lbl_upgr_current_money.innerHTML = `${save_obj.money} €`;
+        lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
         tower_img.src = tower.tower_img
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
