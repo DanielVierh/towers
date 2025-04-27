@@ -1345,7 +1345,7 @@ function set_difficulty(game_difficulty) {
   }
   if(game_difficulty === 'easy') {
     save_obj.live = 25;
-    save_obj.money = 250;
+    save_obj.money = 350;
     save_obj.enemy_max_health = 170;
     save_obj.energy_start_level = 50;
   }
