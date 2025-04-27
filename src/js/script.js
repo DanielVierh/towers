@@ -1308,6 +1308,9 @@ function initialize_game(level_details) {
   save_obj.waypoints = level.waypoints;
   save_obj.tower_places = level.tower_places;
   save_obj.waypoint_color = level.waypoint_color;
+  save_obj.wave = 0;
+  save_obj.max_enemy_amount = 2;
+  save_obj.enemy_max_velocity = 1.5;
   waypoint_color = level.waypoint_color;
   start_game();
 }
