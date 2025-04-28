@@ -1419,7 +1419,7 @@ function count_energy_level() {
   let slower_energy_amount = 0;
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_type === 'slower') {
-      slower_energy_amount += Math.max(0, slower_energy + (tower.tower_damage_lvl * 25));
+      slower_energy_amount += Math.max(0, slower_energy + (tower.tower_damage_lvl * 25) -25);
     }
   });
 
