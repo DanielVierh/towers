@@ -310,7 +310,7 @@ const creep_properties = [
     extra_velocity: -0.3,
     extra_health: 50,
     scale: 0.2,
-    resistent: ['toxic', 'anti_air', 'air_mine'],
+    resistent: ['anti_air', 'air_mine'],
     extra_money_amount: 1
   },
   {
