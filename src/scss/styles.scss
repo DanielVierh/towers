@@ -172,6 +172,10 @@ body {
         font-size: .8rem;
         border: 1px solid rgba(255, 255, 255, 0.446);
 
+        &.overpriced {
+          opacity: .2;
+        }
+
         h4 {
           margin: 5px 0;
         }
@@ -429,6 +433,10 @@ body {
         text-align: center;
         cursor: pointer;
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+        &.overpriced {
+          opacity: .2;
+        }
 
         &:hover {
           transform: scale(1.05);

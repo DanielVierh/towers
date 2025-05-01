@@ -167,6 +167,10 @@ body.red-flash {
   font-size: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
+.modal-towers .grid-wrapper .tile.overpriced,
+.modal-upgrade .grid-wrapper .tile.overpriced {
+  opacity: 0.2;
+}
 .modal-towers .grid-wrapper .tile h4,
 .modal-upgrade .grid-wrapper .tile h4 {
   margin: 5px 0;
@@ -419,6 +423,9 @@ select option {
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.modal-sel-lvl .grid-wrapper .tile.overpriced {
+  opacity: 0.2;
 }
 .modal-sel-lvl .grid-wrapper .tile:hover {
   transform: scale(1.05);

@@ -933,6 +933,7 @@ canvas.addEventListener("click", (event) => {
       //* Modal for traps
       if(place.is_trap) {
         mdl_traps.style.display = "flex";
+        set_class_for_overpriced_towers();
         return;
       }
       if (!place.tower_is_build) {
@@ -942,7 +943,8 @@ canvas.addEventListener("click", (event) => {
         const lbl_current_energy = document.getElementById('lbl_current_energy');
         lbl_current_money.innerHTML = `${save_obj.money} €`;
         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
-        calc_energy_overdose()
+        calc_energy_overdose();
+        set_class_for_overpriced_towers();
       } else {
         //* ANCHOR - Open Modal for Upgrade the tower 
         const lbl_upgr_current_money = document.getElementById('lbl_upgr_current_money');
@@ -1487,4 +1489,26 @@ function calc_energy_overdose() {
       existingSpan.remove(); 
     }
   });
+}
+
+//*#########################################################
+//* ANCHOR -Function to set a class to the tile if there is not enough money to buy the tower
+//*#########################################################
+function set_class_for_overpriced_towers() {
+  const tiles = document.querySelectorAll('.tile');
+  const current_money = save_obj.money;
+
+  tiles.forEach((tile) => {
+    try {
+      const tower_price = tile.getAttribute('data-tower_price');
+      if(tower_price > current_money) {
+        tile.classList.add('overpriced');
+      }else {
+        tile.classList.remove('overpriced');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+  })
 }
