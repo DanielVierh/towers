@@ -11,11 +11,11 @@ export function drawWaypoints(ctx, waypoints, waypoint_color) {
   waypoints.forEach((waypoint, index) => {
     const adjustedY = waypoint.y + 40; // Verschiebe die y-Koordinate um 50 Pixel nach unten
     if (index === 0) {
-      ctx.moveTo(waypoint.x, adjustedY);
+      ctx.moveTo(waypoint.x + 10, adjustedY);
     } else {
-      ctx.lineTo(waypoint.x, adjustedY);
+      ctx.lineTo(waypoint.x + 10, adjustedY);
     }
-    ctx.arc(waypoint.x, adjustedY, 2, 0, Math.PI * 2);
+    ctx.arc(waypoint.x + 10, adjustedY, 2, 0, Math.PI * 2);
   });
   ctx.stroke();
 }

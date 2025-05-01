@@ -2,7 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="canonical" href="https://danielvierh.github.io/towers/" />
     <link rel="manifest" href="danielvierh.github.io/towers/manifest.json">
     <!-- Favicon -->
@@ -70,11 +71,11 @@
 
     <div class="modal modal-sel-lvl" id="modal_select_lvl">
         <div class="close-button" id="btn_close_modal_lvl">x</div>
-        <h2>Schwierigkeit</h2>
-        <select name="difficulty" id="sel_difficulty">
+        <h2 class="title-difficulty">Schwierigkeit</h2>
+        <select class="select-difficulty" name="difficulty" id="sel_difficulty">
             <option value="very_easy">Sehr Einfach</option>
             <option value="easy" selected>Einfach</option>
-            <option value="standard">Standard</option>
+            <option value="standard">Mittel</option>
             <option value="hard">Schwer</option>
         </select>
         <h2>Level Auswahl</h2>
@@ -235,9 +236,9 @@
            type="audio/mpeg">
         </source>
     </audio>
-    <div id="btn_mute"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-mute-fill" viewBox="0 0 16 16">
+    <!-- <div id="btn_mute"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-mute-fill" viewBox="0 0 16 16">
         <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06m7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0"/>
-      </svg></div>
+      </svg></div> -->
 
     <script type="module" src="src/js/script.js"></script>
 </body>
