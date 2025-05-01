@@ -57,55 +57,6 @@ window.addEventListener("resize", () => {
   canvas.height = window.innerHeight * 0.9;
 });
 
-// canvas.addEventListener("click", (event) => {
-//   const rect = canvas.getBoundingClientRect(); // Aktuelle Größe des Canvas
-//   const scaleX = canvas.width / rect.width; // Skalierungsfaktor für die Breite
-//   const scaleY = canvas.height / rect.height; // Skalierungsfaktor für die Höhe
-
-//   // Mauskoordinaten relativ zur Canvas-Größe berechnen
-//   const x = (event.clientX - rect.left) * scaleX;
-//   const y = (event.clientY - rect.top) * scaleY;
-
-//   save_obj.tower_places.forEach((place) => {
-//     if (
-//       x >= place.x &&
-//       x <= place.x + 30 &&
-//       y >= place.y &&
-//       y <= place.y + 30
-//     ) {
-//       tower = place;
-//       if (!game_is_running) {
-//         game_is_running = true;
-//       }
-//       play_pause();
-
-//       //* Modal für Fallen
-//       if (place.is_trap) {
-//         mdl_traps.style.display = "flex";
-//         return;
-//       }
-//       if (!place.tower_is_build) {
-//         //* Öffne das Baumenü
-//         mdl_towers.style.display = "flex";
-//         const lbl_current_money = document.getElementById("lbl_current_money");
-//         const lbl_current_energy = document.getElementById("lbl_current_energy");
-//         lbl_current_money.innerHTML = `${save_obj.money} €`;
-//         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
-//       } else {
-//         //* Öffne das Upgrade-Menü
-//         const lbl_upgr_current_money = document.getElementById(
-//           "lbl_upgr_current_money"
-//         );
-//         const lbl_upgr_current_energy = document.getElementById(
-//           "lbl_upgr_current_energy"
-//         );
-//         lbl_upgr_current_money.innerHTML = `${save_obj.money} €`;
-//         lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
-//       }
-//     }
-//   });
-// });
-
 const enemies = [];
 const lasers = [];
 const moneyPopups = [];
@@ -996,6 +947,7 @@ canvas.addEventListener("click", (event) => {
         const lbl_current_energy = document.getElementById('lbl_current_energy');
         lbl_current_money.innerHTML = `${save_obj.money} €`;
         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
+        calc_energy_overdose()
       } else {
         //* ANCHOR - Open Modal for Upgrade the tower 
         const lbl_upgr_current_money = document.getElementById('lbl_upgr_current_money');
@@ -1502,17 +1454,17 @@ function tower_type_amount(towers, towertype) {
 //* ANCHOR -Toggle sound
 //*#########################################################
 
-btn_mute.addEventListener('click', ()=> {
-  if(sound_is_on) {
-    game_audio.pause();
-    sound_is_on = false;
-    btn_mute.style.background = 'red';
-  }else {
-    game_audio.play();
-    sound_is_on = true;
-    btn_mute.style.background = 'black';
-  }
-})
+// btn_mute.addEventListener('click', ()=> {
+//   if(sound_is_on) {
+//     game_audio.pause();
+//     sound_is_on = false;
+//     btn_mute.style.background = 'red';
+//   }else {
+//     game_audio.play();
+//     sound_is_on = true;
+//     btn_mute.style.background = 'black';
+//   }
+// })
 
 //*#########################################################
 //* ANCHOR -Close new game level modal
@@ -1520,3 +1472,19 @@ btn_mute.addEventListener('click', ()=> {
 btn_close_modal_lvl.addEventListener('click', ()=> {
   window.location.reload();
 })
+
+
+//*#########################################################
+//* ANCHOR -Function to display if there is insufficient energy after purchasing a tower
+//*#########################################################
+function calc_energy_overdose() {
+  const needed_energy_labels = document.querySelectorAll('.lbl-needed-energy');
+  const energy_level = save_obj.energy_level;
+
+  needed_energy_labels.forEach((needed_energy_label)=> {
+    const needed_energy = parseInt(needed_energy_label.getAttribute('data-needed_energy'));
+    if((energy_level - needed_energy) < 0) {
+      needed_energy_label.innerHTML = needed_energy_label.innerHTML + `<span style="color: red; font-size: .8rem;">(${(energy_level - needed_energy)})</span>`
+    }
+  }) 
+}
