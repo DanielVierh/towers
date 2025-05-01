@@ -52,11 +52,6 @@ const btn_close_modal_lvl = document.getElementById('btn_close_modal_lvl');
 canvas.width = 400;
 canvas.height = 400;
 
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth * 0.9;
-  canvas.height = window.innerHeight * 0.9;
-});
-
 const enemies = [];
 const lasers = [];
 const moneyPopups = [];
@@ -1489,7 +1484,7 @@ function calc_energy_overdose() {
         needed_energy_label.innerHTML += `<span style="color: red; font-size: .8rem;">(${(energy_level - needed_energy)})</span>`;
       }
     } else if (existingSpan) {
-      existingSpan.remove(); // Entferne den Span, wenn die Bedingung nicht mehr zutrifft
+      existingSpan.remove(); 
     }
   });
 }
