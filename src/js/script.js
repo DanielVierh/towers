@@ -57,54 +57,54 @@ window.addEventListener("resize", () => {
   canvas.height = window.innerHeight * 0.9;
 });
 
-canvas.addEventListener("click", (event) => {
-  const rect = canvas.getBoundingClientRect(); // Aktuelle Größe des Canvas
-  const scaleX = canvas.width / rect.width; // Skalierungsfaktor für die Breite
-  const scaleY = canvas.height / rect.height; // Skalierungsfaktor für die Höhe
+// canvas.addEventListener("click", (event) => {
+//   const rect = canvas.getBoundingClientRect(); // Aktuelle Größe des Canvas
+//   const scaleX = canvas.width / rect.width; // Skalierungsfaktor für die Breite
+//   const scaleY = canvas.height / rect.height; // Skalierungsfaktor für die Höhe
 
-  // Mauskoordinaten relativ zur Canvas-Größe berechnen
-  const x = (event.clientX - rect.left) * scaleX;
-  const y = (event.clientY - rect.top) * scaleY;
+//   // Mauskoordinaten relativ zur Canvas-Größe berechnen
+//   const x = (event.clientX - rect.left) * scaleX;
+//   const y = (event.clientY - rect.top) * scaleY;
 
-  save_obj.tower_places.forEach((place) => {
-    if (
-      x >= place.x &&
-      x <= place.x + 30 &&
-      y >= place.y &&
-      y <= place.y + 30
-    ) {
-      tower = place;
-      if (!game_is_running) {
-        game_is_running = true;
-      }
-      play_pause();
+//   save_obj.tower_places.forEach((place) => {
+//     if (
+//       x >= place.x &&
+//       x <= place.x + 30 &&
+//       y >= place.y &&
+//       y <= place.y + 30
+//     ) {
+//       tower = place;
+//       if (!game_is_running) {
+//         game_is_running = true;
+//       }
+//       play_pause();
 
-      //* Modal für Fallen
-      if (place.is_trap) {
-        mdl_traps.style.display = "flex";
-        return;
-      }
-      if (!place.tower_is_build) {
-        //* Öffne das Baumenü
-        mdl_towers.style.display = "flex";
-        const lbl_current_money = document.getElementById("lbl_current_money");
-        const lbl_current_energy = document.getElementById("lbl_current_energy");
-        lbl_current_money.innerHTML = `${save_obj.money} €`;
-        lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
-      } else {
-        //* Öffne das Upgrade-Menü
-        const lbl_upgr_current_money = document.getElementById(
-          "lbl_upgr_current_money"
-        );
-        const lbl_upgr_current_energy = document.getElementById(
-          "lbl_upgr_current_energy"
-        );
-        lbl_upgr_current_money.innerHTML = `${save_obj.money} €`;
-        lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
-      }
-    }
-  });
-});
+//       //* Modal für Fallen
+//       if (place.is_trap) {
+//         mdl_traps.style.display = "flex";
+//         return;
+//       }
+//       if (!place.tower_is_build) {
+//         //* Öffne das Baumenü
+//         mdl_towers.style.display = "flex";
+//         const lbl_current_money = document.getElementById("lbl_current_money");
+//         const lbl_current_energy = document.getElementById("lbl_current_energy");
+//         lbl_current_money.innerHTML = `${save_obj.money} €`;
+//         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
+//       } else {
+//         //* Öffne das Upgrade-Menü
+//         const lbl_upgr_current_money = document.getElementById(
+//           "lbl_upgr_current_money"
+//         );
+//         const lbl_upgr_current_energy = document.getElementById(
+//           "lbl_upgr_current_energy"
+//         );
+//         lbl_upgr_current_money.innerHTML = `${save_obj.money} €`;
+//         lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
+//       }
+//     }
+//   });
+// });
 
 const enemies = [];
 const lasers = [];
@@ -963,9 +963,13 @@ function updateWaveTimer() {
 //*#########################################################
 // 
 canvas.addEventListener("click", (event) => {
-  const rect = canvas.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  const rect = canvas.getBoundingClientRect(); // Aktuelle Größe des Canvas
+  const scaleX = canvas.width / rect.width; // Skalierungsfaktor für die Breite
+  const scaleY = canvas.height / rect.height; // Skalierungsfaktor für die Höhe
+
+  // Mauskoordinaten relativ zur Canvas-Größe berechnen
+  const x = (event.clientX - rect.left) * scaleX;
+  const y = (event.clientY - rect.top) * scaleY;
 
   save_obj.tower_places.forEach((place) => {
     if (

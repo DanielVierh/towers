@@ -169,7 +169,7 @@ body {
         justify-content: space-evenly;
         align-items: center;
         border-radius: 5px;
-        font-size: .9rem;
+        font-size: .8rem;
         border: 1px solid rgba(255, 255, 255, 0.446);
 
         h4 {
@@ -177,19 +177,19 @@ body {
         }
 
         p {
-          font-size: .8rem;
+          font-size: .6rem;
           text-align: center;
           margin: 5px 0;
         }
 
         img {
-          width: 80px;
-          height: 100px;
+          width: 60px;
+          height: 50px;
           object-fit: cover;
           object-position: top;
           background-color: #61616378;
           border-radius: 5px;
-          padding: 20px;
+          padding: 5px;
           box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
           border: 1px solid rgba(255, 255, 255, 0.446);
         }
@@ -233,6 +233,10 @@ body {
 
   .modal-upgrade {
     justify-content: center;
+
+    h2 {
+      margin-top: 300px !important;
+    }
   }
 
   .button-tower-range {

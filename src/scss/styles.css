@@ -164,7 +164,7 @@ body.red-flash {
   justify-content: space-evenly;
   align-items: center;
   border-radius: 5px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile h4,
@@ -173,21 +173,21 @@ body.red-flash {
 }
 .modal-towers .grid-wrapper .tile p,
 .modal-upgrade .grid-wrapper .tile p {
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   text-align: center;
   margin: 5px 0;
 }
 .modal-towers .grid-wrapper .tile img,
 .modal-upgrade .grid-wrapper .tile img {
-  width: 80px;
-  height: 100px;
+  width: 60px;
+  height: 50px;
   -o-object-fit: cover;
      object-fit: cover;
   -o-object-position: top;
      object-position: top;
   background-color: rgba(97, 97, 99, 0.4705882353);
   border-radius: 5px;
-  padding: 20px;
+  padding: 5px;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
@@ -228,6 +228,9 @@ body.red-flash {
 
 .modal-upgrade {
   justify-content: center;
+}
+.modal-upgrade h2 {
+  margin-top: 300px !important;
 }
 
 .button-tower-range {
