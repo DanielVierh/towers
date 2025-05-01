@@ -1481,10 +1481,15 @@ function calc_energy_overdose() {
   const needed_energy_labels = document.querySelectorAll('.lbl-needed-energy');
   const energy_level = save_obj.energy_level;
 
-  needed_energy_labels.forEach((needed_energy_label)=> {
+  needed_energy_labels.forEach((needed_energy_label) => {
     const needed_energy = parseInt(needed_energy_label.getAttribute('data-needed_energy'));
-    if((energy_level - needed_energy) < 0) {
-      needed_energy_label.innerHTML = needed_energy_label.innerHTML + `<span style="color: red; font-size: .8rem;">(${(energy_level - needed_energy)})</span>`
+    let existingSpan = needed_energy_label.querySelector('span');
+    if ((energy_level - needed_energy) < 0) {
+      if (!existingSpan) {
+        needed_energy_label.innerHTML += `<span style="color: red; font-size: .8rem;">(${(energy_level - needed_energy)})</span>`;
+      }
+    } else if (existingSpan) {
+      existingSpan.remove(); // Entferne den Span, wenn die Bedingung nicht mehr zutrifft
     }
-  }) 
+  });
 }
