@@ -63,8 +63,6 @@ let show_tower_range = false;
 let game_is_running = false;
 let sound_is_on = false;
 let waypoint_color = 'rgba(241, 207, 113, 0.9)';
-let XP = 0;
-let assign_XP = false;
 
 let save_obj = {
   money: 200,
@@ -230,6 +228,8 @@ let save_obj = {
   level: 1,
   waypoints: [],
   waypoint_color: '',
+  current_XP: 0,
+  assign_XP: false,
   XP: 0,
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
 };
@@ -539,10 +539,13 @@ function calculateDistance(x1, y1, x2, y2) {
 function showGameOverModal() {
   gameOverModal.style.display = "block";
   lbl_Live.innerHTML = "0 Leben";
-  if(!assign_XP) {
-    save_obj.XP += Math.floor(XP / 2);
-    lbl_XP.innerHTML = ` +${Math.floor(XP / 2)} XP (${save_obj.XP} XP)`;
-    assign_XP = true;
+  if(!save_obj.assign_XP) {
+    save_obj.XP += Math.floor(save_obj.current_XP / 2);
+    if(save_obj.current_XP > 0) {
+      lbl_XP.innerHTML = ` +${Math.floor(save_obj.current_XP / 2)} XP (${save_obj.XP} XP)`;
+    }
+    save_obj.assign_XP = true;
+    saveGameToLocalStorage();
   }
 }
 
@@ -631,7 +634,8 @@ function gameLoop() {
             }
 
             earnedMoney = earnedMoney += enemy.extra_money;
-            XP += 1;
+            save_obj.current_XP += 1;
+            
           
             save_obj.money += earnedMoney;
           
@@ -1278,6 +1282,8 @@ btn_start_game.addEventListener("click", () => {
 });
 
 function initialize_game(level_details) {
+  save_obj.assign_XP = false;
+  save_obj.current_XP = 0;
   modal_select_lvl.style.display = 'none';
   const level = level_details;
   save_obj.backgroundImage = level.background_img_path;
