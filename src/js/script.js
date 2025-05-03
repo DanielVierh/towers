@@ -1517,6 +1517,5 @@ function set_class_for_overpriced_towers() {
     } catch (error) {
       console.log(error);
     }
-
   })
 }
