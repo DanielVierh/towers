@@ -48,6 +48,7 @@ const level_2 = document.getElementById('level_2');
 const level_3 = document.getElementById('level_3');
 const level_random = document.getElementById('level_random');
 const btn_close_modal_lvl = document.getElementById('btn_close_modal_lvl');
+const lbl_xp = document.getElementById('lbl_xp');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -257,6 +258,7 @@ function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
+    lbl_xp.innerHTML = `${save_obj.XP} XP`
     if(save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = 'column'
       btn_load_game.innerHTML = `Spiel Laden <p style="font-size: .7rem;" >${save_obj.save_date}</p>`;

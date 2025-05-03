@@ -460,3 +460,15 @@ body {
       }
     }
   }
+
+  .lbl-xp {
+    position: fixed;
+    top: 0;
+    right: 0;
+    font-size: .9rem;
+    background-color: black;
+    padding: 5px 10px;
+    box-shadow: 0 0 10px black;
+    border: 1px solid rgba(255, 255, 255, 0.255);
+    border-radius: 5px;
+  }
