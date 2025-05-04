@@ -232,9 +232,14 @@ let save_obj = {
   current_XP: 0,
   assign_XP: false,
   XP: 0,
+  XP_Coins: 0,
+  XP_Store_Items: [],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
 };
 
+//*#########################################################
+//* ANCHOR - Initialize Images for Tower
+//*#########################################################
 function initializeTowerImages() {
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_is_build && tower.tower_img) {
@@ -247,6 +252,9 @@ function initializeTowerImages() {
   });
 }
 
+//*#########################################################
+//* ANCHOR - Save Game into local storage
+//*#########################################################
 function saveGameToLocalStorage() {
   const now = new Date();
   const formattedDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} - ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
@@ -254,11 +262,15 @@ function saveGameToLocalStorage() {
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
 
+//*#########################################################
+//* ANCHOR - Load Game  from Local Storage
+//*#########################################################
 function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
-    lbl_xp.innerHTML = `${save_obj.XP} XP`
+    lbl_xp.innerHTML = `${save_obj.XP} XP`;
+    include_new_SaveObj_Properties();
     if(save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = 'column'
       btn_load_game.innerHTML = `Spiel Laden <p style="font-size: .7rem;" >${save_obj.save_date}</p>`;
@@ -267,9 +279,47 @@ function loadGameFromLocalStorage() {
   }
 }
 
+
+
+//*#########################################################
+//* ANCHOR - Include new properties into existing save obj
+//*#########################################################
+function include_new_SaveObj_Properties() {
+  //* Add XP Coins
+  if(save_obj.XP_Coins === undefined) {
+    try {
+      save_obj.XP_Coins = save_obj.XP;
+    } catch (error) {
+      console.log(error);
+      save_obj.XP = 0;
+      save_obj.XP_Coins = save_obj.XP;
+    }
+  }
+
+  //* Add XP_Store_Items
+  if(save_obj.XP_Store_Items === undefined) {
+    try {
+      save_obj.XP_Store_Items = [];
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  saveGameToLocalStorage();
+}
+
+
+
+//*#########################################################
+//* ANCHOR - Go to Instruction Page
+//*#########################################################
+
 btn_show_instructions.addEventListener('click', ()=> {
   window.location = 'instructions.html'
 })
+
+//*#########################################################
+//* ANCHOR - Init .-load
+//*#########################################################
 
 window.onload = () => {
   loadGameFromLocalStorage()
