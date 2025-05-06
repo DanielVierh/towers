@@ -294,6 +294,7 @@ function include_new_SaveObj_Properties() {
       save_obj.XP = 0;
       save_obj.XP_Coins = save_obj.XP;
     }
+    saveGameToLocalStorage();
   }
 
   //* Add XP_Store_Items
@@ -303,8 +304,8 @@ function include_new_SaveObj_Properties() {
     } catch (error) {
       console.log(error);
     }
+    saveGameToLocalStorage();
   }
-  saveGameToLocalStorage();
 }
 
 
