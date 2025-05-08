@@ -395,6 +395,56 @@ const creep_properties = [
   }
 ];
 
+const special_creeps = [
+  {
+    name: 'Special, shield',
+    src: 'src/assets/creeps/creep_5',
+    extra_velocity: -.9,
+    extra_health: 1500,
+    scale: 0.6,
+    resistent: ['slower', 'anti_air', 'air_mine', 'toxic', 'slower', 'mine'],
+    extra_money_amount: 50
+  }
+]
+
+function call_special_creep() {
+  if (save_obj.wave < 15) {
+    return;
+  }
+
+  const random_numb = Math.floor(Math.random() * 100) + 1;
+
+  if (random_numb <= 10) { // % chance to spawn a special creep
+    
+    const posX = -100;
+    const posY = 20;
+    const width = 60;
+    const height = 50;
+    const scale = (1 + special_creeps[0].scale);
+    const health = special_creeps[0].extra_health;
+    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + special_creeps[0].extra_velocity;
+    const imgFolder = special_creeps[0].src;
+    const resistent = special_creeps[0].resistent;
+    const extra_money = special_creeps[0].extra_money_amount;
+
+    enemies.push(
+      new Creep(
+        posX,
+        posY,
+        width,
+        height,
+        imgFolder,
+        scale,
+        save_obj.waypoints,
+        health,
+        velocity,
+        resistent,
+        extra_money
+      )
+    );
+  }
+}
+
 //*#########################################################
 //* ANCHOR - Initialize Creeps for this and next round
 //*########################################################
@@ -415,8 +465,11 @@ function initialize_Creeps_for_next_round() {
       ? Math.floor(Math.random() * (creep_properties.length - 2)) + 2 
       : Math.floor(Math.random() * creep_properties.length);
     spawnEnemy();
+    call_special_creep();
   }
 }
+
+
 
 function spawnEnemy() {
   let enemyCount = 0;
