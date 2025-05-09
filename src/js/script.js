@@ -399,8 +399,8 @@ const special_creeps = [
   {
     name: 'Special, shield',
     src: 'src/assets/creeps/creep_5',
-    extra_velocity: -.9,
-    extra_health: 1500,
+    extra_velocity: .5,
+    extra_health: 3500,
     scale: 0.6,
     resistent: ['slower', 'anti_air', 'air_mine', 'toxic', 'slower', 'mine'],
     extra_money_amount: 50
@@ -408,21 +408,15 @@ const special_creeps = [
 ]
 
 function call_special_creep() {
-  if (save_obj.wave < 15) {
-    return;
-  }
-
-  const random_numb = Math.floor(Math.random() * 100) + 1;
-
-  if (random_numb <= 10) { // % chance to spawn a special creep
-    
+  
+  if (save_obj.wave % 6 === 0) { 
     const posX = -100;
     const posY = 20;
     const width = 60;
     const height = 50;
     const scale = (1 + special_creeps[0].scale);
     const health = special_creeps[0].extra_health;
-    const velocity = Math.random() * (save_obj.enemy_max_velocity - 1) + 1 + special_creeps[0].extra_velocity;
+    const velocity = special_creeps[0].extra_velocity;
     const imgFolder = special_creeps[0].src;
     const resistent = special_creeps[0].resistent;
     const extra_money = special_creeps[0].extra_money_amount;
@@ -1009,6 +1003,9 @@ function updateWaveTimer() {
     } else {
       save_obj.max_enemy_amount += save_obj.wave;
       save_obj.enemy_max_health += 15;
+      if(save_obj.money >= 2000) {
+        save_obj.enemy_max_health += 50;
+      }
     }
     save_obj.money += Math.floor(save_obj.wave * 2);
   }
