@@ -404,7 +404,7 @@ const special_creeps = [
     scale: 0.6,
     resistent: ['slower', 'anti_air', 'air_mine', 'toxic', 'slower', 'mine'],
     extra_money_amount: 50
-  }
+  },
 ]
 
 function call_special_creep() {
@@ -995,6 +995,9 @@ function updateWaveTimer() {
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     initialize_Creeps_for_next_round();
     save_obj.wave++;
+    if(save_obj.money >= 2000) {
+      save_obj.enemy_max_health += 50;
+    }
     save_obj.wave < 10
       ? (save_obj.enemy_max_velocity += 0.1)
       : (save_obj.enemy_max_velocity = save_obj.enemy_max_velocity);
@@ -1003,9 +1006,6 @@ function updateWaveTimer() {
     } else {
       save_obj.max_enemy_amount += save_obj.wave;
       save_obj.enemy_max_health += 15;
-      if(save_obj.money >= 2000) {
-        save_obj.enemy_max_health += 50;
-      }
     }
     save_obj.money += Math.floor(save_obj.wave * 2);
   }
