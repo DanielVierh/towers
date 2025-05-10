@@ -995,19 +995,21 @@ function updateWaveTimer() {
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     initialize_Creeps_for_next_round();
     save_obj.wave++;
-    if(save_obj.money >= 2000) {
-      save_obj.enemy_max_health += 50;
+    if(save_obj.money >= 1500) {
+      save_obj.enemy_max_health += 250;
     }
     save_obj.wave < 10
       ? (save_obj.enemy_max_velocity += 0.1)
       : (save_obj.enemy_max_velocity = save_obj.enemy_max_velocity);
     if (save_obj.wave >= 8) {
-      save_obj.enemy_max_health += 20;
+      save_obj.enemy_max_health += 25;
     } else {
       save_obj.max_enemy_amount += save_obj.wave;
-      save_obj.enemy_max_health += 15;
+      save_obj.enemy_max_health += 20;
     }
     save_obj.money += Math.floor(save_obj.wave * 2);
+    console.log(save_obj);
+    
   }
 }
 
