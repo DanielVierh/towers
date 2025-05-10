@@ -11,6 +11,7 @@ export class Creep {
     velocity,
     resistent,
     extra_money,
+    invisible,
   ) {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
@@ -40,6 +41,7 @@ export class Creep {
     this.frameSpeed = 5; // Geschwindigkeit der Animation
     this.frameTick = 0;
     this.counter = 0;
+    this.invisible = invisible;
 
     // Lade alle Bilder aus dem Ordner
     for (let i = 1; i <= 17; i++) {
@@ -117,6 +119,9 @@ export class Creep {
   }
 
   draw(ctx) {
+    if(this.invisible) {
+        return; // Wenn der Creep unsichtbar ist, nichts zeichnen
+    }
     const currentImage = this.imageFrames[this.imageIndex];
     if (currentImage.complete) {
         const scaledWidth = this.width * this.scale;

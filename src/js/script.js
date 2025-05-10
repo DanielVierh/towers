@@ -392,18 +392,30 @@ const creep_properties = [
     scale: 0.1,
     resistent: ['slower', 'anti_air', 'air_mine'],
     extra_money_amount: 8
-  }
+  },
 ];
 
+//* Creep 0: Boss Super Tanky - not able to slow down, mine and toxi resistent
+//* Creep 1: Invisible - not able to slow down - can only be seen by anti air tower
 const special_creeps = [
   {
-    name: 'Special, shield',
+    name: 'Special, Super-Tanky',
     src: 'src/assets/creeps/creep_5',
     extra_velocity: .5,
     extra_health: 3500,
     scale: 0.6,
     resistent: ['slower', 'anti_air', 'air_mine', 'toxic', 'slower', 'mine'],
     extra_money_amount: 50
+  },
+  {
+    name: 'Ground, invisible',
+    src: 'src/assets/creeps/creep_3',
+    extra_velocity: 1,
+    extra_health: 250,
+    scale: 0.1,
+    resistent: ['slower', 'air_mine', 'anti_air', 'toxic', 'destroyer'],
+    extra_money_amount: 20,
+    invisible: true
   },
 ]
 
@@ -437,6 +449,41 @@ function call_special_creep() {
       )
     );
   }
+
+  if (save_obj.wave % 10 === 0) {
+    const posX = -100;
+    const posY = 20;
+    const width = 60;
+    const height = 50;
+    const scale = (1 + special_creeps[1].scale);
+    const health = special_creeps[1].extra_health;
+    const velocity = special_creeps[1].extra_velocity;
+    const imgFolder = special_creeps[1].src;
+    const resistent = special_creeps[1].resistent;
+    const extra_money = special_creeps[1].extra_money_amount;
+    const invisible = special_creeps[1].invisible;
+
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        enemies.push(
+          new Creep(
+            posX,
+            posY,
+            width,
+            height,
+            imgFolder,
+            scale,
+            save_obj.waypoints,
+            health,
+            velocity,
+            resistent,
+            extra_money,
+            invisible
+          )
+        );
+      }, i * 800); 
+    }
+  }
 }
 
 //*#########################################################
@@ -458,8 +505,9 @@ function initialize_Creeps_for_next_round() {
     next_round_creep_index = save_obj.wave < 10 
       ? Math.floor(Math.random() * (creep_properties.length - 2)) + 2 
       : Math.floor(Math.random() * creep_properties.length);
-    spawnEnemy();
     call_special_creep();
+    spawnEnemy();
+
   }
 }
 
@@ -821,6 +869,11 @@ function gameLoop() {
 
             //* >>> Anti Air Tower <<<
           }else if(tower.tower_type === "anti_air") {
+              //* Discover invisible Enemy
+              if(enemy.invisible) {
+                enemy.invisible = false;
+                enemy.resistent = ['slower', 'anti_air', 'air_mine'];
+              }
             //* Harm Enemy
             if(!enemy.resistent.includes('anti_air')) {
                 enemy.health -= (tower.tower_damage_lvl * 70);
