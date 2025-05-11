@@ -2,7 +2,7 @@ export class Laser {
     constructor(startX, startY, targetX, targetY, color) {
         this.startX = startX;
         this.startY = startY;
-        this.targetX = targetX + (Math.random() * 80 - 40);
+        this.targetX = targetX;
         this.targetY = targetY;
         this.posX = startX;
         this.posY = startY;
