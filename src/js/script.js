@@ -22,14 +22,12 @@ const btn_energy = document.getElementById("btn_energy");
 const btn_close_modal_upgrade = document.getElementById("btn_close_modal_upgrade");
 const mdl_upgrade = document.getElementById("mdl_upgrade");
 const btn_show_tower_range = document.getElementById("btn_show_tower_range");
-const btn_mute = document.getElementById("btn_mute");
 const menu_modal = document.getElementById("menu_modal");
 const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
 const btn_pause = document.getElementById("btn_pause");
 const lbl_energy = document.getElementById("lbl_energy");
 const tower_img = document.getElementById("tower_img");
-const game_audio = document.getElementById("game_audio");
 const sel_difficulty = document.getElementById("sel_difficulty");
 const btn_save_game = document.getElementById('btn_save_game');
 const btn_load_game = document.getElementById('btn_load_game');
@@ -1396,9 +1394,6 @@ btn_load_game.addEventListener('click', ()=> {
   backgroundImage.src = save_obj.backgroundImage;
   waypoint_color = save_obj.waypoint_color;
   game_is_running = true;
-  if(sound_is_on) {
-    game_audio.play();
-  }
   // Start the game loop
   gameLoop();
 
@@ -1464,10 +1459,8 @@ function start_game() {
   set_difficulty(game_difficulty);
   
   game_is_running = true;
-  if(sound_is_on) {
-    game_audio.play();
-  }
-  // Start the game loop
+
+  //* Start the game loop
   gameLoop();
 
   // Update the wave timer every second
@@ -1528,15 +1521,10 @@ function play_pause() {
     // Spiel pausieren
     game_is_running = false;
     btn_pause.innerHTML = 'Weiter';
-    game_audio.pause();
   } else {
     // Spiel fortsetzen
     game_is_running = true;
     btn_pause.innerHTML = 'Pause';
-    if(sound_is_on) {
-      game_audio.play();
-    }
-    
 
     // Starte die gameLoop erneut
     gameLoop();
@@ -1611,21 +1599,6 @@ function tower_type_amount(towers, towertype) {
   return amount;
 }
 
-//*#########################################################
-//* ANCHOR -Toggle sound
-//*#########################################################
-
-// btn_mute.addEventListener('click', ()=> {
-//   if(sound_is_on) {
-//     game_audio.pause();
-//     sound_is_on = false;
-//     btn_mute.style.background = 'red';
-//   }else {
-//     game_audio.play();
-//     sound_is_on = true;
-//     btn_mute.style.background = 'black';
-//   }
-// })
 
 //*#########################################################
 //* ANCHOR -Close new game level modal
