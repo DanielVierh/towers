@@ -409,7 +409,7 @@ const special_creeps = [
     name: 'Ground, invisible',
     src: 'src/assets/creeps/creep_7',
     extra_velocity: 1,
-    extra_health: 250,
+    extra_health: 300,
     scale: 0.1,
     resistent: ['slower', 'air_mine', 'anti_air', 'toxic', 'destroyer'],
     extra_money_amount: 20,
@@ -448,7 +448,7 @@ function call_special_creep() {
     );
   }
 
-  if (save_obj.wave % 2 === 0) {
+  if (save_obj.wave % 10 === 0) {
     const posX = -100;
     const posY = 20;
     const width = 60;
