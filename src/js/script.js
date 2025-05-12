@@ -437,7 +437,7 @@ function call_special_creep() {
     add_special_creep(posX, posY, width, height, imgFolder, scale, health, velocity, resistent, extra_money, invisible, amount);
   }
 
-  if (save_obj.wave % 1 === 0) {
+  if (save_obj.wave % 10 === 0) {
     const posX = -100;
     const posY = 20;
     const width = 60;
