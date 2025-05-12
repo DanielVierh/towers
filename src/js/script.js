@@ -60,7 +60,6 @@ let waveTimer = 10; // Timer für die nächste Welle in Sekunden
 let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
-let sound_is_on = false;
 let waypoint_color = 'rgba(241, 207, 113, 0.9)';
 
 let save_obj = {
@@ -732,6 +731,9 @@ function gameLoop() {
   }
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`
 
+  //* Update game labels
+  updateLabels();
+
   //* Dann die Creeps darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update(save_obj, moneyPopups);
@@ -994,6 +996,19 @@ function triggerExplosion(x, y) {
 // Rufe diese Funktion beim Start des Spiels auf
 preloadExplosionImages();
 
+
+//*#########################################################
+//* ANCHOR - Update Labels
+//*#########################################################
+
+function updateLabels() {
+  lbl_Money.innerHTML = `${save_obj.money}€`;
+  lbl_Live.innerHTML = `${save_obj.live} Leben`;
+  lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`;
+  if (current_creep_index !== undefined) {
+    lbl_wave.innerHTML = `Welle: ${save_obj.wave} ${creep_properties[current_creep_index].name}`;
+  }
+}
 
 //*#########################################################
 //* ANCHOR -drawMoneyPopups
