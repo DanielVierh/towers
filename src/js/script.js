@@ -274,6 +274,8 @@ function loadGameFromLocalStorage() {
       btn_load_game.innerHTML = `Spiel Laden <p style="font-size: .7rem;" >${save_obj.save_date}</p>`;
     }
     initializeTowerImages(); 
+  } else {
+    btn_load_game.style.display = 'none';
   }
 }
 
