@@ -401,7 +401,7 @@ const special_creeps = [
   {
     name: 'Special, Super-Tanky',
     src: 'src/assets/creeps/creep_5',
-    extra_velocity: .5,
+    velocity: .5,
     extra_health: 3500,
     scale: 0.6,
     resistent: ['slower', 'anti_air', 'air_mine', 'toxic', 'slower', 'mine'],
@@ -410,7 +410,7 @@ const special_creeps = [
   {
     name: 'Ground, invisible',
     src: 'src/assets/creeps/creep_7',
-    extra_velocity: 1,
+    velocity: 1,
     extra_health: 300,
     scale: 0.1,
     resistent: ['slower', 'air_mine', 'anti_air', 'toxic', 'destroyer'],
@@ -427,62 +427,53 @@ function call_special_creep() {
     const width = 60;
     const height = 50;
     const scale = (1 + special_creeps[0].scale);
-    const health = special_creeps[0].extra_health;
-    const velocity = special_creeps[0].extra_velocity;
+    const health = save_obj.enemy_max_health + special_creeps[0].extra_health;
+    const velocity = special_creeps[0].velocity;
     const imgFolder = special_creeps[0].src;
     const resistent = special_creeps[0].resistent;
     const extra_money = special_creeps[0].extra_money_amount;
-
-    enemies.push(
-      new Creep(
-        posX,
-        posY,
-        width,
-        height,
-        imgFolder,
-        scale,
-        save_obj.waypoints,
-        health,
-        velocity,
-        resistent,
-        extra_money
-      )
-    );
+    const invisible = false;
+    const amount = 1;
+    add_special_creep(posX, posY, width, height, imgFolder, scale, health, velocity, resistent, extra_money, invisible, amount);
   }
 
-  if (save_obj.wave % 10 === 0) {
+  if (save_obj.wave % 1 === 0) {
     const posX = -100;
     const posY = 20;
     const width = 60;
     const height = 50;
     const scale = (1 + special_creeps[1].scale);
-    const health = special_creeps[1].extra_health;
-    const velocity = special_creeps[1].extra_velocity;
+    const health = save_obj.enemy_max_health + special_creeps[1].extra_health;
+    const velocity = special_creeps[1].velocity;
     const imgFolder = special_creeps[1].src;
     const resistent = special_creeps[1].resistent;
     const extra_money = special_creeps[1].extra_money_amount;
     const invisible = special_creeps[1].invisible;
+    const amount = 10;
+    add_special_creep(posX, posY, width, height, imgFolder, scale, health, velocity, resistent, extra_money, invisible, amount);
+  }
+}
 
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => {
-        enemies.push(
-          new Creep(
-            posX,
-            posY,
-            width,
-            height,
-            imgFolder,
-            scale,
-            save_obj.waypoints,
-            health,
-            velocity,
-            resistent,
-            extra_money,
-            invisible
-          )
-        );
-      }, i * 800); 
-    }
+function add_special_creep( posX, posY, width, height, imgFolder, scale, health, velocity, resistent, extra_money, invisible, amount) { 
+  for (let i = 1; i <= amount; i++) {
+    setTimeout(() => {
+      enemies.push(
+        new Creep(
+          posX,
+          posY,
+          width,
+          height,
+          imgFolder,
+          scale,
+          save_obj.waypoints,
+          health,
+          velocity,
+          resistent,
+          extra_money,
+          invisible
+        )
+      );
+    }, i * 1200); 
   }
 }
 
