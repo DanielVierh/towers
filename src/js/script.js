@@ -1745,12 +1745,15 @@ function calc_energy_overdose() {
       needed_energy_label.getAttribute("data-needed_energy")
     );
     let existingSpan = needed_energy_label.querySelector("span");
-    if (energy_level - needed_energy < 0) {
+    const diff = energy_level - needed_energy;
+    if (diff < 0) {
       if (!existingSpan) {
-        needed_energy_label.innerHTML += `<span style="color: red; font-size: .8rem;">(${
-          energy_level - needed_energy
-        })</span>`;
+        existingSpan = document.createElement("span");
+        needed_energy_label.appendChild(existingSpan);
       }
+      existingSpan.style.color = "red";
+      existingSpan.style.fontSize = ".8rem";
+      existingSpan.textContent = `(${diff})`;
     } else if (existingSpan) {
       existingSpan.remove();
     }
