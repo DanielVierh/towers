@@ -177,6 +177,16 @@ export class Creep {
             ctx.fill();
             ctx.closePath();
         }
+
+        // zeichne einen rahmen um den Creep
+        // ctx.strokeStyle = "black";
+        // ctx.lineWidth = 1;
+        // ctx.strokeRect(
+        //     this.pos_x,
+        //     this.pos_y,
+        //     scaledWidth,
+        //     scaledHeight
+        // );
     }
 }
 }
