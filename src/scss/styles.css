@@ -91,7 +91,8 @@ body.red-flash {
 }
 
 .modal-towers,
-.modal-upgrade {
+.modal-upgrade,
+.modal-skill {
   background: rgba(10, 11, 27, 0.9);
   font-size: 1rem;
   justify-content: flex-start;
@@ -101,16 +102,19 @@ body.red-flash {
   padding: 30px 0;
 }
 .modal-towers .tower-stats,
-.modal-upgrade .tower-stats {
+.modal-upgrade .tower-stats,
+.modal-skill .tower-stats {
   margin: 30px auto;
   flex-direction: column;
 }
 .modal-towers .modal-title,
-.modal-upgrade .modal-title {
+.modal-upgrade .modal-title,
+.modal-skill .modal-title {
   margin: 30px auto;
 }
 .modal-towers .info_wrapper,
-.modal-upgrade .info_wrapper {
+.modal-upgrade .info_wrapper,
+.modal-skill .info_wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -118,14 +122,16 @@ body.red-flash {
   margin: 20px auto;
 }
 .modal-towers .info_wrapper .info,
-.modal-upgrade .info_wrapper .info {
+.modal-upgrade .info_wrapper .info,
+.modal-skill .info_wrapper .info {
   background-color: black;
   padding: 10px 20px;
   border-radius: 20px;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.436);
 }
 .modal-towers .close-button,
-.modal-upgrade .close-button {
+.modal-upgrade .close-button,
+.modal-skill .close-button {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -147,14 +153,16 @@ body.red-flash {
   z-index: 9999999;
 }
 .modal-towers .grid-wrapper,
-.modal-upgrade .grid-wrapper {
+.modal-upgrade .grid-wrapper,
+.modal-skill .grid-wrapper {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 5px;
   margin: 50px auto;
 }
 .modal-towers .grid-wrapper .tile,
-.modal-upgrade .grid-wrapper .tile {
+.modal-upgrade .grid-wrapper .tile,
+.modal-skill .grid-wrapper .tile {
   background: linear-gradient(45deg, rgb(24, 54, 50), transparent);
   -webkit-backdrop-filter: blur(13px);
           backdrop-filter: blur(13px);
@@ -168,21 +176,25 @@ body.red-flash {
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile.overpriced,
-.modal-upgrade .grid-wrapper .tile.overpriced {
+.modal-upgrade .grid-wrapper .tile.overpriced,
+.modal-skill .grid-wrapper .tile.overpriced {
   opacity: 0.2;
 }
 .modal-towers .grid-wrapper .tile h4,
-.modal-upgrade .grid-wrapper .tile h4 {
+.modal-upgrade .grid-wrapper .tile h4,
+.modal-skill .grid-wrapper .tile h4 {
   margin: 5px 0;
 }
 .modal-towers .grid-wrapper .tile p,
-.modal-upgrade .grid-wrapper .tile p {
+.modal-upgrade .grid-wrapper .tile p,
+.modal-skill .grid-wrapper .tile p {
   font-size: 0.6rem;
   text-align: center;
   margin: 5px 0;
 }
 .modal-towers .grid-wrapper .tile img,
-.modal-upgrade .grid-wrapper .tile img {
+.modal-upgrade .grid-wrapper .tile img,
+.modal-skill .grid-wrapper .tile img {
   width: 60px;
   height: 50px;
   -o-object-fit: cover;
@@ -196,7 +208,8 @@ body.red-flash {
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile .button-buy,
-.modal-upgrade .grid-wrapper .tile .button-buy {
+.modal-upgrade .grid-wrapper .tile .button-buy,
+.modal-skill .grid-wrapper .tile .button-buy {
   background-color: rgb(24, 24, 65);
   padding: 10px 20px;
   border: 3px solid white;
@@ -207,7 +220,8 @@ body.red-flash {
   align-items: center;
 }
 .modal-towers .grid-wrapper .tile .button-sell,
-.modal-upgrade .grid-wrapper .tile .button-sell {
+.modal-upgrade .grid-wrapper .tile .button-sell,
+.modal-skill .grid-wrapper .tile .button-sell {
   background-color: rgb(24, 24, 65);
   padding: 10px 20px;
   border: 3px solid white;
@@ -456,4 +470,10 @@ select option {
   box-shadow: 0 0 10px black;
   border: 1px solid rgba(255, 255, 255, 0.255);
   border-radius: 5px;
+}
+
+.modal-skill.active {
+  display: flex;
+  z-index: 999;
+  background-color: black;
 }/*# sourceMappingURL=styles.css.map */
