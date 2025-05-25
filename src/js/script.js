@@ -275,7 +275,7 @@ function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
-    lbl_xp.innerHTML = `${save_obj.XP.toLocaleString("de-DE")} XP`;
+    lbl_xp.innerHTML = `${save_obj.XP.toLocaleString("de-DE")} XP || ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
     include_new_SaveObj_Properties();
     if (save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = "column";
@@ -746,9 +746,10 @@ function showGameOverModal() {
   lbl_Live.innerHTML = "0 Leben";
   if (!save_obj.assign_XP) {
     save_obj.XP += Math.floor(save_obj.current_XP / 2);
+    save_obj.XP_Coins += Math.floor(save_obj.current_XP / 2);
     if (save_obj.current_XP > 0) {
-      lbl_XP.innerHTML = ` +${Math.floor(save_obj.current_XP / 2)} XP (${
-        save_obj.XP
+      lbl_XP.innerHTML = ` +${Math.floor(save_obj.current_XP.toLocaleString("de-DE") / 2)} XP (${
+        save_obj.XP.toLocaleString("de-DE")
       } XP)`;
     }
     save_obj.assign_XP = true;
