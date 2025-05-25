@@ -275,7 +275,7 @@ function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
-    lbl_xp.innerHTML = `${save_obj.XP.toLocaleString("de-DE")} XP || ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
+    lbl_xp.innerHTML = `${save_obj.XP.toLocaleString("de-DE")} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
     include_new_SaveObj_Properties();
     if (save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = "column";
