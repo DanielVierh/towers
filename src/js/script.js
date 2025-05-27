@@ -49,6 +49,7 @@ const level_3 = document.getElementById("level_3");
 const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
+const lbl_title = document.getElementById("lbl_title");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -234,6 +235,7 @@ let save_obj = {
   XP_Coins: 0,
   XP_Store_Items: [],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
+  active_game_target_wave: 0,
 };
 
 //*#########################################################
@@ -275,7 +277,9 @@ function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
-    lbl_xp.innerHTML = `${save_obj.XP.toLocaleString("de-DE")} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
+    lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
+      "de-DE"
+    )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
     include_new_SaveObj_Properties();
     if (save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = "column";
@@ -748,9 +752,9 @@ function showGameOverModal() {
     save_obj.XP += Math.floor(save_obj.current_XP / 2);
     save_obj.XP_Coins += Math.floor(save_obj.current_XP / 2);
     if (save_obj.current_XP > 0) {
-      lbl_XP.innerHTML = ` +${Math.floor(save_obj.current_XP.toLocaleString("de-DE") / 2)} XP (${
-        save_obj.XP.toLocaleString("de-DE")
-      } XP)`;
+      lbl_XP.innerHTML = ` +${Math.floor(
+        save_obj.current_XP.toLocaleString("de-DE") / 2
+      )} XP (${save_obj.XP.toLocaleString("de-DE")} XP)`;
     }
     save_obj.assign_XP = true;
     saveGameToLocalStorage();
@@ -797,7 +801,7 @@ function gameLoop() {
   lbl_Money.innerHTML = `${save_obj.money}€`;
   lbl_Live.innerHTML = `${save_obj.live} Leben`;
   if (current_creep_index !== undefined) {
-    lbl_wave.innerHTML = `Welle: ${save_obj.wave} ${creep_properties[current_creep_index].name}`;
+    lbl_wave.innerHTML = `Welle: ${save_obj.wave} / ${save_obj.active_game_target_wave} - ${creep_properties[current_creep_index].name}`;
   }
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`;
 
@@ -1097,7 +1101,7 @@ function updateLabels() {
   lbl_Live.innerHTML = `${save_obj.live} Leben`;
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`;
   if (current_creep_index !== undefined) {
-    lbl_wave.innerHTML = `Welle: ${save_obj.wave} ${creep_properties[current_creep_index].name}`;
+    lbl_wave.innerHTML = `Welle: ${save_obj.wave} / ${save_obj.active_game_target_wave} - ${creep_properties[current_creep_index].name}`;
   }
 }
 
@@ -1147,6 +1151,15 @@ function updateWaveTimer() {
     waveTimer = time_to_next_wave; // Reset the timer for the next wave
     initialize_Creeps_for_next_round();
     save_obj.wave++;
+
+    //* Sieg
+    if (save_obj.wave >= save_obj.active_game_target_wave + 1) {
+     setTimeout(() => {
+       won_game();
+     }, 1000);
+      return;
+    }
+
     if (save_obj.money >= 1500) {
       save_obj.enemy_max_health += 250;
     }
@@ -1161,6 +1174,31 @@ function updateWaveTimer() {
     }
     save_obj.money += Math.floor(save_obj.wave * 2);
     console.log(save_obj);
+  }
+}
+
+//* Won Game
+function won_game() {
+  game_is_running = false;
+  if (save_obj.assign_XP === false) {
+    // Zeige das Game Over Modal mit Sieg-Text und XP-Anzeige
+    gameOverModal.style.display = "block";
+    gameOverModal.style.backgroundColor = "rgba(8, 178, 59, 0.8)";
+    lbl_title.innerHTML = "Du hast gewonnen!";
+    if (!save_obj.assign_XP) {
+      save_obj.current_XP = Math.floor(save_obj.current_XP + save_obj.wave * 30);
+      save_obj.XP += save_obj.current_XP;
+      save_obj.XP_Coins += save_obj.current_XP;
+      if (save_obj.current_XP > 0) {
+      lbl_XP.innerHTML = ` +${save_obj.current_XP.toLocaleString("de-DE")} XP (${save_obj.XP.toLocaleString("de-DE")} XP)`;
+      }
+      save_obj.current_XP = 0;
+      save_obj.assign_XP = true;
+      saveGameToLocalStorage();
+    }
+    btn_goto_menu.classList.remove("hidden");
+    btn_pause.classList.add("hidden");
+    btn_save_game.classList.add("hidden");
   }
 }
 
@@ -1499,6 +1537,7 @@ btn_save_game.addEventListener("click", () => {
 btn_load_game.addEventListener("click", () => {
   loadGameFromLocalStorage();
   menu_modal.classList.remove("active");
+  save_obj.wave -= 1;
   backgroundImage.src = save_obj.backgroundImage;
   waypoint_color = save_obj.waypoint_color;
   game_is_running = true;
@@ -1547,14 +1586,25 @@ function initialize_game(level_details) {
   save_obj.current_XP = 0;
   modal_select_lvl.style.display = "none";
   const level = level_details;
+  //* Set the max wave target for this round
+  save_obj.active_game_target_wave = Math.floor(Math.random() * (60 - 20)) + 20;
+  //* Set the background image path in the save object
   save_obj.backgroundImage = level.background_img_path;
+  //* Set the background image for the canvas
   backgroundImage.src = level.background_img_path;
+  //* Set the waypoints for the level
   save_obj.waypoints = level.waypoints;
+  //* Set the tower places for the level
   save_obj.tower_places = level.tower_places;
+  //* Set the waypoint color for the level
   save_obj.waypoint_color = level.waypoint_color;
+  //* Set the current wave to 0
   save_obj.wave = 0;
+  //* Set the maximum enemy amount
   save_obj.max_enemy_amount = 2;
+  //* Set the maximum enemy velocity
   save_obj.enemy_max_velocity = 1.5;
+  //* Set the global waypoint color
   waypoint_color = level.waypoint_color;
   start_game();
 }
@@ -1567,7 +1617,7 @@ function start_game() {
 
   game_is_running = true;
 
-  //* Start the game loop
+  //** Start the game loop
   gameLoop();
 
   // Update the wave timer every second
