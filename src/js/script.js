@@ -270,6 +270,10 @@ function saveGameToLocalStorage() {
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
 
+function save_Game_without_saveDate() {
+   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
+}
+
 //*#########################################################
 //* ANCHOR - Load Game  from Local Storage
 //*#########################################################
@@ -284,6 +288,8 @@ function loadGameFromLocalStorage() {
     if (save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = "column";
       btn_load_game.innerHTML = `Spiel Laden <p style="font-size: .7rem;" >${save_obj.save_date}</p>`;
+    }else {
+      btn_load_game.style.display = 'none';
     }
     initializeTowerImages();
   } else {
@@ -1194,7 +1200,8 @@ function won_game() {
       }
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
-      saveGameToLocalStorage();
+      save_obj.save_date = undefined;
+      save_Game_without_saveDate();
     }
     btn_goto_menu.classList.remove("hidden");
     btn_pause.classList.add("hidden");
