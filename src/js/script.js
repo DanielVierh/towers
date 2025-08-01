@@ -984,12 +984,12 @@ function gameLoop() {
           } else if (tower.tower_type === "mine") {
             if (!enemy.resistent.includes("mine")) {
               setTimeout(() => {
-                enemy.health = 0;
-
+                setTimeout(() => {
+                  enemy.health = 0;
+                }, 100);
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
-
                   // Mine entfernen
                   tower.tower_is_build = false;
                   tower.tower_type = "";
