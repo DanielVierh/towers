@@ -50,6 +50,9 @@ const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
 const lbl_title = document.getElementById("lbl_title");
+const btn_open_skill_menu = document.getElementById('btn_open_skill_menu');
+const mdl_skill_tree = document.getElementById('mdl_skill_tree');
+const btn_close_modal_skill = document.getElementById('btn_close_modal_skill');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -273,6 +276,15 @@ function saveGameToLocalStorage() {
 function save_Game_without_saveDate() {
    localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
+
+//* ANCHOR - Open Skill Modal
+btn_open_skill_menu.addEventListener('click', ()=> {
+  mdl_skill_tree.classList.add('active');
+});
+
+btn_close_modal_skill.addEventListener('click', ()=> {
+  mdl_skill_tree.classList.remove('active');
+})
 
 //*#########################################################
 //* ANCHOR - Load Game  from Local Storage
