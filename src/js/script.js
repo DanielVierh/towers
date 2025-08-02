@@ -53,6 +53,8 @@ const lbl_title = document.getElementById("lbl_title");
 const btn_open_skill_menu = document.getElementById('btn_open_skill_menu');
 const mdl_skill_tree = document.getElementById('mdl_skill_tree');
 const btn_close_modal_skill = document.getElementById('btn_close_modal_skill');
+const btn_trap_discount = document.getElementById('btn_trap_discount');
+
 
 canvas.width = 400;
 canvas.height = 400;
@@ -768,7 +770,7 @@ function showGameOverModal() {
   lbl_Live.innerHTML = "0 Leben";
   if (!save_obj.assign_XP) {
     save_obj.XP += Math.floor(save_obj.current_XP / 2);
-    save_obj.XP_Coins += Math.floor(save_obj.current_XP / 2);
+    save_obj.XP_Coins += Math.floor(save_obj.current_XP / 1.5);
     if (save_obj.current_XP > 0) {
       lbl_XP.innerHTML = ` +${Math.floor(
         save_obj.current_XP.toLocaleString("de-DE") / 2
@@ -1849,4 +1851,34 @@ function set_class_for_overpriced_towers() {
       console.log(error);
     }
   });
+}
+
+//*ANCHOR - XP Store
+
+btn_trap_discount.addEventListener('click', ()=> {
+  const xp_transaction = check_XPCoins(500);
+  if(xp_transaction.success === true) {
+    alert('Transaktion erfolgreich')
+  }else {
+    alert('Leider nicht genug XP Coints vorhanden')
+  }
+  
+})
+
+
+
+function check_XPCoins(price) {
+  const current_XPCoins = save_obj.XP_Coins;
+  if(current_XPCoins < price) {
+    return {
+      returnText: 'Leider nicht genug XP Coins vorhanden',
+      success: false
+    }
+  }else {
+    return {
+      returnText: 'Upgrade gekauft',
+      success: true
+    }
+  }
+  
 }

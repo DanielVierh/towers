@@ -180,6 +180,11 @@ body.red-flash {
 .modal-skill .grid-wrapper .tile.overpriced {
   opacity: 0.2;
 }
+.modal-towers .grid-wrapper .tile.hidden,
+.modal-upgrade .grid-wrapper .tile.hidden,
+.modal-skill .grid-wrapper .tile.hidden {
+  display: none;
+}
 .modal-towers .grid-wrapper .tile h4,
 .modal-upgrade .grid-wrapper .tile h4,
 .modal-skill .grid-wrapper .tile h4 {
