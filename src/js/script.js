@@ -1,5 +1,6 @@
 import { Creep } from "./classes/Creep.js";
 import { Laser } from "./classes/Laser.js";
+import { GameMessage } from "./classes/GameMessage.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
 
@@ -1858,9 +1859,11 @@ function set_class_for_overpriced_towers() {
 btn_trap_discount.addEventListener('click', ()=> {
   const xp_transaction = check_XPCoins(500);
   if(xp_transaction.success === true) {
-    alert('Transaktion erfolgreich')
+   const message = new GameMessage('Erfolg', xp_transaction.returnText, 'success');
+   message.show_Message();
   }else {
-    alert('Leider nicht genug XP Coints vorhanden')
+   const message = new GameMessage('Erfolg', xp_transaction.returnText, 'success');
+   message.show_Message();
   }
   
 })
