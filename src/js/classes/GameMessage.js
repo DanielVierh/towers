@@ -1,8 +1,9 @@
 export class GameMessage {
-    constructor(title, message, type) {
+    constructor(title, message, type, display_time) {
         this.title = title;
         this.message = message;
         this.type = type;
+        this.display_time = display_time;
     }
 
     show_Message() {
@@ -36,7 +37,7 @@ export class GameMessage {
         //* Remove message from body
         setTimeout(() => {
             document.body.removeChild(message_body);
-        }, 2000);
+        }, this.display_time);
     }
     
 }

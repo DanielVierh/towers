@@ -1,6 +1,7 @@
 import { Creep } from "./classes/Creep.js";
 import { Laser } from "./classes/Laser.js";
 import { GameMessage } from "./classes/GameMessage.js";
+import { XP_SHOP_ITEM } from "./classes/XP_SHOP_ITEM.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
 
@@ -239,7 +240,12 @@ let save_obj = {
   assign_XP: false,
   XP: 0,
   XP_Coins: 0,
-  XP_Store_Items: [],
+  XP_Store_Items: [
+    {
+      'name': 'trap_rabatt_50',
+      'amount': 0,
+    }
+  ],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
   active_game_target_wave: 0,
 };
@@ -1855,29 +1861,30 @@ function set_class_for_overpriced_towers() {
 }
 
 //*ANCHOR - XP Store
-
 btn_trap_discount.addEventListener('click', ()=> {
-  const xp_transaction = check_XPCoins(500, 'Fallen Rabatt');
+  const price = btn_trap_discount.getAttribute('data-skill_price');
+  const xp_transaction = check_XPCoins(price, 'Fallen Rabatt');
   if(xp_transaction === true) {
-    console.log('Hat nicht geklappt');
-  }else {
-    console.log('Hat geklappt');
+    saveGameToLocalStorage();
+    console.log('Hat geklappt', xp_transaction);
+    save_obj.XP_SHOP_ITEM[0].amount += 10;
+    save_obj.XP_Coins -= pr
+    saveGameToLocalStorage();
   }
 })
 
 
 //*ANCHOR -  Function to check, if enough coins are available  - Respond with a message
-
 function check_XPCoins(price, xp_objectname) {
-  const current_XPCoins = save_obj.XP_Coins;
+  // const current_XPCoins = save_obj.XP_Coins;
+  const current_XPCoins = 9000;
+  
   if(current_XPCoins >= price) {
-    const message = new GameMessage('Erfolg', `"${xp_objectname}" erfolgreich gekauft`, 'success');
-    message.show_Message();
-    return false;
-  }else {
-    const message = new GameMessage('Leider nicht möglich', `Zu wenig XPCredits für "${xp_objectname}"`, 'error');
-    message.show_Message();
+    const message = new GameMessage('Erfolg', `"${xp_objectname}" erfolgreich gekauft`, 'success', 4000).show_Message();
     return true;
+  }else {
+    const message = new GameMessage('Leider nicht möglich', `Zu wenig XPCredits für "${xp_objectname}"`, 'error', 3000).show_Message();
+    return false;
   }
   
 }
