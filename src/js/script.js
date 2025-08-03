@@ -1862,7 +1862,7 @@ btn_trap_discount.addEventListener('click', ()=> {
    const message = new GameMessage('Erfolg', xp_transaction.returnText, 'success');
    message.show_Message();
   }else {
-   const message = new GameMessage('Erfolg', xp_transaction.returnText, 'success');
+   const message = new GameMessage('Leider nicht möglich', xp_transaction.returnText, 'error');
    message.show_Message();
   }
   
