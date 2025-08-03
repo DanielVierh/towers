@@ -1857,31 +1857,27 @@ function set_class_for_overpriced_towers() {
 //*ANCHOR - XP Store
 
 btn_trap_discount.addEventListener('click', ()=> {
-  const xp_transaction = check_XPCoins(500);
-  if(xp_transaction.success === true) {
-   const message = new GameMessage('Erfolg', xp_transaction.returnText, 'success');
-   message.show_Message();
+  const xp_transaction = check_XPCoins(500, 'Fallen Rabatt');
+  if(xp_transaction === true) {
+    console.log('Hat nicht geklappt');
   }else {
-   const message = new GameMessage('Leider nicht möglich', xp_transaction.returnText, 'error');
-   message.show_Message();
+    console.log('Hat geklappt');
   }
-  
 })
 
 
+//*ANCHOR -  Function to check, if enough coins are available  - Respond with a message
 
-function check_XPCoins(price) {
+function check_XPCoins(price, xp_objectname) {
   const current_XPCoins = save_obj.XP_Coins;
-  if(current_XPCoins < price) {
-    return {
-      returnText: 'Leider nicht genug XP Coins vorhanden',
-      success: false
-    }
+  if(current_XPCoins >= price) {
+    const message = new GameMessage('Erfolg', `"${xp_objectname}" erfolgreich gekauft`, 'success');
+    message.show_Message();
+    return false;
   }else {
-    return {
-      returnText: 'Upgrade gekauft',
-      success: true
-    }
+    const message = new GameMessage('Leider nicht möglich', `Zu wenig XPCredits für "${xp_objectname}"`, 'error');
+    message.show_Message();
+    return true;
   }
   
 }

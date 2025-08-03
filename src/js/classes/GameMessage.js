@@ -6,12 +6,11 @@ export class GameMessage {
     }
 
     show_Message() {
-        console.log('show_Message called');
         
         let message_body = document.createElement('div');
         message_body.classList.add('message-body');
 
-        let message_title = document.createElement('p');
+        let message_title = document.createElement('h2');
         message_title.innerText = this.title;
 
 
@@ -30,7 +29,14 @@ export class GameMessage {
         } else if (this.type === 'info') {
             message_body.classList.add('info');
         }
+
+        //* Add message to body
         document.body.appendChild(message_body);
+
+        //* Remove message from body
+        setTimeout(() => {
+            document.body.removeChild(message_body);
+        }, 2000);
     }
     
 }
