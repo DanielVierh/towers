@@ -4,7 +4,7 @@ import { GameMessage } from "./classes/GameMessage.js";
 import { XP_SHOP_ITEM } from "./classes/XP_SHOP_ITEM.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
-import { render_amount } from "./functions/xp_Items.js";
+import { render_amount, render_XP_Coins } from "./functions/xp_Items.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -313,7 +313,8 @@ function loadGameFromLocalStorage() {
       btn_load_game.style.display = "none";
     }
     try {
-      render_amount(save_obj)
+      render_amount(save_obj);
+      render_XP_Coins(save_obj);
     } catch (error) {
       console.log(error);
       
@@ -1894,7 +1895,8 @@ btn_trap_discount.addEventListener("click", () => {
         save_obj.XP_Store_Items[0].amount += 10;
       }
       save_obj.XP_Coins -= price;
-      lbl_trap_discount_amount.innerHTML = `${save_obj.XP_Store_Items[0].amount}X`
+      lbl_trap_discount_amount.innerHTML = `${save_obj.XP_Store_Items[0].amount}X`;
+      render_XP_Coins(save_obj);
       save_Game_without_saveDate();
       console.log("saveobj", save_obj);
     }
