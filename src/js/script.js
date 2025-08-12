@@ -4,6 +4,7 @@ import { GameMessage } from "./classes/GameMessage.js";
 import { XP_SHOP_ITEM } from "./classes/XP_SHOP_ITEM.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
+import { render_amount } from "./functions/xp_Items.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -52,11 +53,10 @@ const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
 const lbl_title = document.getElementById("lbl_title");
-const btn_open_skill_menu = document.getElementById('btn_open_skill_menu');
-const mdl_skill_tree = document.getElementById('mdl_skill_tree');
-const btn_close_modal_skill = document.getElementById('btn_close_modal_skill');
-const btn_trap_discount = document.getElementById('btn_trap_discount');
-
+const btn_open_skill_menu = document.getElementById("btn_open_skill_menu");
+const mdl_skill_tree = document.getElementById("mdl_skill_tree");
+const btn_close_modal_skill = document.getElementById("btn_close_modal_skill");
+const btn_trap_discount = document.getElementById("btn_trap_discount");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -242,9 +242,9 @@ let save_obj = {
   XP_Coins: 0,
   XP_Store_Items: [
     {
-      'name': 'trap_rabatt_50',
-      'amount': 0,
-    }
+      name: "trap_rabatt_50",
+      amount: 0,
+    },
   ],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
   active_game_target_wave: 0,
@@ -283,17 +283,17 @@ function saveGameToLocalStorage() {
 }
 
 function save_Game_without_saveDate() {
-   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
+  localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
 
 //* ANCHOR - Open Skill Modal
-btn_open_skill_menu.addEventListener('click', ()=> {
-  mdl_skill_tree.classList.add('active');
+btn_open_skill_menu.addEventListener("click", () => {
+  mdl_skill_tree.classList.add("active");
 });
 
-btn_close_modal_skill.addEventListener('click', ()=> {
-  mdl_skill_tree.classList.remove('active');
-})
+btn_close_modal_skill.addEventListener("click", () => {
+  mdl_skill_tree.classList.remove("active");
+});
 
 //*#########################################################
 //* ANCHOR - Load Game  from Local Storage
@@ -309,8 +309,14 @@ function loadGameFromLocalStorage() {
     if (save_obj.save_date !== undefined) {
       btn_load_game.style.flexDirection = "column";
       btn_load_game.innerHTML = `Spiel Laden <p style="font-size: .7rem;" >${save_obj.save_date}</p>`;
-    }else {
-      btn_load_game.style.display = 'none';
+    } else {
+      btn_load_game.style.display = "none";
+    }
+    try {
+      render_amount(save_obj)
+    } catch (error) {
+      console.log(error);
+      
     }
     initializeTowerImages();
   } else {
@@ -337,7 +343,12 @@ function include_new_SaveObj_Properties() {
   //* Add XP_Store_Items
   if (save_obj.XP_Store_Items === undefined) {
     try {
-      save_obj.XP_Store_Items = [];
+      save_obj.XP_Store_Items = [
+        {
+          name: "trap_rabatt_50",
+          amount: 0,
+        },
+      ];
     } catch (error) {
       console.log(error);
     }
@@ -1181,9 +1192,9 @@ function updateWaveTimer() {
 
     //* Sieg
     if (save_obj.wave >= save_obj.active_game_target_wave + 1) {
-     setTimeout(() => {
-       won_game();
-     }, 1000);
+      setTimeout(() => {
+        won_game();
+      }, 1000);
       return;
     }
 
@@ -1213,11 +1224,15 @@ function won_game() {
     gameOverModal.style.backgroundColor = "rgba(8, 178, 59, 0.8)";
     lbl_title.innerHTML = "Du hast gewonnen!";
     if (!save_obj.assign_XP) {
-      save_obj.current_XP = Math.floor(save_obj.current_XP + save_obj.wave * 30);
+      save_obj.current_XP = Math.floor(
+        save_obj.current_XP + save_obj.wave * 30
+      );
       save_obj.XP += save_obj.current_XP;
       save_obj.XP_Coins += save_obj.current_XP;
       if (save_obj.current_XP > 0) {
-      lbl_XP.innerHTML = ` +${save_obj.current_XP.toLocaleString("de-DE")} XP (${save_obj.XP.toLocaleString("de-DE")} XP)`;
+        lbl_XP.innerHTML = ` +${save_obj.current_XP.toLocaleString(
+          "de-DE"
+        )} XP (${save_obj.XP.toLocaleString("de-DE")} XP)`;
       }
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
@@ -1861,30 +1876,50 @@ function set_class_for_overpriced_towers() {
 }
 
 //*ANCHOR - XP Store
-btn_trap_discount.addEventListener('click', ()=> {
-  const price = btn_trap_discount.getAttribute('data-skill_price');
-  const xp_transaction = check_XPCoins(price, 'Fallen Rabatt');
-  if(xp_transaction === true) {
-    saveGameToLocalStorage();
-    console.log('Hat geklappt', xp_transaction);
-    save_obj.XP_SHOP_ITEM[0].amount += 10;
-    save_obj.XP_Coins -= pr
-    saveGameToLocalStorage();
-  }
-})
 
+btn_trap_discount.addEventListener("click", () => {
+  const price = btn_trap_discount.getAttribute("data-skill_price");
+  const confirm = window.confirm(
+    `Möchtest du den Rabatt für Fallen für ${price} XPCoins kaufen?`
+  );
+  if (confirm) {
+    const xp_transaction = check_XPCoins(price, "Fallen Rabatt");
+    if (xp_transaction === true) {
+      if (save_obj.XP_Store_Items[0] === undefined) {
+        save_obj.XP_Store_Items.push({
+          name: "trap_rabatt_50",
+          amount: 10,
+        });
+      } else {
+        save_obj.XP_Store_Items[0].amount += 10;
+      }
+      save_obj.XP_Coins -= price;
+      lbl_trap_discount_amount.innerHTML = `${save_obj.XP_Store_Items[0].amount}X`
+      save_Game_without_saveDate();
+      console.log("saveobj", save_obj);
+    }
+  }
+});
 
 //*ANCHOR -  Function to check, if enough coins are available  - Respond with a message
 function check_XPCoins(price, xp_objectname) {
-  // const current_XPCoins = save_obj.XP_Coins;
-  const current_XPCoins = 9000;
-  
-  if(current_XPCoins >= price) {
-    const message = new GameMessage('Erfolg', `"${xp_objectname}" erfolgreich gekauft`, 'success', 4000).show_Message();
+  const current_XPCoins = save_obj.XP_Coins;
+  // const current_XPCoins = 9000; //* zum testen
+  if (current_XPCoins >= price) {
+    const message = new GameMessage(
+      "Erfolg",
+      `"${xp_objectname}" erfolgreich gekauft`,
+      "success",
+      4000
+    ).show_Message();
     return true;
-  }else {
-    const message = new GameMessage('Leider nicht möglich', `Zu wenig XPCredits für "${xp_objectname}"`, 'error', 3000).show_Message();
+  } else {
+    const message = new GameMessage(
+      "Leider nicht möglich",
+      `Zu wenig XPCredits für "${xp_objectname}"`,
+      "error",
+      3000
+    ).show_Message();
     return false;
   }
-  
 }

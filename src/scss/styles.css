@@ -505,4 +505,14 @@ select option {
 }
 .message-body.success {
   background-color: rgba(2, 63, 2, 0.95);
+}
+
+.label-amount {
+  background-color: orange;
+  color: black;
+  padding: 5px 7px;
+  border-radius: 8px;
+  position: absolute;
+  bottom: 20px;
+  right: 0;
 }/*# sourceMappingURL=styles.css.map */

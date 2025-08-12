@@ -108,7 +108,7 @@
       <h2>Tower</h2>
       <div class="button" id="btn_start_game">Neues Spiel</div>
       <div class="button" id="btn_load_game">Spiel laden</div>
-      <div class="button" id="btn_open_skill_menu">Skill</div>
+      <div class="button" id="btn_open_skill_menu">Skill Store</div>
       <div class="button" id="btn_show_instructions">Anleitung</div>
     </div>
 
@@ -161,6 +161,7 @@
           </div>
         </div>
         <div class="tile hidden">
+          <div id="lbl_tower_discount_amount" class="label-amount">0X</div>
           <h3>10 x 50% Rabatt auf Türme</h3>
           <p>
             Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Türmen. Spare
@@ -175,6 +176,7 @@
           </div>
         </div>
         <div class="tile">
+          <div id="lbl_trap_discount_amount" class="label-amount">0X</div>
           <h3>10 x 50% Rabatt auf Fallen</h3>
           <p>
             Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Fallen. Spare
@@ -199,7 +201,8 @@
             Kaufen 15.000 XP Coins
           </div>
         </div>
-        <div class="tile">
+        <div class="tile hidden">
+          <div id="lbl_extra_coins_amount" class="label-amount">0X</div>
           <h3>Zusätzliche Coins durch Kills</h3>
           <p>Erhalte zusätzliche Coins für jeden getöteten Gegner</p>
           <div class="button-buy" id="btn_extra_coins" data-skill_price="20000">
