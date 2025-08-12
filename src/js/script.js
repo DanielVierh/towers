@@ -4,7 +4,8 @@ import { GameMessage } from "./classes/GameMessage.js";
 import { XP_SHOP_ITEM } from "./classes/XP_SHOP_ITEM.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
-import { render_amount, render_XP_Coins } from "./functions/xp_Items.js";
+import { render_amount, render_XP_Coins, return_Item_Amount_and_Existens } from "./functions/xp_Items.js";
+
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -1275,6 +1276,24 @@ canvas.addEventListener("click", (event) => {
       //* Modal for traps
       if (place.is_trap) {
         mdl_traps.style.display = "flex";
+          const oldPrice_mine_ground =  70;
+          const new_price_mine_ground = oldPrice_mine_ground / 2;
+          const oldPrice_mine_air =  70;
+          const new_price_mine_air = oldPrice_mine_air / 2;
+          const btn_ground_mine = document.getElementById('btn_ground_mine');
+          const mine_rabatt = return_Item_Amount_and_Existens(save_obj, 'trap_rabatt_50');
+          const trigger_btn_air_mine = document.getElementById('trigger_btn_air_mine');
+        if(mine_rabatt.available && mine_rabatt.amount > 0) {
+          btn_mine.setAttribute('data-tower_price', new_price_mine_ground);
+          btn_air_mine.setAttribute('data-tower_price', new_price_mine_air);
+          btn_ground_mine.innerHTML = `Kaufen ${new_price_mine_ground}€`;
+          trigger_btn_air_mine.innerHTML = `Kaufen ${new_price_mine_air}€`;
+        }else {
+          btn_mine.setAttribute('data-tower_price', oldPrice_mine_ground);
+          btn_air_mine.setAttribute('data-tower_price', oldPrice_mine_air);
+          btn_ground_mine.innerHTML = `Kaufen ${oldPrice_mine_ground}€`;
+          trigger_btn_air_mine.innerHTML = `Kaufen ${oldPrice_mine_air}€`;
+        }
         set_class_for_overpriced_towers();
         return;
       }
@@ -1361,6 +1380,12 @@ btn_Slower.addEventListener("click", () => {
 
 btn_mine.addEventListener("click", () => {
   set_Tower(btn_mine, "mine", 0, mdl_traps);
+  const item = return_Item_Amount_and_Existens(save_obj, 'trap_rabatt_50');
+  if(item.available && item.amount > 0) {
+    save_obj.XP_Store_Items[item.index].amount -= 1;
+    render_amount(save_obj)
+    save_Game_without_saveDate();
+  }
 });
 
 //*#########################################################
@@ -1370,6 +1395,12 @@ const btn_air_mine = document.getElementById("btn_air_mine");
 
 btn_air_mine.addEventListener("click", () => {
   set_Tower(btn_air_mine, "air_mine", 0, mdl_traps);
+  const item = return_Item_Amount_and_Existens(save_obj, 'trap_rabatt_50');
+  if(item.available && item.amount > 0) {
+    save_obj.XP_Store_Items[item.index].amount -= 1;
+    render_amount(save_obj)
+    save_Game_without_saveDate();
+  }
 });
 
 //*#########################################################
@@ -1895,8 +1926,8 @@ btn_trap_discount.addEventListener("click", () => {
         save_obj.XP_Store_Items[0].amount += 10;
       }
       save_obj.XP_Coins -= price;
-      lbl_trap_discount_amount.innerHTML = `${save_obj.XP_Store_Items[0].amount}X`;
       render_XP_Coins(save_obj);
+      render_amount(save_obj);
       save_Game_without_saveDate();
       console.log("saveobj", save_obj);
     }
