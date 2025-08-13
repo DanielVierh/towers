@@ -1942,6 +1942,7 @@ btn_trap_discount.addEventListener("click", () => {
       save_obj.XP_Coins -= price;
       render_XP_Coins(save_obj);
       render_amount(save_obj);
+      render_xp_on_homescreen()
       save_Game_without_saveDate();
     }
   }
@@ -1973,10 +1974,17 @@ btn_tower_discount.addEventListener("click", () => {
       save_obj.XP_Coins -= price;
       render_XP_Coins(save_obj);
       render_amount(save_obj);
+      render_xp_on_homescreen()
       save_Game_without_saveDate();
     }
   }
 });
+
+function render_xp_on_homescreen() {
+      lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
+      "de-DE"
+    )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
+}
 
 //*ANCHOR -  Function to check, if enough coins are available  - Respond with a message
 function check_XPCoins(price, xp_objectname) {
