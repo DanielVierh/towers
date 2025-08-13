@@ -514,7 +514,7 @@ select option {
   border-radius: 8px;
   position: absolute;
   bottom: 17px;
-  right: 17px;
-  font-size: 0.6rem;
+  right: 5px;
+  font-size: 0.8rem;
   font-weight: bold;
 }/*# sourceMappingURL=styles.css.map */
