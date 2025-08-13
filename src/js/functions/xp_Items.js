@@ -4,18 +4,20 @@ export function render_amount(save_obj) {
   const lbl_trap_discount_amount = document.getElementById("lbl_trap_discount_amount");
   const lbl_mine_discount_amount = document.getElementById("lbl_mine_discount_amount");
   const lbl_tower_discount_amount = document.getElementById("lbl_tower_discount_amount");
+  const lbl_buymenu_tower_discount_amount = document.getElementById("lbl_buymenu_tower_discount_amount");
 
-  //* Trap Discount
+  //* Show Amount of Trap Discount
   const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
   if (item.available) {
     lbl_trap_discount_amount.innerHTML = `${item.amount}X`;
     lbl_mine_discount_amount.innerHTML = `${item.amount} X 50% Rabatt`;
   }
 
-  //* Tower Discount
+  //* Show Amount of Tower Discount
   const tower_item = return_Item_Amount_and_existence(save_obj, 'tower_rabatt_50');
   if(tower_item.available) {
     lbl_tower_discount_amount.innerHTML = `${tower_item.amount}X`;
+    lbl_buymenu_tower_discount_amount.innerHTML = `${tower_item.amount} X 50% Rabatt`;
   }
 }
 

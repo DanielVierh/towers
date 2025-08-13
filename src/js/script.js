@@ -1313,6 +1313,7 @@ canvas.addEventListener("click", (event) => {
           document.getElementById("lbl_current_energy");
         lbl_current_money.innerHTML = `${save_obj.money} €`;
         lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
+        show_recuded_price_on_discount();
         calc_energy_overdose();
         set_class_for_overpriced_towers();
       } else {
@@ -1374,6 +1375,56 @@ canvas.addEventListener("click", (event) => {
   });
 });
 
+const buy_btn_powerplant = document.getElementById('buy_btn_powerplant');
+const buy_btn_destroyer = document.getElementById('buy_btn_destroyer');
+const buy_btn_slower = document.getElementById('buy_btn_slower');
+const buy_btn_toxic = document.getElementById('buy_btn_toxic');
+const buy_btn_antiair = document.getElementById('buy_btn_antiair');
+
+
+function show_recuded_price_on_discount() {
+  const towerDiscount = return_Item_Amount_and_existence(save_obj, 'tower_rabatt_50');
+  if(towerDiscount) {
+    const original_powerplant_price = 70;
+    const original_destroyer_price = 50;
+    const original_slower_price = 100;
+    const original_toxic_price = 300;
+    const original_antiair_price = 100;
+
+    const new_powerplant_price = 70 / 2;
+    const new_destroyer_price = 50 / 2;
+    const new_slower_price = 100 / 2;
+    const new_toxic_price = 300 / 2;
+    const new_antiair_price = 100 / 2;
+
+    if(towerDiscount.available && towerDiscount.amount > 0) {
+      buy_btn_powerplant.innerHTML =  `Kaufen ${new_powerplant_price}€`;
+      btn_energy.setAttribute('data-tower_price', new_powerplant_price);
+      buy_btn_destroyer.innerHTML =  `Kaufen ${new_destroyer_price}€`;
+      btn_Destroyer.setAttribute('data-tower_price', new_destroyer_price);
+      buy_btn_slower.innerHTML =  `Kaufen ${new_slower_price}€`;
+      btn_Slower.setAttribute('data-tower_price', new_slower_price);
+      buy_btn_toxic.innerHTML =  `Kaufen ${new_toxic_price}€`;
+      btn_Toxic.setAttribute('data-tower_price', new_toxic_price);
+      buy_btn_antiair.innerHTML =  `Kaufen ${new_antiair_price}€`;
+      btn_Anti_Air.setAttribute('data-tower_price', new_antiair_price);
+
+    }else {
+      buy_btn_powerplant.innerHTML =  `Kaufen ${original_powerplant_price}€`;
+      btn_energy.setAttribute('data-tower_price', original_powerplant_price);
+      buy_btn_destroyer.innerHTML =  `Kaufen ${original_destroyer_price}€`;
+      btn_Destroyer.setAttribute('data-tower_price', original_destroyer_price);
+      buy_btn_slower.innerHTML =  `Kaufen ${original_slower_price}€`;
+      btn_Slower.setAttribute('data-tower_price', original_slower_price);
+      buy_btn_toxic.innerHTML =  `Kaufen ${original_toxic_price}€`;
+      btn_Toxic.setAttribute('data-tower_price', original_toxic_price);
+      buy_btn_antiair.innerHTML =  `Kaufen ${original_antiair_price}€`;
+      btn_Anti_Air.setAttribute('data-tower_price', original_antiair_price);
+    }
+
+  }
+}
+
 //*#########################################################
 //* ANCHOR -Set Tower Slower
 //*#########################################################
@@ -1417,6 +1468,7 @@ btn_air_mine.addEventListener("click", () => {
 
 btn_Destroyer.addEventListener("click", () => {
   set_Tower(btn_Destroyer, "destroyer", 1, mdl_towers);
+  substract_tower_discount();
 });
 
 //*#########################################################
@@ -1425,6 +1477,7 @@ btn_Destroyer.addEventListener("click", () => {
 
 btn_Toxic.addEventListener("click", () => {
   set_Tower(btn_Toxic, "toxic", 1, mdl_towers);
+  substract_tower_discount();
 });
 
 //*#########################################################
@@ -1435,6 +1488,7 @@ const btn_Anti_Air = document.getElementById("btn_Anti_Air");
 
 btn_Anti_Air.addEventListener("click", () => {
   set_Tower(btn_Anti_Air, "anti_air", 1, mdl_towers);
+  substract_tower_discount();
 });
 
 //*#########################################################
@@ -1443,7 +1497,21 @@ btn_Anti_Air.addEventListener("click", () => {
 
 btn_energy.addEventListener("click", () => {
   set_Tower(btn_energy, "energy", 1, mdl_towers);
+  substract_tower_discount();
 });
+
+
+//*#########################################################
+//* ANCHOR -Substract Tower Discount on use
+//*#########################################################
+function substract_tower_discount() {
+  const item = return_Item_Amount_and_existence(save_obj, "tower_rabatt_50");
+  if (item.available && item.amount > 0) {
+    save_obj.XP_Store_Items[item.index].amount -= 1;
+    render_amount(save_obj);
+    save_Game_without_saveDate();
+  }
+}
 
 //*#########################################################
 //* ANCHOR -Set Tower Function
