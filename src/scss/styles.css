@@ -510,9 +510,11 @@ select option {
 .label-amount {
   background-color: orange;
   color: black;
-  padding: 5px 7px;
+  padding: 5px;
   border-radius: 8px;
   position: absolute;
-  bottom: 20px;
-  right: 0;
+  bottom: 17px;
+  right: 17px;
+  font-size: 0.6rem;
+  font-weight: bold;
 }/*# sourceMappingURL=styles.css.map */

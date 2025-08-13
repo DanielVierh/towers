@@ -4,8 +4,11 @@ import { GameMessage } from "./classes/GameMessage.js";
 import { XP_SHOP_ITEM } from "./classes/XP_SHOP_ITEM.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
-import { render_amount, render_XP_Coins, return_Item_Amount_and_Existens } from "./functions/xp_Items.js";
-
+import {
+  render_amount,
+  render_XP_Coins,
+  return_Item_Amount_and_existence,
+} from "./functions/xp_Items.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -58,6 +61,7 @@ const btn_open_skill_menu = document.getElementById("btn_open_skill_menu");
 const mdl_skill_tree = document.getElementById("mdl_skill_tree");
 const btn_close_modal_skill = document.getElementById("btn_close_modal_skill");
 const btn_trap_discount = document.getElementById("btn_trap_discount");
+const btn_tower_discount = document.getElementById("btn_tower_discount");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -318,7 +322,6 @@ function loadGameFromLocalStorage() {
       render_XP_Coins(save_obj);
     } catch (error) {
       console.log(error);
-      
     }
     initializeTowerImages();
   } else {
@@ -1276,21 +1279,26 @@ canvas.addEventListener("click", (event) => {
       //* Modal for traps
       if (place.is_trap) {
         mdl_traps.style.display = "flex";
-          const oldPrice_mine_ground =  70;
-          const new_price_mine_ground = oldPrice_mine_ground / 2;
-          const oldPrice_mine_air =  70;
-          const new_price_mine_air = oldPrice_mine_air / 2;
-          const btn_ground_mine = document.getElementById('btn_ground_mine');
-          const mine_rabatt = return_Item_Amount_and_Existens(save_obj, 'trap_rabatt_50');
-          const trigger_btn_air_mine = document.getElementById('trigger_btn_air_mine');
-        if(mine_rabatt.available && mine_rabatt.amount > 0) {
-          btn_mine.setAttribute('data-tower_price', new_price_mine_ground);
-          btn_air_mine.setAttribute('data-tower_price', new_price_mine_air);
+        const oldPrice_mine_ground = 70;
+        const new_price_mine_ground = oldPrice_mine_ground / 2;
+        const oldPrice_mine_air = 70;
+        const new_price_mine_air = oldPrice_mine_air / 2;
+        const btn_ground_mine = document.getElementById("btn_ground_mine");
+        const mine_rabatt = return_Item_Amount_and_existence(
+          save_obj,
+          "trap_rabatt_50"
+        );
+        const trigger_btn_air_mine = document.getElementById(
+          "trigger_btn_air_mine"
+        );
+        if (mine_rabatt.available && mine_rabatt.amount > 0) {
+          btn_mine.setAttribute("data-tower_price", new_price_mine_ground);
+          btn_air_mine.setAttribute("data-tower_price", new_price_mine_air);
           btn_ground_mine.innerHTML = `Kaufen ${new_price_mine_ground}€`;
           trigger_btn_air_mine.innerHTML = `Kaufen ${new_price_mine_air}€`;
-        }else {
-          btn_mine.setAttribute('data-tower_price', oldPrice_mine_ground);
-          btn_air_mine.setAttribute('data-tower_price', oldPrice_mine_air);
+        } else {
+          btn_mine.setAttribute("data-tower_price", oldPrice_mine_ground);
+          btn_air_mine.setAttribute("data-tower_price", oldPrice_mine_air);
           btn_ground_mine.innerHTML = `Kaufen ${oldPrice_mine_ground}€`;
           trigger_btn_air_mine.innerHTML = `Kaufen ${oldPrice_mine_air}€`;
         }
@@ -1380,10 +1388,10 @@ btn_Slower.addEventListener("click", () => {
 
 btn_mine.addEventListener("click", () => {
   set_Tower(btn_mine, "mine", 0, mdl_traps);
-  const item = return_Item_Amount_and_Existens(save_obj, 'trap_rabatt_50');
-  if(item.available && item.amount > 0) {
+  const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
+  if (item.available && item.amount > 0) {
     save_obj.XP_Store_Items[item.index].amount -= 1;
-    render_amount(save_obj)
+    render_amount(save_obj);
     save_Game_without_saveDate();
   }
 });
@@ -1395,10 +1403,10 @@ const btn_air_mine = document.getElementById("btn_air_mine");
 
 btn_air_mine.addEventListener("click", () => {
   set_Tower(btn_air_mine, "air_mine", 0, mdl_traps);
-  const item = return_Item_Amount_and_Existens(save_obj, 'trap_rabatt_50');
-  if(item.available && item.amount > 0) {
+  const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
+  if (item.available && item.amount > 0) {
     save_obj.XP_Store_Items[item.index].amount -= 1;
-    render_amount(save_obj)
+    render_amount(save_obj);
     save_Game_without_saveDate();
   }
 });
@@ -1908,28 +1916,64 @@ function set_class_for_overpriced_towers() {
 }
 
 //*ANCHOR - XP Store
-
+//* Trap Discount
 btn_trap_discount.addEventListener("click", () => {
   const price = btn_trap_discount.getAttribute("data-skill_price");
   const confirm = window.confirm(
-    `Möchtest du den Rabatt für Fallen für ${price} XPCoins kaufen?`
+    `Möchtest du den Rabatt für Fallen für ${price} XP-Coins kaufen?`
   );
   if (confirm) {
     const xp_transaction = check_XPCoins(price, "Fallen Rabatt");
     if (xp_transaction === true) {
-      if (save_obj.XP_Store_Items[0] === undefined) {
+      const item = return_Item_Amount_and_existence(
+        save_obj,
+        "trap_rabatt_50"
+      );
+      
+      if (item.available) {
+        const item_index = item.index;
+        save_obj.XP_Store_Items[item_index].amount += 10;
+      } else {
         save_obj.XP_Store_Items.push({
           name: "trap_rabatt_50",
           amount: 10,
         });
-      } else {
-        save_obj.XP_Store_Items[0].amount += 10;
       }
       save_obj.XP_Coins -= price;
       render_XP_Coins(save_obj);
       render_amount(save_obj);
       save_Game_without_saveDate();
-      console.log("saveobj", save_obj);
+    }
+  }
+});
+
+//* Tower Discount
+btn_tower_discount.addEventListener("click", () => {
+  const price = btn_tower_discount.getAttribute("data-skill_price");
+  const confirm = window.confirm(
+    `Möchtest du den Tower Rabatt für ${price} XP-Coins kaufen?`
+  );
+  if (confirm) {
+    const xp_transaction = check_XPCoins(price, "Tower Rabatt");
+    if (xp_transaction === true) {
+      const item = return_Item_Amount_and_existence(
+        save_obj,
+        "tower_rabatt_50"
+      );
+      
+      if (item.available) {
+        const item_index = item.index;
+        save_obj.XP_Store_Items[item_index].amount += 10;
+      } else {
+        save_obj.XP_Store_Items.push({
+          name: "tower_rabatt_50",
+          amount: 10,
+        });
+      }
+      save_obj.XP_Coins -= price;
+      render_XP_Coins(save_obj);
+      render_amount(save_obj);
+      save_Game_without_saveDate();
     }
   }
 });
@@ -1940,8 +1984,8 @@ function check_XPCoins(price, xp_objectname) {
   // const current_XPCoins = 9000; //* zum testen
   if (current_XPCoins >= price) {
     const message = new GameMessage(
-      "Erfolg",
-      `"${xp_objectname}" erfolgreich gekauft`,
+      "Kauf erfolgreich",
+      `Kauf für "${xp_objectname}" abgeschlossen`,
       "success",
       4000
     ).show_Message();
