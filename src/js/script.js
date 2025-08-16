@@ -793,13 +793,30 @@ function calculateDistance(
 function showGameOverModal() {
   gameOverModal.style.display = "block";
   lbl_Live.innerHTML = "0 Leben";
+  //* Assign new XP and XP-Coins
   if (!save_obj.assign_XP) {
     save_obj.XP += Math.floor(save_obj.current_XP / 2);
-    save_obj.XP_Coins += Math.floor(save_obj.current_XP / 1.5);
+    const game_difficulty = sel_difficulty.value;
+    let base_XP_Coins = 500;
+    let lostLive = 30 - save_obj.live;
+    if(game_difficulty === 'easy') {
+      base_XP_Coins = 1500;
+      lostLive = 25 - save_obj.live;
+    }else if(game_difficulty === 'standard') {
+      base_XP_Coins = 2000;
+      lostLive = 20 - save_obj.live;
+    }else if(game_difficulty === 'hard') {
+      base_XP_Coins = 3000;
+      lostLive = 15 - save_obj.live;
+    }
+    const live_Loss_Antibonus = lostLive * 20;
+    const new_XP_Coins = Math.floor((base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus) / 1.5)
+    
+    save_obj.XP_Coins += new_XP_Coins;
     if (save_obj.current_XP > 0) {
       lbl_XP.innerHTML = ` +${Math.floor(
         save_obj.current_XP.toLocaleString("de-DE") / 2
-      )} XP (${save_obj.XP.toLocaleString("de-DE")} XP)`;
+      )} XP (${save_obj.XP.toLocaleString("de-DE")} XP) <br> ${new_XP_Coins} XP-Coins`;
     }
     save_obj.assign_XP = true;
     saveGameToLocalStorage();
@@ -1235,11 +1252,29 @@ function won_game() {
         save_obj.current_XP + save_obj.wave * 30
       );
       save_obj.XP += save_obj.current_XP;
-      save_obj.XP_Coins += save_obj.current_XP;
+
+
+    const game_difficulty = sel_difficulty.value;
+    let base_XP_Coins = 500;
+    let lostLive = 30 - save_obj.live;
+    if(game_difficulty === 'easy') {
+      base_XP_Coins = 1500;
+      lostLive = 25 - save_obj.live;
+    }else if(game_difficulty === 'standard') {
+      base_XP_Coins = 2000;
+      lostLive = 20 - save_obj.live;
+    }else if(game_difficulty === 'hard') {
+      base_XP_Coins = 3000;
+      lostLive = 15 - save_obj.live;
+    }
+    const live_Loss_Antibonus = lostLive * 20;
+    const new_XP_Coins = Math.floor(base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus)
+
+      save_obj.XP_Coins += new_XP_Coins;
       if (save_obj.current_XP > 0) {
         lbl_XP.innerHTML = ` +${save_obj.current_XP.toLocaleString(
           "de-DE"
-        )} XP (${save_obj.XP.toLocaleString("de-DE")} XP)`;
+        )} XP (${save_obj.XP.toLocaleString("de-DE")} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
@@ -1770,6 +1805,7 @@ function initialize_game(level_details) {
   const level = level_details;
   //* Set the max wave target for this round
   save_obj.active_game_target_wave = Math.floor(Math.random() * (60 - 20)) + 20;
+  // save_obj.active_game_target_wave = 10; // * For testing
   //* Set the background image path in the save object
   save_obj.backgroundImage = level.background_img_path;
   //* Set the background image for the canvas
