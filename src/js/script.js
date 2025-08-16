@@ -62,6 +62,8 @@ const mdl_skill_tree = document.getElementById("mdl_skill_tree");
 const btn_close_modal_skill = document.getElementById("btn_close_modal_skill");
 const btn_trap_discount = document.getElementById("btn_trap_discount");
 const btn_tower_discount = document.getElementById("btn_tower_discount");
+const check_trap_discount = document.getElementById("check_trap_discount");
+const check_tower_discount = document.getElementById("check_tower_discount");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -1279,29 +1281,7 @@ canvas.addEventListener("click", (event) => {
       //* Modal for traps
       if (place.is_trap) {
         mdl_traps.style.display = "flex";
-        const oldPrice_mine_ground = 70;
-        const new_price_mine_ground = oldPrice_mine_ground / 2;
-        const oldPrice_mine_air = 70;
-        const new_price_mine_air = oldPrice_mine_air / 2;
-        const btn_ground_mine = document.getElementById("btn_ground_mine");
-        const mine_rabatt = return_Item_Amount_and_existence(
-          save_obj,
-          "trap_rabatt_50"
-        );
-        const trigger_btn_air_mine = document.getElementById(
-          "trigger_btn_air_mine"
-        );
-        if (mine_rabatt.available && mine_rabatt.amount > 0) {
-          btn_mine.setAttribute("data-tower_price", new_price_mine_ground);
-          btn_air_mine.setAttribute("data-tower_price", new_price_mine_air);
-          btn_ground_mine.innerHTML = `Kaufen ${new_price_mine_ground}€`;
-          trigger_btn_air_mine.innerHTML = `Kaufen ${new_price_mine_air}€`;
-        } else {
-          btn_mine.setAttribute("data-tower_price", oldPrice_mine_ground);
-          btn_air_mine.setAttribute("data-tower_price", oldPrice_mine_air);
-          btn_ground_mine.innerHTML = `Kaufen ${oldPrice_mine_ground}€`;
-          trigger_btn_air_mine.innerHTML = `Kaufen ${oldPrice_mine_air}€`;
-        }
+        show_trap_price();
         set_class_for_overpriced_towers();
         return;
       }
@@ -1375,16 +1355,57 @@ canvas.addEventListener("click", (event) => {
   });
 });
 
-const buy_btn_powerplant = document.getElementById('buy_btn_powerplant');
-const buy_btn_destroyer = document.getElementById('buy_btn_destroyer');
-const buy_btn_slower = document.getElementById('buy_btn_slower');
-const buy_btn_toxic = document.getElementById('buy_btn_toxic');
-const buy_btn_antiair = document.getElementById('buy_btn_antiair');
+//* Toggle trap discount
+check_trap_discount.addEventListener("click", () => {
+  show_trap_price();
+  set_class_for_overpriced_towers();
+});
 
+function show_trap_price() {
+  const oldPrice_mine_ground = 70;
+  const new_price_mine_ground = oldPrice_mine_ground / 2;
+  const oldPrice_mine_air = 70;
+  const new_price_mine_air = oldPrice_mine_air / 2;
+  const btn_ground_mine = document.getElementById("btn_ground_mine");
+  const mine_rabatt = return_Item_Amount_and_existence(
+    save_obj,
+    "trap_rabatt_50"
+  );
+  const is_mine_discount = check_trap_discount.checked;
+  const trigger_btn_air_mine = document.getElementById("trigger_btn_air_mine");
+  if (mine_rabatt.available && mine_rabatt.amount > 0 && is_mine_discount) {
+    btn_mine.setAttribute("data-tower_price", new_price_mine_ground);
+    btn_air_mine.setAttribute("data-tower_price", new_price_mine_air);
+    btn_ground_mine.innerHTML = `Kaufen ${new_price_mine_ground}€`;
+    trigger_btn_air_mine.innerHTML = `Kaufen ${new_price_mine_air}€`;
+  } else {
+    btn_mine.setAttribute("data-tower_price", oldPrice_mine_ground);
+    btn_air_mine.setAttribute("data-tower_price", oldPrice_mine_air);
+    btn_ground_mine.innerHTML = `Kaufen ${oldPrice_mine_ground}€`;
+    trigger_btn_air_mine.innerHTML = `Kaufen ${oldPrice_mine_air}€`;
+  }
+}
+
+//* Toggle Tower Discount
+check_tower_discount.addEventListener("click", () => {
+  show_recuded_price_on_discount();
+  calc_energy_overdose();
+  set_class_for_overpriced_towers();
+});
+
+const buy_btn_powerplant = document.getElementById("buy_btn_powerplant");
+const buy_btn_destroyer = document.getElementById("buy_btn_destroyer");
+const buy_btn_slower = document.getElementById("buy_btn_slower");
+const buy_btn_toxic = document.getElementById("buy_btn_toxic");
+const buy_btn_antiair = document.getElementById("buy_btn_antiair");
 
 function show_recuded_price_on_discount() {
-  const towerDiscount = return_Item_Amount_and_existence(save_obj, 'tower_rabatt_50');
-  if(towerDiscount) {
+  const towerDiscount = return_Item_Amount_and_existence(
+    save_obj,
+    "tower_rabatt_50"
+  );
+  const tower_discount_selected = check_tower_discount.checked;
+  if (towerDiscount) {
     const original_powerplant_price = 70;
     const original_destroyer_price = 50;
     const original_slower_price = 100;
@@ -1397,31 +1418,33 @@ function show_recuded_price_on_discount() {
     const new_toxic_price = 300 / 2;
     const new_antiair_price = 100 / 2;
 
-    if(towerDiscount.available && towerDiscount.amount > 0) {
-      buy_btn_powerplant.innerHTML =  `Kaufen ${new_powerplant_price}€`;
-      btn_energy.setAttribute('data-tower_price', new_powerplant_price);
-      buy_btn_destroyer.innerHTML =  `Kaufen ${new_destroyer_price}€`;
-      btn_Destroyer.setAttribute('data-tower_price', new_destroyer_price);
-      buy_btn_slower.innerHTML =  `Kaufen ${new_slower_price}€`;
-      btn_Slower.setAttribute('data-tower_price', new_slower_price);
-      buy_btn_toxic.innerHTML =  `Kaufen ${new_toxic_price}€`;
-      btn_Toxic.setAttribute('data-tower_price', new_toxic_price);
-      buy_btn_antiair.innerHTML =  `Kaufen ${new_antiair_price}€`;
-      btn_Anti_Air.setAttribute('data-tower_price', new_antiair_price);
-
-    }else {
-      buy_btn_powerplant.innerHTML =  `Kaufen ${original_powerplant_price}€`;
-      btn_energy.setAttribute('data-tower_price', original_powerplant_price);
-      buy_btn_destroyer.innerHTML =  `Kaufen ${original_destroyer_price}€`;
-      btn_Destroyer.setAttribute('data-tower_price', original_destroyer_price);
-      buy_btn_slower.innerHTML =  `Kaufen ${original_slower_price}€`;
-      btn_Slower.setAttribute('data-tower_price', original_slower_price);
-      buy_btn_toxic.innerHTML =  `Kaufen ${original_toxic_price}€`;
-      btn_Toxic.setAttribute('data-tower_price', original_toxic_price);
-      buy_btn_antiair.innerHTML =  `Kaufen ${original_antiair_price}€`;
-      btn_Anti_Air.setAttribute('data-tower_price', original_antiair_price);
+    if (
+      towerDiscount.available &&
+      towerDiscount.amount > 0 &&
+      check_tower_discount.checked & tower_discount_selected
+    ) {
+      buy_btn_powerplant.innerHTML = `Kaufen ${new_powerplant_price}€`;
+      btn_energy.setAttribute("data-tower_price", new_powerplant_price);
+      buy_btn_destroyer.innerHTML = `Kaufen ${new_destroyer_price}€`;
+      btn_Destroyer.setAttribute("data-tower_price", new_destroyer_price);
+      buy_btn_slower.innerHTML = `Kaufen ${new_slower_price}€`;
+      btn_Slower.setAttribute("data-tower_price", new_slower_price);
+      buy_btn_toxic.innerHTML = `Kaufen ${new_toxic_price}€`;
+      btn_Toxic.setAttribute("data-tower_price", new_toxic_price);
+      buy_btn_antiair.innerHTML = `Kaufen ${new_antiair_price}€`;
+      btn_Anti_Air.setAttribute("data-tower_price", new_antiair_price);
+    } else {
+      buy_btn_powerplant.innerHTML = `Kaufen ${original_powerplant_price}€`;
+      btn_energy.setAttribute("data-tower_price", original_powerplant_price);
+      buy_btn_destroyer.innerHTML = `Kaufen ${original_destroyer_price}€`;
+      btn_Destroyer.setAttribute("data-tower_price", original_destroyer_price);
+      buy_btn_slower.innerHTML = `Kaufen ${original_slower_price}€`;
+      btn_Slower.setAttribute("data-tower_price", original_slower_price);
+      buy_btn_toxic.innerHTML = `Kaufen ${original_toxic_price}€`;
+      btn_Toxic.setAttribute("data-tower_price", original_toxic_price);
+      buy_btn_antiair.innerHTML = `Kaufen ${original_antiair_price}€`;
+      btn_Anti_Air.setAttribute("data-tower_price", original_antiair_price);
     }
-
   }
 }
 
@@ -1441,9 +1464,12 @@ btn_mine.addEventListener("click", () => {
   set_Tower(btn_mine, "mine", 0, mdl_traps);
   const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
   if (item.available && item.amount > 0) {
-    save_obj.XP_Store_Items[item.index].amount -= 1;
-    render_amount(save_obj);
-    save_Game_without_saveDate();
+    const is_trap_discount = check_trap_discount.checked;
+    if (is_trap_discount) {
+      save_obj.XP_Store_Items[item.index].amount -= 1;
+      render_amount(save_obj);
+      save_Game_without_saveDate();
+    }
   }
 });
 
@@ -1456,9 +1482,12 @@ btn_air_mine.addEventListener("click", () => {
   set_Tower(btn_air_mine, "air_mine", 0, mdl_traps);
   const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
   if (item.available && item.amount > 0) {
-    save_obj.XP_Store_Items[item.index].amount -= 1;
-    render_amount(save_obj);
-    save_Game_without_saveDate();
+    const is_trap_discount = check_trap_discount.checked;
+    if (is_trap_discount) {
+      save_obj.XP_Store_Items[item.index].amount -= 1;
+      render_amount(save_obj);
+      save_Game_without_saveDate();
+    }
   }
 });
 
@@ -1500,16 +1529,18 @@ btn_energy.addEventListener("click", () => {
   substract_tower_discount();
 });
 
-
 //*#########################################################
 //* ANCHOR -Substract Tower Discount on use
 //*#########################################################
 function substract_tower_discount() {
   const item = return_Item_Amount_and_existence(save_obj, "tower_rabatt_50");
   if (item.available && item.amount > 0) {
-    save_obj.XP_Store_Items[item.index].amount -= 1;
-    render_amount(save_obj);
-    save_Game_without_saveDate();
+    const is_tower_discount = check_tower_discount.checked;
+    if (is_tower_discount) {
+      save_obj.XP_Store_Items[item.index].amount -= 1;
+      render_amount(save_obj);
+      save_Game_without_saveDate();
+    }
   }
 }
 
@@ -1993,11 +2024,8 @@ btn_trap_discount.addEventListener("click", () => {
   if (confirm) {
     const xp_transaction = check_XPCoins(price, "Fallen Rabatt");
     if (xp_transaction === true) {
-      const item = return_Item_Amount_and_existence(
-        save_obj,
-        "trap_rabatt_50"
-      );
-      
+      const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
+
       if (item.available) {
         const item_index = item.index;
         save_obj.XP_Store_Items[item_index].amount += 10;
@@ -2010,7 +2038,7 @@ btn_trap_discount.addEventListener("click", () => {
       save_obj.XP_Coins -= price;
       render_XP_Coins(save_obj);
       render_amount(save_obj);
-      render_xp_on_homescreen()
+      render_xp_on_homescreen();
       save_Game_without_saveDate();
     }
   }
@@ -2029,7 +2057,7 @@ btn_tower_discount.addEventListener("click", () => {
         save_obj,
         "tower_rabatt_50"
       );
-      
+
       if (item.available) {
         const item_index = item.index;
         save_obj.XP_Store_Items[item_index].amount += 10;
@@ -2042,16 +2070,16 @@ btn_tower_discount.addEventListener("click", () => {
       save_obj.XP_Coins -= price;
       render_XP_Coins(save_obj);
       render_amount(save_obj);
-      render_xp_on_homescreen()
+      render_xp_on_homescreen();
       save_Game_without_saveDate();
     }
   }
 });
 
 function render_xp_on_homescreen() {
-      lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
-      "de-DE"
-    )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
+  lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
+    "de-DE"
+  )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
 }
 
 //*ANCHOR -  Function to check, if enough coins are available  - Respond with a message
