@@ -284,7 +284,7 @@ function saveGameToLocalStorage() {
     .padStart(2, "0")}.${now.getFullYear()} - ${now
     .getHours()
     .toString()
-    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${save_obj.wave}/${save_obj.active_game_target_wave})`;
   save_obj.save_date = formattedDate;
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
