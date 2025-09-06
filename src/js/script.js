@@ -1932,14 +1932,14 @@ btn_goto_menu.addEventListener("click", () => {
 btn_pause.addEventListener("click", () => {
   if (game_is_running) {
     const msg_pause = new GameMessage(
-      "Spiel Pausiert",
+      "Spiel pausiert",
       "",
       "",
       2000
     ).show_Message();
   } else {
     const msg_pause = new GameMessage(
-      "Spiel Fortgesetzt",
+      "Spiel fortgesetzt",
       "",
       "",
       2000
