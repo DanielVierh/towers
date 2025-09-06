@@ -284,7 +284,9 @@ function saveGameToLocalStorage() {
     .padStart(2, "0")}.${now.getFullYear()} - ${now
     .getHours()
     .toString()
-    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${save_obj.wave}/${save_obj.active_game_target_wave})`;
+    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${
+    save_obj.wave
+  }/${save_obj.active_game_target_wave})`;
   save_obj.save_date = formattedDate;
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
@@ -377,6 +379,12 @@ btn_show_instructions.addEventListener("click", () => {
 
 window.onload = () => {
   loadGameFromLocalStorage();
+  // const greeting = new GameMessage(
+  //   "Willkommen zurück",
+  //   "Du erhälst heute 500 XP-Coins",
+  //   "success",
+  //   7000
+  // ).show_Message();
 };
 
 //*#########################################################
@@ -799,24 +807,28 @@ function showGameOverModal() {
     const game_difficulty = sel_difficulty.value;
     let base_XP_Coins = 500;
     let lostLive = 30 - save_obj.live;
-    if(game_difficulty === 'easy') {
+    if (game_difficulty === "easy") {
       base_XP_Coins = 1500;
       lostLive = 25 - save_obj.live;
-    }else if(game_difficulty === 'standard') {
+    } else if (game_difficulty === "standard") {
       base_XP_Coins = 2000;
       lostLive = 20 - save_obj.live;
-    }else if(game_difficulty === 'hard') {
+    } else if (game_difficulty === "hard") {
       base_XP_Coins = 3000;
       lostLive = 15 - save_obj.live;
     }
     const live_Loss_Antibonus = lostLive * 20;
-    const new_XP_Coins = Math.floor((base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus) / 1.5)
-    
+    const new_XP_Coins = Math.floor(
+      (base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus) / 1.5
+    );
+
     save_obj.XP_Coins += new_XP_Coins;
     if (save_obj.current_XP > 0) {
       lbl_XP.innerHTML = ` +${Math.floor(
         save_obj.current_XP.toLocaleString("de-DE") / 2
-      )} XP (${save_obj.XP.toLocaleString("de-DE")} XP) <br> ${new_XP_Coins} XP-Coins`;
+      )} XP (${save_obj.XP.toLocaleString(
+        "de-DE"
+      )} XP) <br> ${new_XP_Coins} XP-Coins`;
     }
     save_obj.assign_XP = true;
     saveGameToLocalStorage();
@@ -1253,28 +1265,31 @@ function won_game() {
       );
       save_obj.XP += save_obj.current_XP;
 
-
-    const game_difficulty = sel_difficulty.value;
-    let base_XP_Coins = 500;
-    let lostLive = 30 - save_obj.live;
-    if(game_difficulty === 'easy') {
-      base_XP_Coins = 1500;
-      lostLive = 25 - save_obj.live;
-    }else if(game_difficulty === 'standard') {
-      base_XP_Coins = 2000;
-      lostLive = 20 - save_obj.live;
-    }else if(game_difficulty === 'hard') {
-      base_XP_Coins = 3000;
-      lostLive = 15 - save_obj.live;
-    }
-    const live_Loss_Antibonus = lostLive * 20;
-    const new_XP_Coins = Math.floor(base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus)
+      const game_difficulty = sel_difficulty.value;
+      let base_XP_Coins = 500;
+      let lostLive = 30 - save_obj.live;
+      if (game_difficulty === "easy") {
+        base_XP_Coins = 1500;
+        lostLive = 25 - save_obj.live;
+      } else if (game_difficulty === "standard") {
+        base_XP_Coins = 2000;
+        lostLive = 20 - save_obj.live;
+      } else if (game_difficulty === "hard") {
+        base_XP_Coins = 3000;
+        lostLive = 15 - save_obj.live;
+      }
+      const live_Loss_Antibonus = lostLive * 20;
+      const new_XP_Coins = Math.floor(
+        base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus
+      );
 
       save_obj.XP_Coins += new_XP_Coins;
       if (save_obj.current_XP > 0) {
         lbl_XP.innerHTML = ` +${save_obj.current_XP.toLocaleString(
           "de-DE"
-        )} XP (${save_obj.XP.toLocaleString("de-DE")} XP) <br> ${new_XP_Coins} XP-Coins`;
+        )} XP (${save_obj.XP.toLocaleString(
+          "de-DE"
+        )} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
@@ -1602,7 +1617,12 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       play_pause();
     }
   } else {
-    alert("Nicht genug Geld");
+    const show_not_enough_money = new GameMessage(
+      "Kauf aktuell nicht möglich",
+      "Du hast nicht genug Geld",
+      "error",
+      5000
+    ).show_Message();
   }
 }
 
@@ -1630,9 +1650,19 @@ btn_bigger_range.addEventListener("click", () => {
     mdl_upgrade.style.display = "none";
     play_pause();
   } else if (tower.range >= 140) {
-    alert("Maximale Reichweite erreicht!");
+    const error_msg = new GameMessage(
+      "Maximale Reichweite erreicht!",
+      "",
+      "error",
+      2000
+    ).show_Message();
   } else {
-    alert("Nicht genug Geld für das Upgrade!");
+    const error_msg = new GameMessage(
+      "Nicht genug Geld für das Upgrade!",
+      "",
+      "error",
+      2000
+    ).show_Message();
   }
 });
 
@@ -1649,9 +1679,19 @@ btn_Stronger.addEventListener("click", () => {
     mdl_upgrade.style.display = "none";
     play_pause();
   } else if (tower.tower_damage_lvl >= 3) {
-    alert("Maximale Upgrade Stufe erreicht!");
+    const error_msg = new GameMessage(
+      "Maximale Upgrade Stufe erreicht!",
+      "",
+      "error",
+      2000
+    ).show_Message();
   } else {
-    alert("Nicht genug Geld für das Upgrade!");
+    const error_msg = new GameMessage(
+      "Nicht genug Geld für das Upgrade!",
+      "",
+      "error",
+      2000
+    ).show_Message();
   }
 });
 
@@ -1745,7 +1785,12 @@ btn_show_tower_range.addEventListener("click", () => {
 //*#########################################################
 btn_save_game.addEventListener("click", () => {
   saveGameToLocalStorage();
-  alert("Spiel wurde gespeichert");
+  const show_save_success = new GameMessage(
+    "Spiel gespeichert",
+    "Das Spiel wurde erfolgreich gespeichert",
+    "success",
+    5000
+  ).show_Message();
 });
 
 //*#########################################################
@@ -1885,6 +1930,21 @@ btn_goto_menu.addEventListener("click", () => {
 //*#########################################################
 
 btn_pause.addEventListener("click", () => {
+  if (game_is_running) {
+    const msg_pause = new GameMessage(
+      "Spiel Pausiert",
+      "",
+      "",
+      2000
+    ).show_Message();
+  } else {
+    const msg_pause = new GameMessage(
+      "Spiel Fortgesetzt",
+      "",
+      "",
+      2000
+    ).show_Message();
+  }
   play_pause();
 });
 
@@ -1900,7 +1960,6 @@ function play_pause() {
     // Spiel fortsetzen
     game_is_running = true;
     btn_pause.innerHTML = "Pause";
-
     // Starte die gameLoop erneut
     gameLoop();
   }
