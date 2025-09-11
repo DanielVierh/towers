@@ -258,6 +258,7 @@ body.red-flash {
   justify-content: center;
   align-items: center;
   text-align: center;
+  cursor: pointer;
 }
 
 .start-modal {
@@ -440,7 +441,6 @@ select {
         opacity: 0.2;
       }
 
-
       &:hover {
         transform: scale(1.05);
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
@@ -464,7 +464,6 @@ select {
   }
 }
 
-
 .lbl-xp {
   // display: none; // * TODO - HIDE UNTIL READY TO USE
   position: fixed;
@@ -478,15 +477,11 @@ select {
   border-radius: 5px;
 }
 
-
-
 .modal-skill {
   &.active {
     display: flex;
     z-index: 999;
     background-color: black;
-
-    
   }
 }
 
@@ -494,7 +489,8 @@ select {
   position: fixed;
   top: 20px;
   left: 50%;
-  width: 100%;
+  width: 90%;
+  max-width: 400px;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.95);
   color: white;
@@ -502,8 +498,7 @@ select {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   z-index: 99999999;
-  font-size: 1rem;
-
+  font-size: 0.9rem;
 
   &.error {
     background-color: rgba(255, 0, 0, 0.95);
@@ -512,10 +507,9 @@ select {
     background-color: rgba(0, 0, 255, 0.95);
   }
   &.success {
-    background-color: rgba(2, 63, 2, 0.95); 
-  } 
+    background-color: rgba(2, 63, 2, 0.95);
+  }
 }
-
 
 .label-amount {
   background-color: orange;
@@ -525,6 +519,6 @@ select {
   position: absolute;
   bottom: 17px;
   right: 5px;
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: bold;
 }

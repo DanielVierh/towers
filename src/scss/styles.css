@@ -269,6 +269,7 @@ body.red-flash {
   justify-content: center;
   align-items: center;
   text-align: center;
+  cursor: pointer;
 }
 
 .start-modal {
@@ -487,7 +488,8 @@ select option {
   position: fixed;
   top: 20px;
   left: 50%;
-  width: 100%;
+  width: 90%;
+  max-width: 400px;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.95);
   color: white;
@@ -495,7 +497,7 @@ select option {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   z-index: 99999999;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 .message-body.error {
   background-color: rgba(255, 0, 0, 0.95);
