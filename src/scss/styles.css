@@ -185,6 +185,26 @@ body.red-flash {
 .modal-skill .grid-wrapper .tile.hidden {
   display: none;
 }
+.modal-towers .grid-wrapper .tile.is-active,
+.modal-upgrade .grid-wrapper .tile.is-active,
+.modal-skill .grid-wrapper .tile.is-active {
+  opacity: 0.65;
+  background-color: green;
+  position: relative;
+}
+.modal-towers .grid-wrapper .tile.is-active::after,
+.modal-upgrade .grid-wrapper .tile.is-active::after,
+.modal-skill .grid-wrapper .tile.is-active::after {
+  content: "Gekauft";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: black;
+  color: lightgreen;
+  padding: 5px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+}
 .modal-towers .grid-wrapper .tile h4,
 .modal-upgrade .grid-wrapper .tile h4,
 .modal-skill .grid-wrapper .tile h4 {

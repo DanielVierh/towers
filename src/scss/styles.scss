@@ -178,6 +178,24 @@ body.red-flash {
         display: none;
       }
 
+      &.is-active {
+        opacity: 0.65;
+        background-color: green;
+        position: relative;
+
+        &::after {
+          content: "Gekauft";
+          position: absolute;
+          top: 0;
+          right: 0;
+          background-color: black;
+          color: lightgreen;
+          padding: 5px;
+          border-radius: 8px;
+          font-size: 0.7rem;
+        }
+      }
+
       h4 {
         margin: 5px 0;
       }
