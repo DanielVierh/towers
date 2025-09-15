@@ -157,7 +157,8 @@
           <h3>Minen Slots + 3</h3>
           <p>Erweitert die Anzahl der Minen, die platziert werden können</p>
           <div class="button-buy" id="btn_mine_slots" data-skill_price="1000">
-            Kaufen 1.000 <br> XP Coins
+            Kaufen 1.000 <br />
+            XP Coins
           </div>
         </div>
         <div class="tile">
@@ -167,13 +168,14 @@
             Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Türmen. Spare
             Coins beim Platzieren von Türmen im Spiel.
           </p>
-          <br>
+          <br />
           <div
             class="button-buy"
             id="btn_tower_discount"
             data-skill_price="3000"
           >
-            Kaufen 3.000 <br> XP-Coins
+            Kaufen 3.000 <br />
+            XP-Coins
           </div>
         </div>
         <div class="tile">
@@ -183,24 +185,26 @@
             Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Fallen. Spare
             Coins beim Platzieren von Fallen im Spiel.
           </p>
-          <br>
+          <br />
           <div
             class="button-buy"
             id="btn_trap_discount"
             data-skill_price="1000"
           >
-            Kaufen 1.000 <br> XP-Coins
+            Kaufen 1.000 <br />
+            XP-Coins
           </div>
         </div>
-        <div class="tile hidden">
-          <h3>Leben Upgrade</h3>
-          <p>Generiert alle 10 Kills leben</p>
+        <div class="tile">
+          <h3>Leben Generierer</h3>
+          <p>Generiert alle 20 Kills leben</p>
           <div
             class="button-buy"
             id="btn_life_upgrade"
             data-skill_price="15000"
           >
-            Kaufen 15.000 XP Coins
+            Kaufen 15.000 <br />
+            XP Coins
           </div>
         </div>
         <div class="tile hidden">
@@ -231,7 +235,7 @@
       <div id="lbl_buymenu_tower_discount_amount"></div>
       <p id="checkbox_field_tower">
         <label for="check_tower_discount">Nutze Tower Rabatt</label>
-        <input type="checkbox" id="check_tower_discount">
+        <input type="checkbox" id="check_tower_discount" />
       </p>
       <div class="info_wrapper">
         <div class="info" id="lbl_current_money">100 €</div>
@@ -412,7 +416,7 @@
       <div id="lbl_mine_discount_amount"></div>
       <p id="checkbox_field_trap">
         <label for="check_trap_discount">Nutze Fallen Rabatt</label>
-        <input type="checkbox" id="check_trap_discount">
+        <input type="checkbox" id="check_trap_discount" />
       </p>
 
       <div class="grid-wrapper">
@@ -497,6 +501,13 @@
           <p id="tile_upgrade_stronger_descr">Erhöht die Stärke des Turms</p>
           <div class="button-buy" data-tower_price="300" id="btn_Stronger">
             Kaufen 300€
+          </div>
+        </div>
+        <div class="tile hidden" id="tile_upgrade_liveGenerator">
+          <h4 id="tile_upgrade_live_title">Leben generieren</h4>
+          <p id="tile_upgrade_live_descr">Generiert alle 20 Kills 1 Leben</p>
+          <div class="button-buy" data-tower_price="2000" id="btn_livegen">
+            Kaufen 2000€
           </div>
         </div>
         <div class="tile">

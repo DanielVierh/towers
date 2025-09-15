@@ -64,6 +64,11 @@ const btn_trap_discount = document.getElementById("btn_trap_discount");
 const btn_tower_discount = document.getElementById("btn_tower_discount");
 const check_trap_discount = document.getElementById("check_trap_discount");
 const check_tower_discount = document.getElementById("check_tower_discount");
+const btn_life_upgrade = document.getElementById("btn_life_upgrade");
+const tile_upgrade_liveGenerator = document.getElementById(
+  "tile_upgrade_liveGenerator"
+);
+const btn_livegen = document.getElementById("btn_livegen");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -98,6 +103,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 295,
@@ -108,6 +115,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 150,
@@ -118,6 +127,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 90,
@@ -128,6 +139,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 250,
@@ -138,6 +151,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 130,
@@ -148,6 +163,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 350,
@@ -158,6 +175,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 300,
@@ -168,6 +187,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 180,
@@ -178,6 +199,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 280,
@@ -188,6 +211,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 90,
@@ -198,6 +223,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 300,
@@ -208,6 +235,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 195,
@@ -218,6 +247,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 360,
@@ -228,6 +259,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
     {
       x: 210,
@@ -238,6 +271,8 @@ let save_obj = {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
     },
   ],
   level: 1,
@@ -311,6 +346,8 @@ function loadGameFromLocalStorage() {
   const savedGame = localStorage.getItem("towers_savegame");
   if (savedGame) {
     save_obj = JSON.parse(savedGame);
+    console.log("saveGame", save_obj);
+
     lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
       "de-DE"
     )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
@@ -931,6 +968,18 @@ function gameLoop() {
 
             save_obj.money += earnedMoney;
 
+            //* Live Gen
+            if (tower.live_gen === 1) {
+              tower.kill_counter += 1;
+              console.log("Tower Upgrade kill"), tower.kill_counter;
+
+              if (tower.kill_counter === 20) {
+                save_obj.live++;
+                tower.kill_counter = 0;
+                console.log("LIVE ++");
+              }
+            }
+
             // Füge ein Popup an der aktuellen Position des Gegners hinzu
             moneyPopups.push({
               x: enemy.pos_x,
@@ -1354,6 +1403,21 @@ canvas.addEventListener("click", (event) => {
         const lbl_upgr_current_energy = document.getElementById(
           "lbl_upgr_current_energy"
         );
+        //* Show Upgrade for live gen
+        const upgrade_live_gen = return_Item_Amount_and_existence(
+          save_obj,
+          "live_generator"
+        );
+        if (upgrade_live_gen && tower.tower_type === "destroyer") {
+          tile_upgrade_liveGenerator.classList.remove("hidden");
+          if (tower.live_gen === 1) {
+            document.getElementById("btn_livegen").innerHTML = "Aktiv";
+          } else {
+            document.getElementById("btn_livegen").innerHTML = "Kaufen 2000€";
+          }
+        } else {
+          tile_upgrade_liveGenerator.classList.add("hidden");
+        }
         lbl_upgr_current_money.innerHTML = `${save_obj.money} €`;
         lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
         tower_img.src = tower.tower_img;
@@ -1687,6 +1751,38 @@ btn_Stronger.addEventListener("click", () => {
     ).show_Message();
   } else {
     const error_msg = new GameMessage(
+      "Nicht genug Geld für das Upgrade!",
+      "",
+      "error",
+      2000
+    ).show_Message();
+  }
+});
+
+//*#########################################################
+//* ANCHOR -Upgrade Live Gen
+//*#########################################################
+btn_livegen.addEventListener("click", () => {
+  const upgrade_price = parseInt(btn_livegen.getAttribute("data-tower_price"));
+  console.log("upgrade_price", upgrade_price);
+
+  if (save_obj.money >= upgrade_price) {
+    if (tower.live_gen === 1) {
+      new GameMessage(
+        "Upgrade bereits aktiv!",
+        "",
+        "error",
+        2000
+      ).show_Message();
+      return;
+    }
+    tower.live_gen = 1;
+    tower.kill_counter = 0;
+    save_obj.money -= upgrade_price;
+    mdl_upgrade.style.display = "none";
+    play_pause();
+  } else {
+    new GameMessage(
       "Nicht genug Geld für das Upgrade!",
       "",
       "error",
@@ -2167,6 +2263,38 @@ btn_tower_discount.addEventListener("click", () => {
       render_amount(save_obj);
       render_xp_on_homescreen();
       save_Game_without_saveDate();
+    }
+  }
+});
+
+btn_life_upgrade.addEventListener("click", () => {
+  const price = btn_life_upgrade.getAttribute("data-skill_price");
+  const confirm = window.confirm(
+    `Möchtest du das Upgrade zum Leben generieren für ${price} XP-Coins kaufen?`
+  );
+  if (confirm) {
+    const xp_transaction = check_XPCoins(price, "Leben Generierer");
+    if (xp_transaction === true) {
+      const item = return_Item_Amount_and_existence(save_obj, "live_generator");
+
+      if (item.available) {
+        new GameMessage(
+          "Fehler",
+          "Upgrade bereits vorhanden",
+          "error",
+          4000
+        ).show_Message();
+      } else {
+        save_obj.XP_Store_Items.push({
+          name: "live_generator",
+          amount: 1,
+        });
+        save_obj.XP_Coins -= price;
+        render_XP_Coins(save_obj);
+        render_amount(save_obj);
+        render_xp_on_homescreen();
+        save_Game_without_saveDate();
+      }
     }
   }
 });
