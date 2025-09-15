@@ -44,11 +44,12 @@ export function render_amount(save_obj) {
     lbl_buymenu_tower_discount_amount.innerHTML = `${tower_item.amount} X 50% Rabatt`;
   }
 
+  //* Show if live upgrade is available
   const live_upgr = return_Item_Amount_and_existence(
     save_obj,
     "live_generator"
   );
-  if (live_upgr) {
+  if (live_upgr.available) {
     tile_live_upgr.classList.add("is-active");
   }
 }

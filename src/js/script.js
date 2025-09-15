@@ -1408,7 +1408,9 @@ canvas.addEventListener("click", (event) => {
           save_obj,
           "live_generator"
         );
-        if (upgrade_live_gen && tower.tower_type === "destroyer") {
+        console.log("upgrade_live_gen", upgrade_live_gen);
+
+        if (upgrade_live_gen.available && tower.tower_type === "destroyer") {
           tile_upgrade_liveGenerator.classList.remove("hidden");
           if (tower.live_gen === 1) {
             document.getElementById("btn_livegen").innerHTML = "Aktiv";
