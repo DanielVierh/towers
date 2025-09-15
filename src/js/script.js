@@ -1413,7 +1413,7 @@ canvas.addEventListener("click", (event) => {
           if (tower.live_gen === 1) {
             document.getElementById("btn_livegen").innerHTML = "Aktiv";
           } else {
-            document.getElementById("btn_livegen").innerHTML = "Kaufen 2000€";
+            document.getElementById("btn_livegen").innerHTML = "Kaufen 1500€";
           }
         } else {
           tile_upgrade_liveGenerator.classList.add("hidden");
