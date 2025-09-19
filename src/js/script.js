@@ -1932,6 +1932,11 @@ level_3.addEventListener("click", () => {
   initialize_game(level_details);
 });
 
+level_4.addEventListener("click", () => {
+  const level_details = set_level("4");
+  initialize_game(level_details);
+});
+
 level_random.addEventListener("click", () => {
   const level_details = set_level("level_rnd");
   initialize_game(level_details);

@@ -1,5 +1,3 @@
-
-
 //*#########################################################
 //* ANCHOR -draw Waypoints
 //*#########################################################
@@ -20,13 +18,13 @@ export function drawWaypoints(ctx, waypoints, waypoint_color) {
   ctx.stroke();
 }
 
-
 const levels = [
-  { //* ANCHOR - Level: Grassland
-    name: 'Grassland',
-    background_img_path: 'src/assets/bg/bg2.webp',
-    waypoint_color: 'rgba(241, 207, 113, 0.9)',
-    waypoints: [  
+  {
+    //* ANCHOR - Level: Grassland
+    name: "Grassland",
+    background_img_path: "src/assets/bg/bg2.webp",
+    waypoint_color: "rgba(241, 207, 113, 0.9)",
+    waypoints: [
       { x: -50, y: 20 },
       { x: 50, y: 20 },
       { x: 340, y: 20 },
@@ -37,7 +35,7 @@ const levels = [
       { x: 350, y: 260 },
       { x: 30, y: 260 },
       { x: 30, y: 340 },
-      { x: 450, y: 340 }
+      { x: 450, y: 340 },
     ],
     tower_places: [
       {
@@ -49,7 +47,7 @@ const levels = [
         tower_img: "",
         range: 40,
         cooldown: 0,
-        is_trap: true
+        is_trap: true,
       },
       {
         x: 70,
@@ -200,13 +198,14 @@ const levels = [
         tower_img: "",
         range: 80,
         cooldown: 0,
-      }
-    ]
+      },
+    ],
   },
-  { //* ANCHOR - Desert:
-    name: 'Desert',
-    background_img_path: 'src/assets/bg/desert_bg.png',
-    waypoint_color: 'rgba(231, 137, 55, 0.9)',
+  {
+    //* ANCHOR - Desert:
+    name: "Desert",
+    background_img_path: "src/assets/bg/desert_bg.png",
+    waypoint_color: "rgba(231, 137, 55, 0.9)",
     waypoints: [
       { x: -50, y: 80 },
       { x: 50, y: 80 },
@@ -220,7 +219,8 @@ const levels = [
       { x: 360, y: 250 },
       { x: 110, y: 250 },
       { x: 110, y: 330 },
-      { x: 450, y: 330 }],
+      { x: 450, y: 330 },
+    ],
     tower_places: [
       {
         x: 330,
@@ -231,7 +231,7 @@ const levels = [
         tower_img: "",
         range: 40,
         cooldown: 0,
-        is_trap: true
+        is_trap: true,
       },
       {
         x: 60,
@@ -382,13 +382,14 @@ const levels = [
         tower_img: "",
         range: 80,
         cooldown: 0,
-      }
-    ]
+      },
+    ],
   },
-  {//* ANCHOR - Snow:
-    name: 'Snow',
-    background_img_path: 'src/assets/bg/bg_snow.png',
-    waypoint_color: 'rgba(255, 255, 255, 0.9)',
+  {
+    //* ANCHOR - Snow:
+    name: "Snow",
+    background_img_path: "src/assets/bg/bg_snow.png",
+    waypoint_color: "rgba(255, 255, 255, 0.9)",
     waypoints: [
       { x: -50, y: 65 },
       { x: 50, y: 65 },
@@ -402,7 +403,8 @@ const levels = [
       { x: 270, y: 230 },
       { x: 110, y: 230 },
       { x: 110, y: 330 },
-      { x: 450, y: 330 }],
+      { x: 450, y: 330 },
+    ],
     tower_places: [
       {
         x: 345,
@@ -413,7 +415,7 @@ const levels = [
         tower_img: "",
         range: 40,
         cooldown: 0,
-        is_trap: true
+        is_trap: true,
       },
       {
         x: 5,
@@ -564,29 +566,30 @@ const levels = [
         tower_img: "",
         range: 80,
         cooldown: 0,
-      }
-    ]
+      },
+    ],
   },
-  {//* ANCHOR - Swamp:
-    name: 'Swamp',
-    background_img_path: 'src/assets/bg/bg_swamp.png',
-    waypoint_color: 'rgba(62, 39, 3, 0.9)',
+  {
+    //* ANCHOR - Swamp:
+    name: "Swamp",
+    background_img_path: "src/assets/bg/bg_swamp.png",
+    waypoint_color: "rgba(62, 39, 3, 0.9)",
     waypoints: [
-      { x: -50, y: 20},
-      { x: 20, y: 20},
-      { x: 20, y: 150},
-      { x: 130, y: 150},
-      { x: 130, y: 20},
-      { x: 130, y: 20},
-      { x: 200, y: 20},
-      { x: 200, y: 250},
-      { x: 20, y: 250},
-      { x: 20, y: 335},
-      { x: 240, y: 335},
-      { x: 240, y: 70},
-      { x: 360, y: 70},
-      { x: 360, y: 335},
-      { x: 450, y: 335},
+      { x: -50, y: 20 },
+      { x: 20, y: 20 },
+      { x: 20, y: 150 },
+      { x: 130, y: 150 },
+      { x: 130, y: 20 },
+      { x: 130, y: 20 },
+      { x: 200, y: 20 },
+      { x: 200, y: 250 },
+      { x: 20, y: 250 },
+      { x: 20, y: 335 },
+      { x: 240, y: 335 },
+      { x: 240, y: 70 },
+      { x: 360, y: 70 },
+      { x: 360, y: 335 },
+      { x: 450, y: 335 },
     ],
     tower_places: [
       {
@@ -598,7 +601,7 @@ const levels = [
         tower_img: "",
         range: 40,
         cooldown: 0,
-        is_trap: true
+        is_trap: true,
       },
       {
         x: 60,
@@ -749,28 +752,208 @@ const levels = [
         tower_img: "",
         range: 80,
         cooldown: 0,
-      }
-    ]
-  }
+      },
+    ],
+  },
+  {
+    //* ANCHOR - Apokalypse:
+    name: "Apokalypse",
+    background_img_path: "src/assets/bg/bg_apo.png",
+    waypoint_color: "rgba(186, 138, 59, 0.9)",
+    waypoints: [
+      { x: -50, y: 120 },
+      { x: 70, y: 120 },
+      { x: 150, y: 60 },
+      { x: 330, y: 130 },
+      { x: 30, y: 270 },
+      { x: 30, y: 310 },
+      { x: 330, y: 310 },
+      { x: 380, y: 180 },
+      { x: 330, y: 130 },
+      { x: 30, y: 270 },
+      { x: 30, y: 310 },
+      { x: 460, y: 310 },
+    ],
+    tower_places: [
+      {
+        x: 370,
+        y: 330,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 40,
+        cooldown: 0,
+        is_trap: true,
+      },
+      {
+        x: 18,
+        y: 80,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 40,
+        y: 180,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 5,
+        y: 10,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 10,
+        y: 250,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 85,
+        y: 300,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 130,
+        y: 300,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 290,
+        y: 60,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 280,
+        y: 300,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 180,
+        y: 300,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 150,
+        y: 10,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 82,
+        y: 220,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 220,
+        y: 240,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 190,
+        y: 65,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 360,
+        y: 100,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+      {
+        x: 200,
+        y: 10,
+        tower_is_build: false,
+        tower_damage_lvl: 1,
+        tower_type: "",
+        tower_img: "",
+        range: 80,
+        cooldown: 0,
+      },
+    ],
+  },
 ];
-
-
 
 export function set_level(lvl_id) {
   let level_details = undefined;
-  if(lvl_id === 'level_rnd') {
+  if (lvl_id === "level_rnd") {
     level_details = random_level();
-  }else {
-    level_details = levels[lvl_id]
+  } else {
+    level_details = levels[lvl_id];
   }
 
   return level_details;
 }
 
-
 //* Random Map
 function random_level() {
-    const rnd_index = Math.floor(Math.random() * levels.length);
-    // const rnd_index = 2;
-    return levels[rnd_index];
+  const rnd_index = Math.floor(Math.random() * levels.length);
+  // const rnd_index = 2;
+  return levels[rnd_index];
 }
