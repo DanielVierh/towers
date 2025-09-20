@@ -913,6 +913,9 @@ function gameLoop() {
   lbl_Live.innerHTML = `${save_obj.live} Leben`;
   if (current_creep_index !== undefined) {
     lbl_wave.innerHTML = `Welle: ${save_obj.wave} / ${save_obj.active_game_target_wave} - ${creep_properties[current_creep_index].name}`;
+    if (save_obj.wave === save_obj.active_game_target_wave) {
+      lbl_wave.innerHTML = `Letzte Welle: ${save_obj.wave}`;
+    }
   }
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`;
 
@@ -1225,6 +1228,9 @@ function updateLabels() {
   lbl_energy.innerHTML = `Überschüssige Energie ${save_obj.energy_level}`;
   if (current_creep_index !== undefined) {
     lbl_wave.innerHTML = `Welle: ${save_obj.wave} / ${save_obj.active_game_target_wave} - ${creep_properties[current_creep_index].name}`;
+    if (save_obj.wave === save_obj.active_game_target_wave) {
+      lbl_wave.innerHTML = `Letzte Welle: ${save_obj.wave}`;
+    }
   }
 }
 
@@ -1266,6 +1272,9 @@ function updateWaveTimer() {
   lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${
     creep_properties[next_round_creep_index].name
   }`;
+  if (save_obj.wave === save_obj.active_game_target_wave) {
+    lbl_WaveTimer.innerHTML = `Letzte Welle`;
+  }
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
     if (save_obj.wave >= 6) {
