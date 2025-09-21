@@ -53,6 +53,8 @@ const level_0 = document.getElementById("level_0");
 const level_1 = document.getElementById("level_1");
 const level_2 = document.getElementById("level_2");
 const level_3 = document.getElementById("level_3");
+const level_4 = document.getElementById("level_4");
+const level_5 = document.getElementById("level_5");
 const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
@@ -1946,6 +1948,11 @@ level_4.addEventListener("click", () => {
   initialize_game(level_details);
 });
 
+level_5.addEventListener("click", () => {
+  const level_details = set_level("5");
+  initialize_game(level_details);
+});
+
 level_random.addEventListener("click", () => {
   const level_details = set_level("level_rnd");
   initialize_game(level_details);
@@ -2343,3 +2350,14 @@ function check_XPCoins(price, xp_objectname) {
     return false;
   }
 }
+
+canvas.addEventListener("mousemove", function (event) {
+  // Canvas-Position im Dokument ermitteln
+  const rect = canvas.getBoundingClientRect();
+
+  // Mausposition relativ zum Canvas
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  console.log(`x: ${x - 20}, y: ${y - 20}`);
+});
