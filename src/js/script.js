@@ -1106,6 +1106,7 @@ function gameLoop() {
               setTimeout(() => {
                 setTimeout(() => {
                   enemy.health = 0;
+                  enemy.markedForDeletion = true;
                 }, 100);
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
@@ -1121,11 +1122,10 @@ function gameLoop() {
             if (!enemy.resistent.includes("air_mine")) {
               setTimeout(() => {
                 enemy.health = 0;
-
+                enemy.markedForDeletion = true;
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
-
                   // Mine entfernen
                   tower.tower_is_build = false;
                   tower.tower_type = "";

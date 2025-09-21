@@ -778,7 +778,7 @@ const levels = [
     ],
     tower_places: [
       {
-        x: 370,
+        x: 345,
         y: 330,
         tower_is_build: false,
         tower_damage_lvl: 1,
