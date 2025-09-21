@@ -941,9 +941,9 @@ const levels = [
     ],
   },
   {
-    //* ANCHOR - Grassland 2:
-    name: "Grassland2",
-    background_img_path: "src/assets/bg/bg_grassland2.png",
+    //* ANCHOR - Grasland 2:
+    name: "Grasland2",
+    background_img_path: "src/assets/bg/bg_grasland2.png",
     waypoint_color: "transparent",
     waypoints: [
       { x: -50, y: 120 },
