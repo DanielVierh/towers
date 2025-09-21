@@ -1273,7 +1273,7 @@ function updateWaveTimer() {
     creep_properties[next_round_creep_index].name
   }`;
   if (save_obj.wave === save_obj.active_game_target_wave) {
-    lbl_WaveTimer.innerHTML = `Letzte Welle`;
+    lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
   if (waveTimer <= 0) {
     let time_to_next_wave = 30;
