@@ -1698,7 +1698,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       "Kauf aktuell nicht möglich",
       "Du hast nicht genug Geld",
       "error",
-      5000
+      2000
     ).show_Message();
   }
 }
