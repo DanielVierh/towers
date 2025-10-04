@@ -307,6 +307,7 @@ body.red-flash {
   justify-content: flex-start;
   align-items: center;
   z-index: 999;
+  padding-top: 60px;
 }
 
 .button {
