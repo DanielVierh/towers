@@ -1,7 +1,6 @@
 import { Creep } from "./classes/Creep.js";
 import { Laser } from "./classes/Laser.js";
 import { GameMessage } from "./classes/GameMessage.js";
-import { XP_SHOP_ITEM } from "./classes/XP_SHOP_ITEM.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
 import {
