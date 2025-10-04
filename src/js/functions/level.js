@@ -1143,6 +1143,6 @@ export function set_level(lvl_id) {
 //* Random Map
 function random_level() {
   let rnd_index = Math.floor(Math.random() * levels.length);
-  rnd_index = 3;
+  //rnd_index = 3;
   return levels[rnd_index];
 }
