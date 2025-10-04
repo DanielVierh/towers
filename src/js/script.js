@@ -801,8 +801,8 @@ function drawTowerPlaces() {
       energy_animation_counter++;
       if (energy_animation_counter === reset_point) {
         const x_random_pos = getRandomMinMax(8, 20);
-        ctx.fillStyle = "rgba(13, 138, 227, 1)";
-        ctx.fillRect(tower.x + x_random_pos, tower.y, 15, 15);
+        ctx.fillStyle = "rgba(13, 138, 227, .9)";
+        ctx.fillRect(tower.x + x_random_pos, tower.y, 7, 7);
         energy_animation_counter = 0;
       }
     }
