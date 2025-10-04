@@ -9,6 +9,7 @@ import {
   render_XP_Coins,
   return_Item_Amount_and_existence,
 } from "./functions/xp_Items.js";
+import { getRandomMinMax } from "./functions/helper_functions.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -85,6 +86,7 @@ let tower = undefined;
 let show_tower_range = false;
 let game_is_running = false;
 let waypoint_color = "rgba(241, 207, 113, 0.9)";
+let energy_animation_counter = 0;
 
 let save_obj = {
   money: 200,
@@ -792,6 +794,18 @@ function drawTowerPlaces() {
     } else {
       ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(tower.x, tower.y, 30, 30);
+    }
+
+    //* Energy Building Animation
+    if (tower.tower_type === "energy") {
+      const reset_point = 5;
+      energy_animation_counter++;
+      if (energy_animation_counter === reset_point) {
+        const x_random_pos = getRandomMinMax(8, 20);
+        ctx.fillStyle = "rgba(13, 138, 227, 1)";
+        ctx.fillRect(tower.x + x_random_pos, tower.y, 15, 15);
+        energy_animation_counter = 0;
+      }
     }
   });
 }

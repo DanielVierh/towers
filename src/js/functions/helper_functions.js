@@ -1,4 +1,3 @@
-export function feffe() {
-    console.log('Huhu');
-    
+export function getRandomMinMax(min, max) {
+  return Math.random() * (max - min) + min;
 }
