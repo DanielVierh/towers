@@ -1,4 +1,5 @@
 import { Creep } from "./classes/Creep.js";
+import { BloodStain } from "./classes/BloodStain.js";
 import { Laser } from "./classes/Laser.js";
 import { GameMessage } from "./classes/GameMessage.js";
 
@@ -77,6 +78,7 @@ canvas.height = 400;
 
 const enemies = [];
 const lasers = [];
+const bloodStains = [];
 const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
@@ -924,6 +926,15 @@ function gameLoop() {
   //* Tower Places zeichnen
   drawTowerPlaces();
 
+  bloodStains.forEach((blood, i) => {
+    blood.update();
+    blood.draw(ctx);
+
+    if (blood.markedForDeletion) {
+      bloodStains.splice(i, 1);
+    }
+  });
+
   lbl_Money.innerHTML = `${save_obj.money}€`;
   lbl_Live.innerHTML = `${save_obj.live} Leben`;
   if (current_creep_index !== undefined) {
@@ -970,6 +981,14 @@ function gameLoop() {
           //* Radius von 80 Pixeln
 
           if (enemy.health <= 0) {
+            bloodStains.push(
+              new BloodStain(
+                enemy.pos_x + enemy.width / 2,
+                enemy.pos_y + enemy.height / 2,
+                "src/assets/blood.png",
+                1.5
+              )
+            );
             enemy.markedForDeletion = true;
 
             let earnedMoney = 0;
