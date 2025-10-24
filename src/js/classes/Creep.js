@@ -11,7 +11,7 @@ export class Creep {
     velocity,
     resistent,
     extra_money,
-    invisible,
+    invisible
   ) {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
@@ -96,97 +96,98 @@ export class Creep {
 
     //* toxicated
     if (this.is_toxicated) {
-        const now = Date.now();
-        if (!this.lastToxicEffect || now - this.lastToxicEffect >= 1000) { // Alle 1 Sekunde
-            this.lastToxicEffect = now;
-            this.health -= (this.toxicated_lvl * 50);
-    
-            if (this.health <= 0) {
-                // Generiere Geld, bevor der Creep gelöscht wird
-                if (!this.markedForDeletion) {
-                    save_obj.money += 10; // Beispiel: 10 Geld für jeden toten Creep
-                    moneyPopups.push({
-                        x: this.pos_x,
-                        y: this.pos_y,
-                        amount: `+10`,
-                        opacity: 1, // Start-Deckkraft
-                    });
-                }
-                this.markedForDeletion = true;
-            }
+      const now = Date.now();
+      if (!this.lastToxicEffect || now - this.lastToxicEffect >= 1000) {
+        // Alle 1 Sekunde
+        this.lastToxicEffect = now;
+        this.health -= this.toxicated_lvl * 50;
+
+        if (this.health <= 0) {
+          // Generiere Geld, bevor der Creep gelöscht wird
+          if (!this.markedForDeletion) {
+            save_obj.money += 30; // Beispiel: 10 Geld für jeden toten Creep
+            moneyPopups.push({
+              x: this.pos_x,
+              y: this.pos_y,
+              amount: `+30`,
+              opacity: 1, // Start-Deckkraft
+            });
+          }
+          this.markedForDeletion = true;
         }
+      }
     }
   }
 
   draw(ctx) {
-    if(this.invisible) {
-        return; // Wenn der Creep unsichtbar ist, nichts zeichnen
+    if (this.invisible) {
+      return; // Wenn der Creep unsichtbar ist, nichts zeichnen
     }
     const currentImage = this.imageFrames[this.imageIndex];
     if (currentImage.complete) {
-        const scaledWidth = this.width * this.scale;
-        const scaledHeight = this.height * this.scale;
+      const scaledWidth = this.width * this.scale;
+      const scaledHeight = this.height * this.scale;
 
-        ctx.save();
-        if (this.direction === -1) {
-            ctx.scale(-1, 1);
-            ctx.drawImage(
-                currentImage,
-                -this.pos_x - scaledWidth,
-                this.pos_y,
-                scaledWidth,
-                scaledHeight
-            );
-        } else {
-            ctx.drawImage(
-                currentImage,
-                this.pos_x,
-                this.pos_y,
-                scaledWidth,
-                scaledHeight
-            );
-        }
-        ctx.restore();
-
-        // Zeichne die Lebensanzeige
-        const healthBarWidth = 40;
-        const healthBarHeight = 5;
-        const healthBarX = this.pos_x + scaledWidth / 2 - healthBarWidth / 2;
-        const healthBarY = this.pos_y - 10;
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
-
-        ctx.fillStyle = "green";
-        ctx.fillRect(
-            healthBarX,
-            healthBarY,
-            (this.health / this.maxHealth) * healthBarWidth,
-            healthBarHeight
+      ctx.save();
+      if (this.direction === -1) {
+        ctx.scale(-1, 1);
+        ctx.drawImage(
+          currentImage,
+          -this.pos_x - scaledWidth,
+          this.pos_y,
+          scaledWidth,
+          scaledHeight
         );
+      } else {
+        ctx.drawImage(
+          currentImage,
+          this.pos_x,
+          this.pos_y,
+          scaledWidth,
+          scaledHeight
+        );
+      }
+      ctx.restore();
 
-        // Zeichne einen grünen Punkt, wenn der Gegner toxicated ist
-        if (this.is_toxicated) {
-            const dotX = healthBarX + healthBarWidth / 2; // Punkt zentrieren
-            const dotY = healthBarY + healthBarHeight + 5; // Unter der Lebensanzeige
-            const dotRadius = 1; // Radius des Punkts
+      // Zeichne die Lebensanzeige
+      const healthBarWidth = 40;
+      const healthBarHeight = 5;
+      const healthBarX = this.pos_x + scaledWidth / 2 - healthBarWidth / 2;
+      const healthBarY = this.pos_y - 10;
 
-            ctx.beginPath();
-            ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2); // Kreis zeichnen
-            ctx.fillStyle = "green";
-            ctx.fill();
-            ctx.closePath();
-        }
+      ctx.fillStyle = "red";
+      ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
 
-        // zeichne einen rahmen um den Creep
-        // ctx.strokeStyle = "black";
-        // ctx.lineWidth = 1;
-        // ctx.strokeRect(
-        //     this.pos_x,
-        //     this.pos_y,
-        //     scaledWidth,
-        //     scaledHeight
-        // );
+      ctx.fillStyle = "green";
+      ctx.fillRect(
+        healthBarX,
+        healthBarY,
+        (this.health / this.maxHealth) * healthBarWidth,
+        healthBarHeight
+      );
+
+      // Zeichne einen grünen Punkt, wenn der Gegner toxicated ist
+      if (this.is_toxicated) {
+        const dotX = healthBarX + healthBarWidth / 2; // Punkt zentrieren
+        const dotY = healthBarY + healthBarHeight + 5; // Unter der Lebensanzeige
+        const dotRadius = 1; // Radius des Punkts
+
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2); // Kreis zeichnen
+        ctx.fillStyle = "green";
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      // zeichne einen rahmen um den Creep
+      // ctx.strokeStyle = "black";
+      // ctx.lineWidth = 1;
+      // ctx.strokeRect(
+      //     this.pos_x,
+      //     this.pos_y,
+      //     scaledWidth,
+      //     scaledHeight
+      // );
     }
-}
+  }
 }
