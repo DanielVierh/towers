@@ -6,7 +6,6 @@ export class BloodStain {
 
     this.image = new Image();
     this.image.src = img_src;
-    console.log("Wird gezeichnet", this.image);
 
     this.spawnTime = Date.now();
     this.lifeTime = 60000; // 60 Sekunden
