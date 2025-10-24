@@ -923,9 +923,7 @@ function gameLoop() {
   //* Zuerst die Waypoints zeichnen
   drawWaypoints(ctx, save_obj.waypoints, waypoint_color);
 
-  //* Tower Places zeichnen
-  drawTowerPlaces();
-
+  //* Blood
   bloodStains.forEach((blood, i) => {
     blood.update();
     blood.draw(ctx);
@@ -934,6 +932,9 @@ function gameLoop() {
       bloodStains.splice(i, 1);
     }
   });
+
+  //* Tower Places zeichnen
+  drawTowerPlaces();
 
   lbl_Money.innerHTML = `${save_obj.money}€`;
   lbl_Live.innerHTML = `${save_obj.live} Leben`;

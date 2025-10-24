@@ -1,7 +1,7 @@
 export class BloodStain {
   constructor(x, y, img_src, scale = 1) {
     this.x = x;
-    this.y = y;
+    this.y = y + 15;
     this.scale = scale;
 
     this.image = new Image();
@@ -9,7 +9,7 @@ export class BloodStain {
     console.log("Wird gezeichnet", this.image);
 
     this.spawnTime = Date.now();
-    this.lifeTime = 5000; // 5 Sekunden
+    this.lifeTime = 60000; // 60 Sekunden
     this.markedForDeletion = false;
   }
 
