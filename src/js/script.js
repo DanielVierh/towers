@@ -2384,6 +2384,7 @@ function check_XPCoins(price, xp_objectname) {
   }
 }
 
+//* Mouse Position for Debugging
 canvas.addEventListener("mousemove", function (event) {
   // Canvas-Position im Dokument ermitteln
   const rect = canvas.getBoundingClientRect();
@@ -2392,5 +2393,5 @@ canvas.addEventListener("mousemove", function (event) {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
-  console.log(`x: ${x - 20}, y: ${y - 20}`);
+  // ! console.log(`x: ${x - 20}, y: ${y - 20}`);
 });
