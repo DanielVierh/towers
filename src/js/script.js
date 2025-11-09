@@ -948,6 +948,16 @@ function gameLoop() {
     }
   });
 
+  // Zeichne und aktualisiere BloodStains (rückwärts iterieren zum sicheren Entfernen)
+  for (let i = bloodStains.length - 1; i >= 0; i--) {
+    const stain = bloodStains[i];
+    stain.update();
+    stain.draw(ctx);
+    if (stain.markedForDeletion) {
+      bloodStains.splice(i, 1);
+    }
+  }
+
   //* Tower Places zeichnen
   drawTowerPlaces();
 

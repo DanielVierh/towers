@@ -2,10 +2,10 @@ export class DeathEffect {
   constructor(x, y, scale = 1.0) {
     this.x = x;
     this.y = y;
-    this.scale = 0.15;
+    this.scale = 0.12;
     this.frames = [];
     this.frameIndex = 0;
-    this.frameInterval = 20; // Zeit pro Frame in ms
+    this.frameInterval = 25; // Zeit pro Frame in ms
     this.lastFrameTime = 0;
     this.loaded = false;
     this.finished = false;
