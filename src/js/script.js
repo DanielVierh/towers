@@ -2,6 +2,7 @@ import { Creep } from "./classes/Creep.js";
 import { BloodStain } from "./classes/BloodStain.js";
 import { Laser } from "./classes/Laser.js";
 import { GameMessage } from "./classes/GameMessage.js";
+import { DeathEffect } from "./classes/DeathEffect.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
 import {
@@ -79,6 +80,7 @@ canvas.height = 400;
 const enemies = [];
 const lasers = [];
 const bloodStains = [];
+const deathEffects = [];
 const moneyPopups = [];
 const backgroundImage = new Image();
 backgroundImage.src = "src/assets/bg/bg2.webp";
@@ -88,6 +90,9 @@ let show_tower_range = false;
 let game_is_running = false;
 let waypoint_color = "rgba(241, 207, 113, 0.9)";
 let energy_animation_counter = 0;
+
+// Zeitstempel für die Delta-Time Berechnung in der Game-Loop
+let lastTime = performance.now();
 
 let save_obj = {
   money: 200,
@@ -923,13 +928,23 @@ function gameLoop() {
   //* Zuerst die Waypoints zeichnen
   drawWaypoints(ctx, save_obj.waypoints, waypoint_color);
 
-  //* Blood
-  bloodStains.forEach((blood, i) => {
-    blood.update();
-    blood.draw(ctx);
+  const now = performance.now();
+  const deltaTime = now - lastTime;
+  lastTime = now;
 
-    if (blood.markedForDeletion) {
-      bloodStains.splice(i, 1);
+  deathEffects.forEach((effect, i) => {
+    effect.update(deltaTime);
+    effect.draw(ctx);
+
+    if (effect.finished && !effect.spawnedBlood) {
+      bloodStains.push(
+        new BloodStain(effect.x, effect.y, "src/assets/blood.png", 1.5)
+      );
+      effect.spawnedBlood = true;
+    }
+
+    if (effect.markedForDeletion) {
+      deathEffects.splice(i, 1);
     }
   });
 
@@ -982,16 +997,19 @@ function gameLoop() {
           //* Radius von 80 Pixeln
 
           if (enemy.health <= 0) {
-            bloodStains.push(
-              new BloodStain(
+            // Explosion starten
+            deathEffects.push(
+              new DeathEffect(
                 enemy.pos_x + enemy.width / 2,
                 enemy.pos_y + enemy.height / 2,
-                "src/assets/blood.png",
-                1.5
+                1.3
               )
             );
+
+            // Gegner markieren, damit er verschwindet
             enemy.markedForDeletion = true;
 
+            // Geld + XP
             let earnedMoney = 0;
             if (save_obj.wave > 20) {
               earnedMoney = 2;
@@ -1001,12 +1019,11 @@ function gameLoop() {
               earnedMoney = 10;
             }
 
-            earnedMoney = earnedMoney += enemy.extra_money;
+            earnedMoney += enemy.extra_money;
             save_obj.current_XP += 1;
-
             save_obj.money += earnedMoney;
 
-            //* Live Gen
+            // Live-Generation durch Tower-Kills
             if (tower.live_gen === 1) {
               tower.kill_counter += 1;
               console.log("Tower Upgrade kill"), tower.kill_counter;
@@ -1018,12 +1035,12 @@ function gameLoop() {
               }
             }
 
-            // Füge ein Popup an der aktuellen Position des Gegners hinzu
+            // Geld-Popup
             moneyPopups.push({
               x: enemy.pos_x,
               y: enemy.pos_y,
               amount: `+${earnedMoney}`,
-              opacity: 1, // Start-Deckkraft
+              opacity: 1,
             });
           }
 
