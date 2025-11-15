@@ -530,4 +530,124 @@ select option {
   right: 5px;
   font-size: 0.8rem;
   font-weight: bold;
+}
+
+#gxu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  -webkit-backdrop-filter: blur(6px) brightness(1.2);
+          backdrop-filter: blur(6px) brightness(1.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+#gxu-overlay.gxu-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.gxu-modal {
+  width: 480px;
+  padding: 32px;
+  border-radius: 22px;
+  position: relative;
+  background: linear-gradient(160deg, #000000, #162b12);
+  border: 3px solid rgba(0, 200, 255, 0.45);
+  box-shadow: 0 0 40px rgba(0, 200, 255, 0.35), inset 0 0 30px rgba(0, 140, 255, 0.22);
+  animation: gxu-dropIn 0.45s cubic-bezier(0.18, 1.3, 0.45, 1);
+}
+
+@keyframes gxu-dropIn {
+  0% {
+    transform: translateY(-40px) scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+.gxu-modal h1 {
+  text-align: center;
+  font-size: 34px;
+  letter-spacing: 1px;
+  font-weight: 900;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg, #b1f696, #04490b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 18px rgba(0, 180, 255, 0.55);
+}
+.gxu-modal h1.game-over {
+  background: linear-gradient(90deg, #e45050, #910a0a);
+}
+
+.gxu-stat-box {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 16px 20px;
+  margin: 12px 0;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(0, 200, 255, 0.25);
+  box-shadow: inset 0 0 12px rgba(0, 200, 255, 0.08);
+  -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+}
+
+.gxu-stat-box span {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.gxu-btn-group {
+  margin-top: 26px;
+  display: flex;
+  gap: 14px;
+}
+
+.gxu-btn {
+  flex: 1;
+  padding: 14px;
+  font-size: 17px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: 0.25s;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.3);
+}
+
+.gxu-btn-green {
+  background: linear-gradient(180deg, #35ff9d, #0ad471);
+  color: #000;
+}
+
+.gxu-btn-green:hover {
+  transform: scale(1.06);
+}
+
+/* Victory flare */
+#gxu-victory-glow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(0, 234, 255, 0.3333333333), transparent 70%);
+  filter: blur(22px);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.gxu-modal.gxu-win #gxu-victory-glow {
+  opacity: 1;
 }/*# sourceMappingURL=styles.css.map */

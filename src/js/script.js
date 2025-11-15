@@ -889,6 +889,12 @@ function showGameOverModal() {
         "de-DE"
       )} XP) <br> ${new_XP_Coins} XP-Coins`;
     }
+    gxuShowEndscreen(false, {
+      kills: 999,
+      xp: `${save_obj.current_XP.toLocaleString("de-DE") / 2}`,
+      coins: new_XP_Coins,
+      waves: save_obj.wave,
+    });
     save_obj.assign_XP = true;
     saveGameToLocalStorage();
   }
@@ -1376,9 +1382,9 @@ function won_game() {
   game_is_running = false;
   if (save_obj.assign_XP === false) {
     // Zeige das Game Over Modal mit Sieg-Text und XP-Anzeige
-    gameOverModal.style.display = "block";
-    gameOverModal.style.backgroundColor = "rgba(8, 178, 59, 0.8)";
-    lbl_title.innerHTML = "Du hast gewonnen!";
+    // gameOverModal.style.display = "block";
+    // gameOverModal.style.backgroundColor = "rgba(8, 178, 59, 0.8)";
+    // lbl_title.innerHTML = "Du hast gewonnen!";
     if (!save_obj.assign_XP) {
       save_obj.current_XP = Math.floor(
         save_obj.current_XP + save_obj.wave * 30
@@ -1411,6 +1417,12 @@ function won_game() {
           "de-DE"
         )} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
+      gxuShowEndscreen(true, {
+        kills: 999,
+        xp: `${save_obj.current_XP.toLocaleString("de-DE")}`,
+        coins: new_XP_Coins,
+        waves: save_obj.wave,
+      });
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
       save_obj.save_date = undefined;
@@ -2422,3 +2434,34 @@ canvas.addEventListener("mousemove", function (event) {
 
   // ! console.log(`x: ${x - 20}, y: ${y - 20}`);
 });
+
+function gxuShowEndscreen(win, stats) {
+  const title = document.getElementById("gxu-title");
+  const box = document.getElementById("gxu-modal-box");
+
+  if (win) {
+    title.textContent = "Gewonnen!";
+    box.classList.add("gxu-win");
+  } else {
+    title.textContent = "Game Over";
+    box.classList.remove("gxu-win");
+  }
+
+  document.getElementById("gxu-s-kills").textContent = stats.kills;
+  document.getElementById("gxu-s-xp").textContent = stats.xp;
+  document.getElementById("gxu-s-coins").textContent = stats.coins;
+  document.getElementById("gxu-s-waves").textContent = stats.waves;
+
+  document.getElementById("gxu-overlay").classList.add("gxu-active");
+}
+function gxuClose() {
+  document.getElementById("gxu-overlay").classList.remove("gxu-active");
+}
+function gxuRestart() {
+  gxuClose();
+  alert("Restart Function");
+}
+
+// setTimeout(() => {
+//   gxuShowEndscreen(false, { kills: 72, xp: 4100, coins: 18, waves: 16 });
+// }, 900);

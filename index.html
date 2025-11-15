@@ -94,6 +94,33 @@
       </div>
     </div>
 
+    <!-- New Modal for the end of the game -->
+    <div id="gxu-overlay">
+      <div class="gxu-modal" id="gxu-modal-box">
+        <div id="gxu-victory-glow"></div>
+        <h1 id="gxu-title">Ergebnis</h1>
+
+        <div class="gxu-stat-box">
+          <span>Kills</span><span id="gxu-s-kills">0</span>
+        </div>
+        <div class="gxu-stat-box">
+          <span>XP gesammelt</span><span id="gxu-s-xp">0</span>
+        </div>
+        <div class="gxu-stat-box">
+          <span>XP Coins</span><span id="gxu-s-coins">0</span>
+        </div>
+        <div class="gxu-stat-box">
+          <span>Wellen überlebt</span><span id="gxu-s-waves">0</span>
+        </div>
+
+        <div class="gxu-btn-group">
+          <button class="gxu-btn gxu-btn-green" onclick="gxuRestart()">
+            Zum Startbildschirm
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div
       class="start-modal active"
       id="menu_modal"
