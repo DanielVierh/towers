@@ -73,6 +73,7 @@ const tile_upgrade_liveGenerator = document.getElementById(
   "tile_upgrade_liveGenerator"
 );
 const btn_livegen = document.getElementById("btn_livegen");
+const reset_game = document.getElementById("reset_game");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -858,7 +859,6 @@ function calculateDistance(
 //*#########################################################
 
 function showGameOverModal() {
-  gameOverModal.style.display = "block";
   lbl_Live.innerHTML = "0 Leben";
   //* Assign new XP and XP-Coins
   if (!save_obj.assign_XP) {
@@ -877,23 +877,21 @@ function showGameOverModal() {
       lostLive = 15 - save_obj.live;
     }
     const live_Loss_Antibonus = lostLive * 20;
-    const new_XP_Coins = Math.floor(
+    let new_XP_Coins = Math.floor(
       (base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus) / 1.5
     );
 
     save_obj.XP_Coins += new_XP_Coins;
-    if (save_obj.current_XP > 0) {
-      lbl_XP.innerHTML = ` +${Math.floor(
-        save_obj.current_XP.toLocaleString("de-DE") / 2
-      )} XP (${save_obj.XP.toLocaleString(
-        "de-DE"
-      )} XP) <br> ${new_XP_Coins} XP-Coins`;
+
+    if (save_obj.total_kills < 5) {
+      save_obj.current_XP = 2;
+      new_XP_Coins = 5;
     }
     gxuShowEndscreen(false, {
-      kills: 999,
+      kills: save_obj.total_kills,
       xp: `${save_obj.current_XP.toLocaleString("de-DE") / 2}`,
       coins: new_XP_Coins,
-      waves: save_obj.wave,
+      waves: save_obj.wave - 1,
     });
     save_obj.assign_XP = true;
     saveGameToLocalStorage();
@@ -1013,6 +1011,12 @@ function gameLoop() {
           //* Radius von 80 Pixeln
 
           if (enemy.health <= 0) {
+            // Increase Total Kill Counter
+            if (save_obj.total_kills === undefined) {
+              save_obj.total_kills = 1;
+            } else {
+              save_obj.total_kills += 1;
+            }
             // Explosion starten
             deathEffects.push(
               new DeathEffect(
@@ -1418,10 +1422,10 @@ function won_game() {
         )} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
       gxuShowEndscreen(true, {
-        kills: 999,
+        kills: save_obj.total_kills,
         xp: `${save_obj.current_XP.toLocaleString("de-DE")}`,
         coins: new_XP_Coins,
-        waves: save_obj.wave,
+        waves: save_obj.wave - 1,
       });
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
@@ -2041,7 +2045,7 @@ function initialize_game(level_details) {
   const level = level_details;
   //* Set the max wave target for this round
   save_obj.active_game_target_wave = Math.floor(Math.random() * (60 - 20)) + 20;
-  // save_obj.active_game_target_wave = 10; // * For testing
+  // save_obj.active_game_target_wave = 2; // * For testing debug
   //* Set the background image path in the save object
   save_obj.backgroundImage = level.background_img_path;
   //* Set the background image for the canvas
@@ -2060,6 +2064,12 @@ function initialize_game(level_details) {
   save_obj.enemy_max_velocity = 1.5;
   //* Set the global waypoint color
   waypoint_color = level.waypoint_color;
+  //* Set totalKills
+  if (save_obj.total_kills === undefined) {
+    save_obj.total_kills = 0;
+  } else {
+    save_obj.total_kills = 0;
+  }
   start_game();
 }
 
@@ -2457,10 +2467,10 @@ function gxuShowEndscreen(win, stats) {
 function gxuClose() {
   document.getElementById("gxu-overlay").classList.remove("gxu-active");
 }
-function gxuRestart() {
-  gxuClose();
-  alert("Restart Function");
-}
+
+reset_game.addEventListener("click", () => {
+  window.location.reload();
+});
 
 // setTimeout(() => {
 //   gxuShowEndscreen(false, { kills: 72, xp: 4100, coins: 18, waves: 16 });
