@@ -74,6 +74,7 @@ const tile_upgrade_liveGenerator = document.getElementById(
 );
 const btn_livegen = document.getElementById("btn_livegen");
 const reset_game = document.getElementById("reset_game");
+const lbl_available_mines = document.getElementById("lbl_available_mines");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -91,7 +92,9 @@ let show_tower_range = false;
 let game_is_running = false;
 let waypoint_color = "rgba(241, 207, 113, 0.9)";
 let energy_animation_counter = 0;
-let max_mine_amount_per_wave = 5;
+
+const max_mine_amount_per_wave = 5;
+let current_mine_amount_per_wave = 5;
 
 // Zeitstempel für die Delta-Time Berechnung in der Game-Loop
 let lastTime = performance.now();
@@ -1362,6 +1365,8 @@ function updateWaveTimer() {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
   if (waveTimer <= 0) {
+    current_mine_amount_per_wave = max_mine_amount_per_wave;
+    lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
     let time_to_next_wave = 30;
     if (save_obj.wave >= 6) {
       time_to_next_wave = 45;
@@ -1769,6 +1774,24 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
   const tower_price = tower_btn.getAttribute("data-tower_price");
   const tower_img = tower_btn.getAttribute("data-tower_img");
   if (save_obj.money >= tower_price) {
+    //* Vorhandene Minen reduzieren
+    console.log("tower_type", tower_type);
+
+    if (tower_type === "mine" || tower_type === "air_mine") {
+      if (current_mine_amount_per_wave === 0) {
+        new GameMessage(
+          "Keine Minen mehr vorhanden",
+          "Du hast keine Minen mehr für diese Welle verfügbar",
+          "error",
+          3000
+        ).show_Message();
+        return;
+      } else {
+        current_mine_amount_per_wave--;
+        lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
+      }
+    }
+
     tower.tower_type = tower_type;
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
