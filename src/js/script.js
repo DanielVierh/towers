@@ -2044,7 +2044,7 @@ function initialize_game(level_details) {
   modal_select_lvl.style.display = "none";
   const level = level_details;
   //* Set the max wave target for this round
-  save_obj.active_game_target_wave = Math.floor(Math.random() * (60 - 20)) + 20;
+  save_obj.active_game_target_wave = Math.floor(Math.random() * (50 - 20)) + 20;
   // save_obj.active_game_target_wave = 2; // * For testing debug
   //* Set the background image path in the save object
   save_obj.backgroundImage = level.background_img_path;
