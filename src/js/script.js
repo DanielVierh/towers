@@ -91,6 +91,7 @@ let show_tower_range = false;
 let game_is_running = false;
 let waypoint_color = "rgba(241, 207, 113, 0.9)";
 let energy_animation_counter = 0;
+let max_mine_amount_per_wave = 5;
 
 // Zeitstempel für die Delta-Time Berechnung in der Game-Loop
 let lastTime = performance.now();
@@ -1179,6 +1180,9 @@ function gameLoop() {
                 setTimeout(() => {
                   enemy.health = 0;
                   enemy.markedForDeletion = true;
+                  save_obj.total_kills === undefined
+                    ? (save_obj.total_kills = 1)
+                    : save_obj.total_kills++;
                 }, 100);
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
@@ -1195,6 +1199,9 @@ function gameLoop() {
               setTimeout(() => {
                 enemy.health = 0;
                 enemy.markedForDeletion = true;
+                save_obj.total_kills === undefined
+                  ? (save_obj.total_kills = 1)
+                  : save_obj.total_kills++;
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
