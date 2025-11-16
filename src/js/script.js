@@ -902,6 +902,7 @@ function showGameOverModal() {
 //*#########################################################
 //* ANCHOR -GAMELOOP
 //*#########################################################
+let got_killed = false;
 function gameLoop() {
   if (game_is_running === false) {
     return;
@@ -1176,13 +1177,16 @@ function gameLoop() {
             //* >>> Mine <<<
           } else if (tower.tower_type === "mine") {
             if (!enemy.resistent.includes("mine")) {
+              //* Mine Kill Count
+              if (!got_killed) {
+                save_obj.total_kills++;
+                got_killed = true;
+              }
               setTimeout(() => {
                 setTimeout(() => {
                   enemy.health = 0;
                   enemy.markedForDeletion = true;
-                  save_obj.total_kills === undefined
-                    ? (save_obj.total_kills = 1)
-                    : save_obj.total_kills++;
+                  got_killed = false;
                 }, 100);
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
@@ -1196,12 +1200,15 @@ function gameLoop() {
             }
           } else if (tower.tower_type === "air_mine") {
             if (!enemy.resistent.includes("air_mine")) {
+              //* Mine Kill Count
+              if (!got_killed) {
+                save_obj.total_kills++;
+                got_killed = true;
+              }
               setTimeout(() => {
                 enemy.health = 0;
                 enemy.markedForDeletion = true;
-                save_obj.total_kills === undefined
-                  ? (save_obj.total_kills = 1)
-                  : save_obj.total_kills++;
+                got_killed = false;
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
