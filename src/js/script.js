@@ -892,9 +892,9 @@ function showGameOverModal() {
       new_XP_Coins = 5;
     }
     gxuShowEndscreen(false, {
-      kills: save_obj.total_kills,
+      kills: save_obj.total_kills.toLocaleString("de-DE"),
       xp: `${save_obj.current_XP.toLocaleString("de-DE") / 2}`,
-      coins: new_XP_Coins,
+      coins: new_XP_Coins.toLocaleString("de-DE"),
       waves: save_obj.wave - 1,
     });
     save_obj.assign_XP = true;
@@ -1442,9 +1442,9 @@ function won_game() {
         )} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
       gxuShowEndscreen(true, {
-        kills: save_obj.total_kills,
+        kills: save_obj.total_kills.toLocaleString("de-DE"),
         xp: `${save_obj.current_XP.toLocaleString("de-DE")}`,
-        coins: new_XP_Coins,
+        coins: new_XP_Coins.toLocaleString("de-DE"),
         waves: save_obj.wave - 1,
       });
       save_obj.current_XP = 0;
