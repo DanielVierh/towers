@@ -1367,6 +1367,7 @@ function updateWaveTimer() {
   if (waveTimer <= 0) {
     current_mine_amount_per_wave = max_mine_amount_per_wave;
     lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
+    lbl_available_mines.classList.remove("empty");
     let time_to_next_wave = 30;
     if (save_obj.wave >= 6) {
       time_to_next_wave = 45;
@@ -1788,6 +1789,9 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
         return;
       } else {
         current_mine_amount_per_wave--;
+        current_mine_amount_per_wave === 0
+          ? lbl_available_mines.classList.add("empty")
+          : lbl_available_mines.classList.remove("empty");
         lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
       }
     }

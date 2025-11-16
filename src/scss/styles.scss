@@ -645,3 +645,17 @@ select {
 .gxu-modal.gxu-win #gxu-victory-glow {
   opacity: 1;
 }
+
+#lbl_available_mines {
+  background-color: #0f381c;
+  padding: 10px 20px;
+  border-radius: 15px;
+  font-size: 1.3rem;
+  margin: 20px;
+  letter-spacing: 3px;
+  color: yellow;
+
+  &.empty {
+    color: red;
+  }
+}
