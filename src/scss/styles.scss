@@ -186,13 +186,14 @@ body.red-flash {
         &::after {
           content: "Gekauft";
           position: absolute;
-          top: 0;
-          right: 0;
+          bottom: 3px;
+          right: 3px;
           background-color: black;
           color: lightgreen;
           padding: 5px;
           border-radius: 8px;
           font-size: 0.7rem;
+          box-shadow: 0 0 15px lightgreen;
         }
       }
 
