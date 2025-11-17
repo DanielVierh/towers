@@ -664,4 +664,10 @@ select option {
 }
 #lbl_available_mines.empty {
   color: red;
+}
+
+.gxu-gameover {
+  background: linear-gradient(90deg, rgba(247, 100, 64, 0.5803921569), rgba(159, 14, 14, 0.2588235294)) !important;
+  text-shadow: 0 0 1px rgb(247, 235, 235) !important;
+  border-radius: 8px;
 }/*# sourceMappingURL=styles.css.map */

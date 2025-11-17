@@ -2493,9 +2493,11 @@ function gxuShowEndscreen(win, stats) {
   if (win) {
     title.textContent = "Gewonnen!";
     box.classList.add("gxu-win");
+    title.classList.remove("gxu-gameover");
   } else {
     title.textContent = "Game Over";
     box.classList.remove("gxu-win");
+    title.classList.add("gxu-gameover");
   }
 
   document.getElementById("gxu-s-kills").textContent = stats.kills;
@@ -2514,5 +2516,5 @@ reset_game.addEventListener("click", () => {
 });
 
 // setTimeout(() => {
-//   gxuShowEndscreen(false, { kills: 72, xp: 4100, coins: 18, waves: 16 });
+//   gxuShowEndscreen(true, { kills: 72, xp: 4100, coins: 18, waves: 16 });
 // }, 900);
