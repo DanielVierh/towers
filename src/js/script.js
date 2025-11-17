@@ -898,7 +898,16 @@ function showGameOverModal() {
       waves: save_obj.wave - 1,
     });
     save_obj.assign_XP = true;
-    saveGameToLocalStorage();
+    // Entferne das Save-Datum, damit auf dem Startscreen kein Lade-Button mehr angezeigt wird
+    if (save_obj.hasOwnProperty("save_date")) {
+      delete save_obj.save_date;
+    }
+    // Schreibe das Save-Objekt ohne save_date in den localStorage
+    save_Game_without_saveDate();
+    // Verstecke den Load-Button sofort im UI
+    if (btn_load_game) {
+      btn_load_game.style.display = "none";
+    }
   }
 }
 
@@ -1405,10 +1414,6 @@ function updateWaveTimer() {
 function won_game() {
   game_is_running = false;
   if (save_obj.assign_XP === false) {
-    // Zeige das Game Over Modal mit Sieg-Text und XP-Anzeige
-    // gameOverModal.style.display = "block";
-    // gameOverModal.style.backgroundColor = "rgba(8, 178, 59, 0.8)";
-    // lbl_title.innerHTML = "Du hast gewonnen!";
     if (!save_obj.assign_XP) {
       save_obj.current_XP = Math.floor(
         save_obj.current_XP + save_obj.wave * 30
