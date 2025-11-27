@@ -1538,6 +1538,7 @@ canvas.addEventListener("click", (event) => {
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
+        calc_energy_overdose();
         mdl_upgrade.style.display = "flex";
         if (tower.tower_damage_lvl === 2) {
           btn_Stronger.innerHTML = "Kaufen 500€";
