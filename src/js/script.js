@@ -2009,7 +2009,7 @@ btn_show_tower_range.addEventListener("click", () => {
   // Starte einen neuen Timer
   rangeTimer = setTimeout(() => {
     show_tower_range = false;
-  }, 10000);
+  }, 5000);
 });
 
 //*#########################################################
