@@ -75,6 +75,7 @@ const tile_upgrade_liveGenerator = document.getElementById(
 const btn_livegen = document.getElementById("btn_livegen");
 const reset_game = document.getElementById("reset_game");
 const lbl_available_mines = document.getElementById("lbl_available_mines");
+const lbl_needed_energy = document.getElementById("lbl_needed_energy");
 
 canvas.width = 400;
 canvas.height = 400;
@@ -1538,7 +1539,12 @@ canvas.addEventListener("click", (event) => {
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
-        calc_energy_overdose();
+        if (tower.tower_type === "energy") {
+          lbl_needed_energy.style.display = "none";
+        } else {
+          lbl_needed_energy.style.display = "block";
+          calc_energy_overdose();
+        }
         mdl_upgrade.style.display = "flex";
         if (tower.tower_damage_lvl === 2) {
           btn_Stronger.innerHTML = "Kaufen 500€";
