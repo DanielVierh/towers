@@ -499,7 +499,7 @@ const creep_properties = [
     name: "Ground, boss",
     src: "src/assets/creeps/creep_5",
     extra_velocity: -0.7,
-    extra_health: 350,
+    extra_health: 500,
     scale: 0.1,
     resistent: ["slower", "anti_air", "air_mine"],
     extra_money_amount: 8,
