@@ -513,7 +513,7 @@ const special_creeps = [
     name: "Special, Super-Tanky",
     src: "src/assets/creeps/creep_5",
     velocity: 0.5,
-    extra_health: 3500,
+    extra_health: 4000,
     scale: 0.6,
     resistent: ["slower", "anti_air", "air_mine", "toxic", "slower", "mine"],
     extra_money_amount: 100,
