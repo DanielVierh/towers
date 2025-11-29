@@ -94,8 +94,8 @@ let game_is_running = false;
 let waypoint_color = "rgba(241, 207, 113, 0.9)";
 let energy_animation_counter = 0;
 
-const max_mine_amount_per_wave = 5;
-let current_mine_amount_per_wave = 5;
+let max_mine_amount_per_wave = 3;
+let current_mine_amount_per_wave = 3;
 
 // Zeitstempel für die Delta-Time Berechnung in der Game-Loop
 let lastTime = performance.now();
@@ -1373,6 +1373,7 @@ function updateWaveTimer() {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
   if (waveTimer <= 0) {
+    save_obj.wave > parseInt(save_obj.active_game_target_wave / 2) ? max_mine_amount_per_wave = 5 : 3;
     current_mine_amount_per_wave = max_mine_amount_per_wave;
     lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
     lbl_available_mines.classList.remove("empty");
@@ -2090,6 +2091,7 @@ btn_start_game.addEventListener("click", () => {
 });
 
 function initialize_game(level_details) {
+  lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
   save_obj.assign_XP = false;
   save_obj.current_XP = 0;
   modal_select_lvl.style.display = "none";

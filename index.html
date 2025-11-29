@@ -1,572 +1,421 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
-    />
-    <link rel="canonical" href="https://danielvierh.github.io/towers/" />
-    <link rel="manifest" href="danielvierh.github.io/towers/manifest.json" />
-    <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="shortcut icon" type="image/png" href="apple-touch-icon.png" />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/apple-touch-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/apple-touch-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="167x167"
-      href="/apple-touch-icon-167x167.png"
-    />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="https://danielvierh.github.io/towers/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="https://danielvierh.github.io/towers/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="https://danielvierh.github.io/towers/favicon-16x16.png"
-    />
-    <link
-      rel="manifest"
-      href="https://danielvierh.github.io/towers/site.webmanifest"
-    />
-    <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- iOS Meta Tags -->
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Tower" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <!-- Web App aktivieren -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <!-- Statusbar-Stil -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <!-- App-Name auf dem Homescreen -->
-    <meta name="apple-mobile-web-app-title" content="Tower" />
+<head>
+  <meta charset="UTF-8" />
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <link rel="canonical" href="https://danielvierh.github.io/towers/" />
+  <link rel="manifest" href="danielvierh.github.io/towers/manifest.json" />
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" type="image/png" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167x167.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://danielvierh.github.io/towers/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="https://danielvierh.github.io/towers/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="https://danielvierh.github.io/towers/favicon-16x16.png" />
+  <link rel="manifest" href="https://danielvierh.github.io/towers/site.webmanifest" />
+  <link rel="manifest" href="/site.webmanifest" />
 
-    <link rel="stylesheet" href="src/scss/styles.css" />
-    <title>Tower</title>
-  </head>
-  <body>
-    <canvas id="canvas"></canvas>
-    <div class="labels-wrapper">
-      <div class="labels" id="lbl_energy"></div>
-      <div class="labels" id="lbl_money"></div>
-      <div class="labels" id="lbl_live"></div>
-      <div class="labels" id="lbl_wave"></div>
-      <div class="labels" id="lbl_wave_timer"></div>
+  <!-- iOS Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Tower" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <!-- Web App aktivieren -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- Statusbar-Stil -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <!-- App-Name auf dem Homescreen -->
+  <meta name="apple-mobile-web-app-title" content="Tower" />
+
+  <link rel="stylesheet" href="src/scss/styles.css" />
+  <title>Tower</title>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="labels-wrapper">
+    <div class="labels" id="lbl_energy"></div>
+    <div class="labels" id="lbl_money"></div>
+    <div class="labels" id="lbl_live"></div>
+    <div class="labels" id="lbl_wave"></div>
+    <div class="labels" id="lbl_wave_timer"></div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="gameOverModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2 id="lbl_title">Game Over</h2>
+      <p>Das Spiel ist vorbei!</p>
+      <p id="lbl_XP"></p>
     </div>
+  </div>
 
-    <!-- Game Over Modal -->
-    <div id="gameOverModal" class="modal">
-      <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h2 id="lbl_title">Game Over</h2>
-        <p>Das Spiel ist vorbei!</p>
-        <p id="lbl_XP"></p>
+  <!-- New Modal for the end of the game -->
+  <div id="gxu-overlay">
+    <div class="gxu-modal" id="gxu-modal-box">
+      <div id="gxu-victory-glow"></div>
+      <h1 id="gxu-title">Ergebnis</h1>
+
+      <div class="gxu-stat-box">
+        <span>Kills</span><span id="gxu-s-kills">0</span>
+      </div>
+      <div class="gxu-stat-box">
+        <span>XP gesammelt</span><span id="gxu-s-xp">0</span>
+      </div>
+      <div class="gxu-stat-box">
+        <span>XP Coins</span><span id="gxu-s-coins">0</span>
+      </div>
+      <div class="gxu-stat-box">
+        <span>Wellen überlebt</span><span id="gxu-s-waves">0</span>
+      </div>
+
+      <div class="gxu-btn-group">
+        <button class="gxu-btn gxu-btn-green" id="reset_game">
+          Zum Startbildschirm
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- New Modal for the end of the game -->
-    <div id="gxu-overlay">
-      <div class="gxu-modal" id="gxu-modal-box">
-        <div id="gxu-victory-glow"></div>
-        <h1 id="gxu-title">Ergebnis</h1>
-
-        <div class="gxu-stat-box">
-          <span>Kills</span><span id="gxu-s-kills">0</span>
-        </div>
-        <div class="gxu-stat-box">
-          <span>XP gesammelt</span><span id="gxu-s-xp">0</span>
-        </div>
-        <div class="gxu-stat-box">
-          <span>XP Coins</span><span id="gxu-s-coins">0</span>
-        </div>
-        <div class="gxu-stat-box">
-          <span>Wellen überlebt</span><span id="gxu-s-waves">0</span>
-        </div>
-
-        <div class="gxu-btn-group">
-          <button class="gxu-btn gxu-btn-green" id="reset_game">
-            Zum Startbildschirm
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="start-modal active"
-      id="menu_modal"
-      style="
+  <div class="start-modal active" id="menu_modal" style="
         background: url(src/assets/bg/menu_bg\ .png);
         background-repeat: no-repeat;
         background-size: cover;
         background-position: 35%;
-      "
-    >
-      <div class="lbl-xp" id="lbl_xp">0 XP</div>
-      <h2>Tower</h2>
-      <div class="button" id="btn_start_game">Neues Spiel</div>
-      <div class="button" id="btn_load_game">Spiel laden</div>
-      <div class="button" id="btn_open_skill_menu">Skill Store</div>
-      <div class="button" id="btn_show_instructions">Anleitung</div>
-    </div>
+      ">
+    <div class="lbl-xp" id="lbl_xp">0 XP</div>
+    <h2>Tower</h2>
+    <div class="button" id="btn_start_game">Neues Spiel</div>
+    <div class="button" id="btn_load_game">Spiel laden</div>
+    <div class="button" id="btn_open_skill_menu">Skill Store</div>
+    <div class="button" id="btn_show_instructions">Anleitung</div>
+  </div>
 
-    <div class="modal modal-sel-lvl" id="modal_select_lvl">
-      <div class="close-button" id="btn_close_modal_lvl">x</div>
-      <h2 class="title-difficulty">Schwierigkeit</h2>
-      <select class="select-difficulty" name="difficulty" id="sel_difficulty">
-        <option value="very_easy">Sehr Einfach</option>
-        <option value="easy" selected>Einfach</option>
-        <option value="standard">Mittel</option>
-        <option value="hard">Schwer</option>
-      </select>
-      <h2>Level Auswahl</h2>
-      <div class="grid-wrapper">
-        <div class="tile" id="level_random">
-          <h1>?</h1>
-          <h4>Zufall</h4>
+  <div class="modal modal-sel-lvl" id="modal_select_lvl">
+    <div class="close-button" id="btn_close_modal_lvl">x</div>
+    <h2 class="title-difficulty">Schwierigkeit</h2>
+    <select class="select-difficulty" name="difficulty" id="sel_difficulty">
+      <option value="very_easy">Sehr Einfach</option>
+      <option value="easy" selected>Einfach</option>
+      <option value="standard">Mittel</option>
+      <option value="hard">Schwer</option>
+    </select>
+    <h2>Level Auswahl</h2>
+    <div class="grid-wrapper">
+      <div class="tile" id="level_random">
+        <h1>?</h1>
+        <h4>Zufall</h4>
+      </div>
+      <div class="tile" id="level_0">
+        <img src="src/assets/bg/bg2.webp" alt="Grassland" />
+        <h4>Grasland (leicht)</h4>
+      </div>
+      <div class="tile" id="level_1">
+        <img src="src/assets/bg/desert_bg.png" alt="Desert" />
+        <h4>Wüste (mittel)</h4>
+      </div>
+      <div class="tile" id="level_2">
+        <img src="src/assets/bg/bg_snow.png" alt="bg_snow" />
+        <h4>Schnee (schwer)</h4>
+      </div>
+      <div class="tile" id="level_3">
+        <img src="src/assets/bg/bg_swamp.png" alt="Swamp" />
+        <h4>Sumpf (leicht)</h4>
+      </div>
+      <div class="tile" id="level_4">
+        <img src="src/assets/bg/bg_apo.png" alt="Apokalypse" />
+        <h4>Apokalypse (leicht)</h4>
+      </div>
+      <div class="tile" id="level_5">
+        <img src="src/assets/bg/bg_grasland2.png" alt="grasland2" />
+        <h4>Grasland 2 (mittel)</h4>
+      </div>
+    </div>
+  </div>
+
+  <!--* Skill Modal -->
+  <div class="modal modal-skill" id="mdl_skill_tree">
+    <div class="close-button" id="btn_close_modal_skill">x</div>
+    <h id="lbl_xp_store_coins">0 XP-Coins</h>
+    <h3>Skill Store</h3>
+
+    <div class="grid-wrapper">
+      <div class="tile hidden">
+        <h3>Minen Slots + 3</h3>
+        <p>Erweitert die Anzahl der Minen, die platziert werden können</p>
+        <div class="button-buy" id="btn_mine_slots" data-skill_price="1000">
+          Kaufen 1.000 <br />
+          XP Coins
         </div>
-        <div class="tile" id="level_0">
-          <img src="src/assets/bg/bg2.webp" alt="Grassland" />
-          <h4>Grasland (leicht)</h4>
+      </div>
+      <div class="tile">
+        <div id="lbl_tower_discount_amount" class="label-amount">0X</div>
+        <h3>10 x 50% Rabatt auf Türme</h3>
+        <p>
+          Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Türmen. Spare
+          Coins beim Platzieren von Türmen im Spiel.
+        </p>
+        <br />
+        <div class="button-buy" id="btn_tower_discount" data-skill_price="3000">
+          Kaufen 3.000 <br />
+          XP-Coins
         </div>
-        <div class="tile" id="level_1">
-          <img src="src/assets/bg/desert_bg.png" alt="Desert" />
-          <h4>Wüste (mittel)</h4>
+      </div>
+      <div class="tile">
+        <div id="lbl_trap_discount_amount" class="label-amount">0X</div>
+        <h3>10 x 50% Rabatt auf Fallen</h3>
+        <p>
+          Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Fallen. Spare
+          Coins beim Platzieren von Fallen im Spiel.
+        </p>
+        <br />
+        <div class="button-buy" id="btn_trap_discount" data-skill_price="1000">
+          Kaufen 1.000 <br />
+          XP-Coins
         </div>
-        <div class="tile" id="level_2">
-          <img src="src/assets/bg/bg_snow.png" alt="bg_snow" />
-          <h4>Schnee (schwer)</h4>
+      </div>
+      <div class="tile" id="tile_live_upgr">
+        <h3>Leben Generierer</h3>
+        <p>Generiert alle 20 Kills leben</p>
+        <div class="button-buy" id="btn_life_upgrade" data-skill_price="15000">
+          Kaufen 15.000 <br />
+          XP Coins
         </div>
-        <div class="tile" id="level_3">
-          <img src="src/assets/bg/bg_swamp.png" alt="Swamp" />
-          <h4>Sumpf (leicht)</h4>
+      </div>
+      <div class="tile hidden">
+        <div id="lbl_extra_coins_amount" class="label-amount">0X</div>
+        <h3>Zusätzliche Coins durch Kills</h3>
+        <p>Erhalte zusätzliche Coins für jeden getöteten Gegner</p>
+        <div class="button-buy" id="btn_extra_coins" data-skill_price="20000">
+          Kaufen 20.000 XP Coins
         </div>
-        <div class="tile" id="level_4">
-          <img src="src/assets/bg/bg_apo.png" alt="Apokalypse" />
-          <h4>Apokalypse (leicht)</h4>
-        </div>
-        <div class="tile" id="level_5">
-          <img src="src/assets/bg/bg_grasland2.png" alt="grasland2" />
-          <h4>Grasland 2 (mittel)</h4>
+      </div>
+      <div class="tile hidden">
+        <h3>Raketen Tower freischalten</h3>
+        <p>Schaltet den Raketen Tower im Baumenü frei</p>
+        <div class="button-buy" id="btn_unlock_rocket_tower" data-skill_price="20000">
+          Kaufen 20.000 XP Coins
         </div>
       </div>
     </div>
+  </div>
 
-    <!--* Skill Modal -->
-    <div class="modal modal-skill" id="mdl_skill_tree">
-      <div class="close-button" id="btn_close_modal_skill">x</div>
-      <h id="lbl_xp_store_coins">0 XP-Coins</h>
-      <h3>Skill Store</h3>
-
-      <div class="grid-wrapper">
-        <div class="tile hidden">
-          <h3>Minen Slots + 3</h3>
-          <p>Erweitert die Anzahl der Minen, die platziert werden können</p>
-          <div class="button-buy" id="btn_mine_slots" data-skill_price="1000">
-            Kaufen 1.000 <br />
-            XP Coins
-          </div>
-        </div>
-        <div class="tile">
-          <div id="lbl_tower_discount_amount" class="label-amount">0X</div>
-          <h3>10 x 50% Rabatt auf Türme</h3>
-          <p>
-            Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Türmen. Spare
-            Coins beim Platzieren von Türmen im Spiel.
-          </p>
-          <br />
-          <div
-            class="button-buy"
-            id="btn_tower_discount"
-            data-skill_price="3000"
-          >
-            Kaufen 3.000 <br />
-            XP-Coins
-          </div>
-        </div>
-        <div class="tile">
-          <div id="lbl_trap_discount_amount" class="label-amount">0X</div>
-          <h3>10 x 50% Rabatt auf Fallen</h3>
-          <p>
-            Erhalte 10 Mal einen Rabatt von 50% auf den Kauf von Fallen. Spare
-            Coins beim Platzieren von Fallen im Spiel.
-          </p>
-          <br />
-          <div
-            class="button-buy"
-            id="btn_trap_discount"
-            data-skill_price="1000"
-          >
-            Kaufen 1.000 <br />
-            XP-Coins
-          </div>
-        </div>
-        <div class="tile" id="tile_live_upgr">
-          <h3>Leben Generierer</h3>
-          <p>Generiert alle 20 Kills leben</p>
-          <div
-            class="button-buy"
-            id="btn_life_upgrade"
-            data-skill_price="15000"
-          >
-            Kaufen 15.000 <br />
-            XP Coins
-          </div>
-        </div>
-        <div class="tile hidden">
-          <div id="lbl_extra_coins_amount" class="label-amount">0X</div>
-          <h3>Zusätzliche Coins durch Kills</h3>
-          <p>Erhalte zusätzliche Coins für jeden getöteten Gegner</p>
-          <div class="button-buy" id="btn_extra_coins" data-skill_price="20000">
-            Kaufen 20.000 XP Coins
-          </div>
-        </div>
-        <div class="tile hidden">
-          <h3>Raketen Tower freischalten</h3>
-          <p>Schaltet den Raketen Tower im Baumenü frei</p>
-          <div
-            class="button-buy"
-            id="btn_unlock_rocket_tower"
-            data-skill_price="20000"
-          >
-            Kaufen 20.000 XP Coins
-          </div>
-        </div>
+  <div id="mdl_towers" class="modal modal-towers">
+    <div class="close-button" id="btn_close_modal_towers">x</div>
+    <h2>Baumenü</h2>
+    <div id="lbl_buymenu_tower_discount_amount"></div>
+    <p id="checkbox_field_tower">
+      <label for="check_tower_discount">Nutze Tower Rabatt</label>
+      <input type="checkbox" id="check_tower_discount" />
+    </p>
+    <div class="info_wrapper">
+      <div class="info" id="lbl_current_money">100 €</div>
+      <div class="info">
+        <span id="lbl_current_energy">75</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow" class="bi bi-lightning-charge-fill"
+          viewBox="0 0 16 16">
+          <path
+            d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
+        </svg>
       </div>
     </div>
 
-    <div id="mdl_towers" class="modal modal-towers">
-      <div class="close-button" id="btn_close_modal_towers">x</div>
-      <h2>Baumenü</h2>
-      <div id="lbl_buymenu_tower_discount_amount"></div>
-      <p id="checkbox_field_tower">
-        <label for="check_tower_discount">Nutze Tower Rabatt</label>
-        <input type="checkbox" id="check_tower_discount" />
-      </p>
-      <div class="info_wrapper">
-        <div class="info" id="lbl_current_money">100 €</div>
-        <div class="info">
-          <span id="lbl_current_energy">75</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            fill="yellow"
-            class="bi bi-lightning-charge-fill"
-            viewBox="0 0 16 16"
-          >
+    <div class="grid-wrapper">
+      <div class="tile" id="btn_energy" data-tower_price="70" data-tower_img="src/assets/energy.png">
+        <img src="src/assets/energy.png" />
+        <h4>
+          Kraftwerk
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow"
+            class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
             <path
-              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-            />
+              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
           </svg>
-        </div>
-      </div>
-
-      <div class="grid-wrapper">
-        <div
-          class="tile"
-          id="btn_energy"
-          data-tower_price="70"
-          data-tower_img="src/assets/energy.png"
-        >
-          <img src="src/assets/energy.png" />
-          <h4>
-            Kraftwerk
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="yellow"
-              class="bi bi-lightning-charge-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-              />
-            </svg>
-          </h4>
-          <p>Erzeugt Strom, um Türme mit Energie zu versorgen</p>
-          <p>
-            Erzeugt 100
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="yellow"
-              class="bi bi-lightning-charge-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-              />
-            </svg>
-          </p>
-          <div class="button-buy" id="buy_btn_powerplant">Kaufen 70€</div>
-        </div>
-        <div
-          class="tile"
-          data-tower_price="50"
-          data-tower_img="src/assets/tower_1.2.png"
-          id="btn_Destroyer"
-        >
-          <img src="src/assets/tower_1.2.png" />
-          <h4>Destroyer</h4>
-          <p>Ein einfacher Turm mit mittlerer Reichweite und Schaden</p>
-          <p class="lbl-needed-energy" data-needed_energy="25">
-            Benötigt 25
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="yellow"
-              class="bi bi-lightning-charge-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-              />
-            </svg>
-          </p>
-          <div class="button-buy" id="buy_btn_destroyer">Kaufen 50€</div>
-        </div>
-        <div
-          class="tile"
-          id="btn_Slower"
-          data-tower_price="100"
-          data-tower_img="src/assets/tower_2.2.png"
-        >
-          <img src="src/assets/tower_2.2.png" />
-          <h4>Slower</h4>
-          <p>
-            Ein Turm, der die Geschwindigkeit der Gegner reduziert, sodass sie
-            langsamer vorankommen
-          </p>
-          <p class="lbl-needed-energy" data-needed_energy="75">
-            Benötigt 75
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="yellow"
-              class="bi bi-lightning-charge-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-              />
-            </svg>
-          </p>
-          <div class="button-buy" id="buy_btn_slower">Kaufen 100€</div>
-        </div>
-        <div
-          class="tile"
-          id="btn_Toxic"
-          data-tower_price="300"
-          data-tower_img="src/assets/tower_3.2.png"
-        >
-          <img src="src/assets/tower_3.2.png" />
-          <h4>Toxic</h4>
-          <p>
-            Ein Turm, der die Gegner vergiftet, diese nehmen im Verlauf Schaden
-          </p>
-          <p class="lbl-needed-energy" data-needed_energy="75">
-            Benötigt 75
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="yellow"
-              class="bi bi-lightning-charge-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-              />
-            </svg>
-          </p>
-          <div class="button-buy" id="buy_btn_toxic">Kaufen 300€</div>
-        </div>
-        <div
-          class="tile"
-          id="btn_Anti_Air"
-          data-tower_price="100"
-          data-tower_img="src/assets/anti_air.png"
-        >
-          <img src="src/assets/anti_air.png" />
-          <h4>Anti Air</h4>
-          <p>Ein Turm, der fliegende Gegner angreift</p>
-          <p>( Deckt unsichtbare Gegner auf )</p>
-          <p class="lbl-needed-energy" data-needed_energy="25">
-            Benötigt 25
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              fill="yellow"
-              class="bi bi-lightning-charge-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-              />
-            </svg>
-          </p>
-          <div class="button-buy" id="buy_btn_antiair">Kaufen 100€</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="mdl_traps" class="modal modal-towers">
-      <div class="close-button" id="btn_close_modal_traps">x</div>
-      <h2>Fallen</h2>
-      <div id="lbl_mine_discount_amount"></div>
-      <p id="checkbox_field_trap">
-        <label for="check_trap_discount">Nutze Fallen Rabatt</label>
-        <input type="checkbox" id="check_trap_discount" />
-      </p>
-      <div id="lbl_available_mines">5/5 Minen verfügbar</div>
-
-      <div class="grid-wrapper">
-        <div
-          class="tile"
-          id="btn_mine"
-          data-tower_price="70"
-          data-tower_img="src/assets/mine/mine.png"
-        >
-          <img src="src/assets/mine/mine.png" />
-          <h4>Mine</h4>
-          <p>
-            Eine Mine, die bei Kontakt mit einem Gegner auf dem Boden explodiert
-            und schweren Schaden verursacht.
-          </p>
-          <div class="button-buy" id="btn_ground_mine">Kaufen 70€</div>
-        </div>
-        <div
-          class="tile"
-          id="btn_air_mine"
-          data-tower_price="70"
-          data-tower_img="src/assets/mine/air_mine.png"
-        >
-          <img src="src/assets/mine/air_mine.png" />
-          <h4>Air Mine</h4>
-          <p>
-            Eine Mine, die bei Kontakt mit einem Gegner in der Luft explodiert
-            und schweren Schaden verursacht.
-          </p>
-          <div class="button-buy" id="trigger_btn_air_mine">Kaufen 70€</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="mdl_upgrade" class="modal modal-upgrade">
-      <div class="close-button" id="btn_close_modal_upgrade">x</div>
-      <h2 class="modal-title">Upgrademenü</h2>
-      <img class="tower-modal-img" id="tower_img" src="" />
-
-      <div class="tower-stats" id="tower_stats">
-        <p id="tower_type">Typ:</p>
-        <p id="tower_damage_lvl">Schaden:</p>
-        <p id="tower_range">Reichweite:</p>
-      </div>
-
-      <div class="info_wrapper">
-        <div class="info" id="lbl_upgr_current_money">100 €</div>
-        <div class="info">
-          <span id="lbl_upgr_current_energy">75</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            fill="yellow"
-            class="bi bi-lightning-charge-fill"
-            viewBox="0 0 16 16"
-          >
+        </h4>
+        <p>Erzeugt Strom, um Türme mit Energie zu versorgen</p>
+        <p>
+          Erzeugt 100
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow"
+            class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
             <path
-              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
-            />
+              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
           </svg>
-        </div>
+        </p>
+        <div class="button-buy" id="buy_btn_powerplant">Kaufen 70€</div>
       </div>
+      <div class="tile" data-tower_price="50" data-tower_img="src/assets/tower_1.2.png" id="btn_Destroyer">
+        <img src="src/assets/tower_1.2.png" />
+        <h4>Destroyer</h4>
+        <p>Ein einfacher Turm mit mittlerer Reichweite und Schaden</p>
+        <p class="lbl-needed-energy" data-needed_energy="25">
+          Benötigt 25
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow"
+            class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+            <path
+              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
+          </svg>
+        </p>
+        <div class="button-buy" id="buy_btn_destroyer">Kaufen 50€</div>
+      </div>
+      <div class="tile" id="btn_Slower" data-tower_price="100" data-tower_img="src/assets/tower_2.2.png">
+        <img src="src/assets/tower_2.2.png" />
+        <h4>Slower</h4>
+        <p>
+          Ein Turm, der die Geschwindigkeit der Gegner reduziert, sodass sie
+          langsamer vorankommen
+        </p>
+        <p class="lbl-needed-energy" data-needed_energy="75">
+          Benötigt 75
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow"
+            class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+            <path
+              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
+          </svg>
+        </p>
+        <div class="button-buy" id="buy_btn_slower">Kaufen 100€</div>
+      </div>
+      <div class="tile" id="btn_Toxic" data-tower_price="300" data-tower_img="src/assets/tower_3.2.png">
+        <img src="src/assets/tower_3.2.png" />
+        <h4>Toxic</h4>
+        <p>
+          Ein Turm, der die Gegner vergiftet, diese nehmen im Verlauf Schaden
+        </p>
+        <p class="lbl-needed-energy" data-needed_energy="75">
+          Benötigt 75
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow"
+            class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+            <path
+              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
+          </svg>
+        </p>
+        <div class="button-buy" id="buy_btn_toxic">Kaufen 300€</div>
+      </div>
+      <div class="tile" id="btn_Anti_Air" data-tower_price="100" data-tower_img="src/assets/anti_air.png">
+        <img src="src/assets/anti_air.png" />
+        <h4>Anti Air</h4>
+        <p>Ein Turm, der fliegende Gegner angreift</p>
+        <p>( Deckt unsichtbare Gegner auf )</p>
+        <p class="lbl-needed-energy" data-needed_energy="25">
+          Benötigt 25
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow"
+            class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+            <path
+              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
+          </svg>
+        </p>
+        <div class="button-buy" id="buy_btn_antiair">Kaufen 100€</div>
+      </div>
+    </div>
+  </div>
 
-      <div class="grid-wrapper">
-        <div class="tile" id="tile_upgrade_range">
-          <h4>Reichweite erhöhen</h4>
-          <p>
-            Erhöht die Reichweite des Turms, sodass er weiter entfernte Gegner
-            angreifen kann
-          </p>
-          <div
-            class="button-buy"
-            id="btn_bigger_range"
-            data-upgrade_price="300"
-          >
-            Kaufen 300€
-          </div>
-        </div>
-        <div class="tile" id="tile_upgrade_stronger">
-          <h4 id="tile_upgrade_stronger_title">Stärke Upgrade</h4>
-          <p
-            id="lbl_needed_energy"
-            class="lbl-needed-energy"
-            data-needed_energy="25"
-          ></p>
-          <p id="tile_upgrade_stronger_descr">Erhöht die Stärke des Turms</p>
-          <div class="button-buy" data-tower_price="300" id="btn_Stronger">
-            Kaufen 300€
-          </div>
-        </div>
-        <div class="tile hidden" id="tile_upgrade_liveGenerator">
-          <h4 id="tile_upgrade_live_title">Leben generieren</h4>
-          <p id="tile_upgrade_live_descr">Generiert alle 20 Kills 1 Leben</p>
-          <div class="button-buy" data-tower_price="700" id="btn_livegen">
-            Kaufen 700€
-          </div>
-        </div>
-        <div class="tile">
-          <h4>Gebäude verkaufen</h4>
-          <p>
-            Verkauft das ausgewählte Gebäude und erstattet einen Teil der
-            ursprünglichen Kosten
-          </p>
-          <div class="button-sell" id="btn_SellTower">Verkaufen +30 €</div>
-        </div>
+  <div id="mdl_traps" class="modal modal-towers">
+    <div class="close-button" id="btn_close_modal_traps">x</div>
+    <h2>Fallen</h2>
+    <div id="lbl_mine_discount_amount"></div>
+    <p id="checkbox_field_trap">
+      <label for="check_trap_discount">Nutze Fallen Rabatt</label>
+      <input type="checkbox" id="check_trap_discount" />
+    </p>
+    <div id="lbl_available_mines"></div>
+
+    <div class="grid-wrapper">
+      <div class="tile" id="btn_mine" data-tower_price="70" data-tower_img="src/assets/mine/mine.png">
+        <img src="src/assets/mine/mine.png" />
+        <h4>Mine</h4>
+        <p>
+          Eine Mine, die bei Kontakt mit einem Gegner auf dem Boden explodiert
+          und schweren Schaden verursacht.
+        </p>
+        <div class="button-buy" id="btn_ground_mine">Kaufen 70€</div>
+      </div>
+      <div class="tile" id="btn_air_mine" data-tower_price="70" data-tower_img="src/assets/mine/air_mine.png">
+        <img src="src/assets/mine/air_mine.png" />
+        <h4>Air Mine</h4>
+        <p>
+          Eine Mine, die bei Kontakt mit einem Gegner in der Luft explodiert
+          und schweren Schaden verursacht.
+        </p>
+        <div class="button-buy" id="trigger_btn_air_mine">Kaufen 70€</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mdl_upgrade" class="modal modal-upgrade">
+    <div class="close-button" id="btn_close_modal_upgrade">x</div>
+    <h2 class="modal-title">Upgrademenü</h2>
+    <img class="tower-modal-img" id="tower_img" src="" />
+
+    <div class="tower-stats" id="tower_stats">
+      <p id="tower_type">Typ:</p>
+      <p id="tower_damage_lvl">Schaden:</p>
+      <p id="tower_range">Reichweite:</p>
+    </div>
+
+    <div class="info_wrapper">
+      <div class="info" id="lbl_upgr_current_money">100 €</div>
+      <div class="info">
+        <span id="lbl_upgr_current_energy">75</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="yellow" class="bi bi-lightning-charge-fill"
+          viewBox="0 0 16 16">
+          <path
+            d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
+        </svg>
       </div>
     </div>
 
-    <div id="btn_show_tower_range" class="button-tower-range">Tower Range</div>
-    <div class="button button2" id="btn_pause">Pause</div>
-    <div class="button button2" id="btn_save_game">Spiel speichern</div>
-    <div class="button button2" id="btn_goto_menu">Zum Hauptmenü</div>
+    <div class="grid-wrapper">
+      <div class="tile" id="tile_upgrade_range">
+        <h4>Reichweite erhöhen</h4>
+        <p>
+          Erhöht die Reichweite des Turms, sodass er weiter entfernte Gegner
+          angreifen kann
+        </p>
+        <div class="button-buy" id="btn_bigger_range" data-upgrade_price="300">
+          Kaufen 300€
+        </div>
+      </div>
+      <div class="tile" id="tile_upgrade_stronger">
+        <h4 id="tile_upgrade_stronger_title">Stärke Upgrade</h4>
+        <p id="lbl_needed_energy" class="lbl-needed-energy" data-needed_energy="25"></p>
+        <p id="tile_upgrade_stronger_descr">Erhöht die Stärke des Turms</p>
+        <div class="button-buy" data-tower_price="300" id="btn_Stronger">
+          Kaufen 300€
+        </div>
+      </div>
+      <div class="tile hidden" id="tile_upgrade_liveGenerator">
+        <h4 id="tile_upgrade_live_title">Leben generieren</h4>
+        <p id="tile_upgrade_live_descr">Generiert alle 20 Kills 1 Leben</p>
+        <div class="button-buy" data-tower_price="700" id="btn_livegen">
+          Kaufen 700€
+        </div>
+      </div>
+      <div class="tile">
+        <h4>Gebäude verkaufen</h4>
+        <p>
+          Verkauft das ausgewählte Gebäude und erstattet einen Teil der
+          ursprünglichen Kosten
+        </p>
+        <div class="button-sell" id="btn_SellTower">Verkaufen +30 €</div>
+      </div>
+    </div>
+  </div>
 
-    <script type="module" src="src/js/script.js"></script>
-  </body>
+  <div id="btn_show_tower_range" class="button-tower-range">Tower Range</div>
+  <div class="button button2" id="btn_pause">Pause</div>
+  <div class="button button2" id="btn_save_game">Spiel speichern</div>
+  <div class="button button2" id="btn_goto_menu">Zum Hauptmenü</div>
+
+  <script type="module" src="src/js/script.js"></script>
+</body>
+
 </html>
