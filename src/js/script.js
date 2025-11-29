@@ -493,7 +493,7 @@ const creep_properties = [
     extra_health: 50,
     scale: 0,
     resistent: ["toxic", "slower", "anti_air", "air_mine"],
-    extra_money_amount: 0,
+    extra_money_amount: 1,
   },
   {
     name: "Ground, boss",
