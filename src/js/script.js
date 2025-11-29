@@ -480,7 +480,7 @@ const creep_properties = [
   {
     name: "Ground, fast",
     src: "src/assets/creeps/creep_3",
-    extra_velocity: 1,
+    extra_velocity: 1.2,
     extra_health: -80,
     scale: 0,
     resistent: ["anti_air", "air_mine"],
@@ -489,7 +489,7 @@ const creep_properties = [
   {
     name: "Ground, slow",
     src: "src/assets/creeps/creep_4",
-    extra_velocity: -0.7,
+    extra_velocity: -0.8,
     extra_health: 50,
     scale: 0,
     resistent: ["toxic", "slower", "anti_air", "air_mine"],
