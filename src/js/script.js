@@ -759,9 +759,9 @@ function drawTowerPlaces() {
         ctx.lineWidth = 2;
         ctx.strokeRect(tower.x + 28, tower.y + 5, 1, 1);
 
-        ctx.font = "12px Arial";
-        ctx.fillStyle = `rgba(0, 0, 0, 1)`;
-        ctx.fillText(tower.kill_counter, tower.x + 30, tower.y + 20);
+        ctx.font = "10px Arial";
+        ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+        ctx.fillText(tower.kill_counter, tower.x + 15, tower.y + 30);
       }
 
       if (save_obj.energy_level < 0) {
