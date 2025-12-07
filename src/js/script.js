@@ -333,10 +333,11 @@ function saveGameToLocalStorage() {
   )
     .toString()
     .padStart(2, "0")}.${now.getFullYear()} - ${now
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${save_obj.wave
-    }/${save_obj.active_game_target_wave})`;
+    .getHours()
+    .toString()
+    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${
+    save_obj.wave
+  }/${save_obj.active_game_target_wave})`;
   save_obj.save_date = formattedDate;
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
@@ -669,7 +670,7 @@ function spawnEnemy() {
     const health =
       Math.floor(
         Math.random() *
-        (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)
+          (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)
       ) +
       save_obj.enemy_max_health / 2 +
       creep_properties[creep_index].extra_health;
@@ -752,6 +753,17 @@ function drawTowerPlaces() {
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 18, tower.y + 33, 10, 3);
 
+      //* Zeichne Rahmen für live generator upgrade
+      if (tower.live_gen == 1) {
+        ctx.strokeStyle = "lightgreen";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(tower.x + 28, tower.y + 5, 1, 1);
+
+        ctx.font = "12px Arial";
+        ctx.fillStyle = `rgba(0, 0, 0, 1)`;
+        ctx.fillText(tower.kill_counter, tower.x + 30, tower.y + 20);
+      }
+
       if (save_obj.energy_level < 0) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(tower.x + 5, tower.y, 30, 30);
@@ -827,13 +839,13 @@ function drawTowerPlaces() {
 function checkCollision(colliding_object_A, colliding_object_B) {
   return (
     colliding_object_A.pos_x <
-    colliding_object_B.pos_x + colliding_object_B.width &&
+      colliding_object_B.pos_x + colliding_object_B.width &&
     colliding_object_A.pos_x + colliding_object_A.width >
-    colliding_object_B.pos_x &&
+      colliding_object_B.pos_x &&
     colliding_object_A.pos_y <
-    colliding_object_B.pos_y + colliding_object_B.height &&
+      colliding_object_B.pos_y + colliding_object_B.height &&
     colliding_object_A.pos_y + colliding_object_A.height >
-    colliding_object_B.pos_y
+      colliding_object_B.pos_y
   );
 }
 
@@ -1367,13 +1379,16 @@ function updateWaveTimer() {
   }
 
   waveTimer--;
-  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${creep_properties[next_round_creep_index].name
-    }`;
+  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${
+    creep_properties[next_round_creep_index].name
+  }`;
   if (save_obj.wave === save_obj.active_game_target_wave) {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
   if (waveTimer <= 0) {
-    save_obj.wave > parseInt(save_obj.active_game_target_wave / 2) ? max_mine_amount_per_wave = 5 : 3;
+    save_obj.wave > parseInt(save_obj.active_game_target_wave / 2)
+      ? (max_mine_amount_per_wave = 5)
+      : 3;
     current_mine_amount_per_wave = max_mine_amount_per_wave;
     lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
     lbl_available_mines.classList.remove("empty");
