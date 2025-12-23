@@ -42,7 +42,10 @@ function heuristic(a, b) {
 
 export function findPath(startPx, endPx, gridObj) {
   const { grid, cols, rows, cell } = gridObj;
-  const start = { c: Math.floor(startPx.x / cell), r: Math.floor(startPx.y / cell) };
+  const start = {
+    c: Math.floor(startPx.x / cell),
+    r: Math.floor(startPx.y / cell),
+  };
   const end = { c: Math.floor(endPx.x / cell), r: Math.floor(endPx.y / cell) };
 
   // clamp
@@ -52,26 +55,40 @@ export function findPath(startPx, endPx, gridObj) {
   end.r = Math.max(0, Math.min(rows - 1, end.r));
 
   const openSet = [];
-  const cameFrom = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
-  const gScore = new Array(rows).fill(null).map(() => new Array(cols).fill(Infinity));
-  const fScore = new Array(rows).fill(null).map(() => new Array(cols).fill(Infinity));
+  const cameFrom = new Array(rows)
+    .fill(null)
+    .map(() => new Array(cols).fill(null));
+  const gScore = new Array(rows)
+    .fill(null)
+    .map(() => new Array(cols).fill(Infinity));
+  const fScore = new Array(rows)
+    .fill(null)
+    .map(() => new Array(cols).fill(Infinity));
 
   gScore[start.r][start.c] = 0;
   fScore[start.r][start.c] = heuristic(start, end);
   openSet.push({ r: start.r, c: start.c, f: fScore[start.r][start.c] });
 
-  const neighbors = [ [0,1],[1,0],[0,-1],[-1,0] ]; // 4-dir
+  const neighbors = [
+    [0, 1],
+    [1, 0],
+    [0, -1],
+    [-1, 0],
+  ]; // 4-dir
 
   while (openSet.length > 0) {
     // get lowest f
-    openSet.sort((a,b)=>a.f-b.f);
+    openSet.sort((a, b) => a.f - b.f);
     const current = openSet.shift();
     if (current.r === end.r && current.c === end.c) {
       // reconstruct path
       const path = [];
       let cur = current;
       while (cur) {
-        path.push({ x: cur.c * cell + Math.floor(cell/2), y: cur.r * cell + Math.floor(cell/2) });
+        path.push({
+          x: cur.c * cell + Math.floor(cell / 2),
+          y: cur.r * cell + Math.floor(cell / 2),
+        });
         cur = cameFrom[cur.r][cur.c];
       }
       path.reverse();
@@ -87,8 +104,8 @@ export function findPath(startPx, endPx, gridObj) {
       if (tentative_g < gScore[nr][nc]) {
         cameFrom[nr][nc] = current;
         gScore[nr][nc] = tentative_g;
-        fScore[nr][nc] = tentative_g + heuristic({r:nr,c:nc}, end);
-        if (!openSet.some(n => n.r===nr && n.c===nc)) {
+        fScore[nr][nc] = tentative_g + heuristic({ r: nr, c: nc }, end);
+        if (!openSet.some((n) => n.r === nr && n.c === nc)) {
           openSet.push({ r: nr, c: nc, f: fScore[nr][nc] });
         }
       }

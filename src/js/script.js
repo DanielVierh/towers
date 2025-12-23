@@ -709,8 +709,10 @@ function spawnEnemy() {
         height,
         imgFolder,
         scale,
-        (save_obj.free_build && pathGrid)
-          ? (findPath({ x: posX, y: posY }, free_spawn_end, pathGrid) || [free_spawn_end])
+        save_obj.free_build && pathGrid
+          ? findPath({ x: posX, y: posY }, free_spawn_end, pathGrid) || [
+              free_spawn_end,
+            ]
           : save_obj.waypoints,
         health,
         velocity,
@@ -1001,7 +1003,13 @@ function gameLoop() {
     if (free_spawn_start) {
       ctx.fillStyle = "rgba(0,0,255,0.9)";
       ctx.beginPath();
-      ctx.arc(free_spawn_start.x + 10, free_spawn_start.y + 10, 6, 0, Math.PI * 2);
+      ctx.arc(
+        free_spawn_start.x + 10,
+        free_spawn_start.y + 10,
+        6,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
     }
     if (free_spawn_end) {
@@ -1296,18 +1304,26 @@ function gameLoop() {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
                   // Mine entfernen
-                      tower.tower_is_build = false;
-                      tower.tower_type = "";
-                      tower.tower_img = "";
-                      if (save_obj.free_build && pathGrid) {
-                        buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
-                        enemies.forEach((enemy) => {
-                          try {
-                            const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
-                            if (newPath) enemy.setPath(newPath);
-                          } catch (e) {}
-                        });
-                      }
+                  tower.tower_is_build = false;
+                  tower.tower_type = "";
+                  tower.tower_img = "";
+                  if (save_obj.free_build && pathGrid) {
+                    buildObstaclesFromTowers(
+                      save_obj.tower_places,
+                      pathGrid,
+                      freeBuildPadding
+                    );
+                    enemies.forEach((enemy) => {
+                      try {
+                        const newPath = findPath(
+                          { x: enemy.pos_x, y: enemy.pos_y },
+                          free_spawn_end,
+                          pathGrid
+                        );
+                        if (newPath) enemy.setPath(newPath);
+                      } catch (e) {}
+                    });
+                  }
                 }, 50);
               }, 10);
             }
@@ -1330,10 +1346,18 @@ function gameLoop() {
                   tower.tower_type = "";
                   tower.tower_img = "";
                   if (save_obj.free_build && pathGrid) {
-                    buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+                    buildObstaclesFromTowers(
+                      save_obj.tower_places,
+                      pathGrid,
+                      freeBuildPadding
+                    );
                     enemies.forEach((enemy) => {
                       try {
-                        const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+                        const newPath = findPath(
+                          { x: enemy.pos_x, y: enemy.pos_y },
+                          free_spawn_end,
+                          pathGrid
+                        );
                         if (newPath) enemy.setPath(newPath);
                       } catch (e) {}
                     });
@@ -1704,7 +1728,7 @@ canvas.addEventListener("click", (event) => {
   });
 
   // If in free-build mode and no existing place was clicked, create a new place
-  if (! _found_place && save_obj.free_build) {
+  if (!_found_place && save_obj.free_build) {
     const newPlace = {
       x: Math.max(0, Math.min(canvas.width - 30, Math.floor(x) - 15)),
       y: Math.max(0, Math.min(canvas.height - 30, Math.floor(y) - 15)),
@@ -1975,10 +1999,18 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     }
     // If in free-build mode, update pathfinding obstacles and recalc paths
     if (save_obj.free_build && pathGrid) {
-      buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+      buildObstaclesFromTowers(
+        save_obj.tower_places,
+        pathGrid,
+        freeBuildPadding
+      );
       enemies.forEach((enemy) => {
         try {
-          const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+          const newPath = findPath(
+            { x: enemy.pos_x, y: enemy.pos_y },
+            free_spawn_end,
+            pathGrid
+          );
           if (newPath) enemy.setPath(newPath);
         } catch (e) {
           // ignore
@@ -2113,10 +2145,18 @@ btn_SellTower.addEventListener("click", () => {
       mdl_upgrade.style.display = "none";
       play_pause();
       if (save_obj.free_build && pathGrid) {
-        buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+        buildObstaclesFromTowers(
+          save_obj.tower_places,
+          pathGrid,
+          freeBuildPadding
+        );
         enemies.forEach((enemy) => {
           try {
-            const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+            const newPath = findPath(
+              { x: enemy.pos_x, y: enemy.pos_y },
+              free_spawn_end,
+              pathGrid
+            );
             if (newPath) enemy.setPath(newPath);
           } catch (e) {}
         });
