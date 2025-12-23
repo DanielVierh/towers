@@ -1580,7 +1580,14 @@ function updateWaveTimer() {
     if (save_obj.wave >= 10) {
       save_obj.enemy_max_health += 25;
     } else {
-      save_obj.max_enemy_amount += save_obj.wave;
+      const baseInc = save_obj.wave;
+      if (save_obj.free_build && save_obj.free_build_enemy_multiplier) {
+        save_obj.max_enemy_amount += Math.ceil(
+          baseInc * save_obj.free_build_enemy_multiplier
+        );
+      } else {
+        save_obj.max_enemy_amount += baseInc;
+      }
       save_obj.enemy_max_health += 20;
     }
     save_obj.money += Math.floor(save_obj.wave * 2);
@@ -2395,6 +2402,10 @@ function initialize_game(level_details) {
     save_obj.spawn_start = free_spawn_start;
     save_obj.spawn_end = free_spawn_end;
     buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+    // FreeBuild-specific settings
+    save_obj.free_build_enemy_multiplier = 1.2;
+    // set larger wave target for free build (override random)
+    save_obj.active_game_target_wave = 70;
   } else {
     save_obj.free_build = false;
   }
@@ -2402,6 +2413,11 @@ function initialize_game(level_details) {
   save_obj.wave = 0;
   //* Set the maximum enemy amount
   save_obj.max_enemy_amount = 2;
+  if (save_obj.free_build && save_obj.free_build_enemy_multiplier) {
+    save_obj.max_enemy_amount = Math.ceil(
+      save_obj.max_enemy_amount * save_obj.free_build_enemy_multiplier
+    );
+  }
   //* Set the maximum enemy velocity
   save_obj.enemy_max_velocity = 1.5;
   //* Set the global waypoint color
