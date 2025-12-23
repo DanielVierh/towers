@@ -11,6 +11,12 @@ import {
   return_Item_Amount_and_existence,
 } from "./functions/xp_Items.js";
 import { getRandomMinMax } from "./functions/helper_functions.js";
+import {
+  createGrid,
+  buildObstaclesFromTowers,
+  findPath,
+  cellSize,
+} from "./functions/pathfinding.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -57,6 +63,7 @@ const level_2 = document.getElementById("level_2");
 const level_3 = document.getElementById("level_3");
 const level_4 = document.getElementById("level_4");
 const level_5 = document.getElementById("level_5");
+const level_6 = document.getElementById("level_6");
 const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
@@ -93,6 +100,13 @@ let show_tower_range = false;
 let game_is_running = false;
 let waypoint_color = "rgba(241, 207, 113, 0.9)";
 let energy_animation_counter = 0;
+
+// Free-build pathfinding grid and spawn points
+let pathGrid = null;
+let free_spawn_start = null;
+let free_spawn_end = null;
+let show_path_debug = true; // drücken: P um zu toggeln
+let freeBuildPadding = 12; // pixels padding around towers when blocking cells
 
 let max_mine_amount_per_wave = 3;
 let current_mine_amount_per_wave = 3;
@@ -607,6 +621,11 @@ function add_special_creep(
 ) {
   for (let i = 1; i <= amount; i++) {
     setTimeout(() => {
+      let waypointsToUse = save_obj.waypoints;
+      if (save_obj.free_build && pathGrid) {
+        const path = findPath({ x: posX, y: posY }, free_spawn_end, pathGrid);
+        waypointsToUse = path || [free_spawn_end];
+      }
       enemies.push(
         new Creep(
           posX,
@@ -615,7 +634,7 @@ function add_special_creep(
           height,
           imgFolder,
           scale,
-          save_obj.waypoints,
+          waypointsToUse,
           health,
           velocity,
           resistent,
@@ -690,7 +709,9 @@ function spawnEnemy() {
         height,
         imgFolder,
         scale,
-        save_obj.waypoints,
+        (save_obj.free_build && pathGrid)
+          ? (findPath({ x: posX, y: posY }, free_spawn_end, pathGrid) || [free_spawn_end])
+          : save_obj.waypoints,
         health,
         velocity,
         resistent,
@@ -958,6 +979,65 @@ function gameLoop() {
   //* Zuerst die Waypoints zeichnen
   drawWaypoints(ctx, save_obj.waypoints, waypoint_color);
 
+  // Debug: draw pathfinding grid and current enemy paths when free build
+  if (save_obj.free_build && pathGrid && show_path_debug) {
+    const { grid, cols, rows, cell } = pathGrid;
+    ctx.save();
+    // faint grid lines
+    ctx.strokeStyle = "rgba(0,0,0,0.05)";
+    ctx.lineWidth = 1;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c] === 1) {
+          ctx.fillStyle = "rgba(220,50,50,0.22)";
+          ctx.fillRect(c * cell, r * cell, cell, cell);
+        } else {
+          ctx.strokeRect(c * cell, r * cell, cell, cell);
+        }
+      }
+    }
+
+    // draw spawn start / end
+    if (free_spawn_start) {
+      ctx.fillStyle = "rgba(0,0,255,0.9)";
+      ctx.beginPath();
+      ctx.arc(free_spawn_start.x + 10, free_spawn_start.y + 10, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (free_spawn_end) {
+      ctx.fillStyle = "rgba(255,165,0,0.95)";
+      ctx.beginPath();
+      ctx.arc(free_spawn_end.x, free_spawn_end.y, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // draw enemy planned paths as dashed lines and small waypoint dots
+    enemies.forEach((e) => {
+      if (e.waypoints && e.waypoints.length) {
+        ctx.beginPath();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = "rgba(0,200,0,0.9)";
+        ctx.lineWidth = 2;
+        ctx.moveTo(e.pos_x + e.width / 2, e.pos_y + e.height / 2);
+        e.waypoints.forEach((wp) => {
+          ctx.lineTo(wp.x, wp.y);
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // draw waypoint dots
+        e.waypoints.forEach((wp) => {
+          ctx.beginPath();
+          ctx.fillStyle = "rgba(0,200,0,0.9)";
+          ctx.arc(wp.x, wp.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.closePath();
+      }
+    });
+
+    ctx.restore();
+  }
+
   const now = performance.now();
   const deltaTime = now - lastTime;
   lastTime = now;
@@ -1216,9 +1296,18 @@ function gameLoop() {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
                   // Mine entfernen
-                  tower.tower_is_build = false;
-                  tower.tower_type = "";
-                  tower.tower_img = "";
+                      tower.tower_is_build = false;
+                      tower.tower_type = "";
+                      tower.tower_img = "";
+                      if (save_obj.free_build && pathGrid) {
+                        buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+                        enemies.forEach((enemy) => {
+                          try {
+                            const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+                            if (newPath) enemy.setPath(newPath);
+                          } catch (e) {}
+                        });
+                      }
                 }, 50);
               }, 10);
             }
@@ -1240,6 +1329,15 @@ function gameLoop() {
                   tower.tower_is_build = false;
                   tower.tower_type = "";
                   tower.tower_img = "";
+                  if (save_obj.free_build && pathGrid) {
+                    buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+                    enemies.forEach((enemy) => {
+                      try {
+                        const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+                        if (newPath) enemy.setPath(newPath);
+                      } catch (e) {}
+                    });
+                  }
                 }, 50);
               }, 10);
             }
@@ -1491,6 +1589,7 @@ canvas.addEventListener("click", (event) => {
   const x = (event.clientX - rect.left) * scaleX;
   const y = (event.clientY - rect.top) * scaleY;
 
+  let _found_place = false;
   save_obj.tower_places.forEach((place) => {
     if (
       x >= place.x &&
@@ -1498,6 +1597,7 @@ canvas.addEventListener("click", (event) => {
       y >= place.y &&
       y <= place.y + 30
     ) {
+      _found_place = true;
       tower = place;
       if (!game_is_running) {
         game_is_running = true;
@@ -1602,6 +1702,43 @@ canvas.addEventListener("click", (event) => {
       }
     }
   });
+
+  // If in free-build mode and no existing place was clicked, create a new place
+  if (! _found_place && save_obj.free_build) {
+    const newPlace = {
+      x: Math.max(0, Math.min(canvas.width - 30, Math.floor(x) - 15)),
+      y: Math.max(0, Math.min(canvas.height - 30, Math.floor(y) - 15)),
+      tower_is_build: false,
+      tower_damage_lvl: 1,
+      tower_type: "",
+      tower_img: "",
+      range: 80,
+      cooldown: 0,
+    };
+    save_obj.tower_places.push(newPlace);
+    tower = newPlace;
+    // open build modal for new place
+    if (!game_is_running) {
+      game_is_running = true;
+    }
+    play_pause();
+    mdl_towers.style.display = "flex";
+    const lbl_current_money = document.getElementById("lbl_current_money");
+    const lbl_current_energy = document.getElementById("lbl_current_energy");
+    lbl_current_money.innerHTML = `${save_obj.money} €`;
+    lbl_current_energy.innerHTML = `${save_obj.energy_level}`;
+    show_recuded_price_on_discount();
+    calc_energy_overdose();
+    set_class_for_overpriced_towers();
+  }
+});
+
+// Toggle debug drawing with 'P'
+window.addEventListener("keydown", (e) => {
+  if (e.key === "p" || e.key === "P") {
+    show_path_debug = !show_path_debug;
+    console.log("show_path_debug:", show_path_debug);
+  }
 });
 
 //* Toggle trap discount
@@ -1836,6 +1973,18 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     if (game_is_running === false) {
       play_pause();
     }
+    // If in free-build mode, update pathfinding obstacles and recalc paths
+    if (save_obj.free_build && pathGrid) {
+      buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+      enemies.forEach((enemy) => {
+        try {
+          const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+          if (newPath) enemy.setPath(newPath);
+        } catch (e) {
+          // ignore
+        }
+      });
+    }
   } else {
     const show_not_enough_money = new GameMessage(
       "Kauf aktuell nicht möglich",
@@ -1963,6 +2112,15 @@ btn_SellTower.addEventListener("click", () => {
       tower.range = 80;
       mdl_upgrade.style.display = "none";
       play_pause();
+      if (save_obj.free_build && pathGrid) {
+        buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+        enemies.forEach((enemy) => {
+          try {
+            const newPath = findPath({ x: enemy.pos_x, y: enemy.pos_y }, free_spawn_end, pathGrid);
+            if (newPath) enemy.setPath(newPath);
+          } catch (e) {}
+        });
+      }
     } else {
       alert("Kein Turm zum Verkaufen ausgewählt!");
     }
@@ -2096,6 +2254,11 @@ level_5.addEventListener("click", () => {
   initialize_game(level_details);
 });
 
+level_6.addEventListener("click", () => {
+  const level_details = set_level("6");
+  initialize_game(level_details);
+});
+
 level_random.addEventListener("click", () => {
   const level_details = set_level("level_rnd");
   initialize_game(level_details);
@@ -2124,6 +2287,18 @@ function initialize_game(level_details) {
   save_obj.tower_places = level.tower_places;
   //* Set the waypoint color for the level
   save_obj.waypoint_color = level.waypoint_color;
+  //* Free build mode handling
+  if (level.free_build) {
+    save_obj.free_build = true;
+    // start with no predefined tower places for free build
+    save_obj.tower_places = [];
+    pathGrid = createGrid(canvas.width, canvas.height, cellSize);
+    free_spawn_start = level.spawn_start || { x: -50, y: 20 };
+    free_spawn_end = level.spawn_end || { x: 450, y: 340 };
+    buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
+  } else {
+    save_obj.free_build = false;
+  }
   //* Set the current wave to 0
   save_obj.wave = 0;
   //* Set the maximum enemy amount

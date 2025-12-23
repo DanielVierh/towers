@@ -1127,6 +1127,18 @@ const levels = [
       },
     ],
   },
+  {
+    //* ANCHOR - FreeBuild (neu)
+    name: "FreeBuild",
+    background_img_path: "src/assets/bg/bg2.webp",
+    waypoint_color: "rgba(200,200,200,0.2)",
+    free_build: true,
+    // Start / End points used by pathfinder
+    spawn_start: { x: -50, y: 20 },
+    spawn_end: { x: 450, y: 340 },
+    waypoints: [],
+    tower_places: [],
+  },
 ];
 
 export function set_level(lvl_id) {

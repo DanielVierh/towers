@@ -190,4 +190,11 @@ export class Creep {
       // );
     }
   }
+
+  setPath(path) {
+    if (!path || path.length === 0) return;
+    // Path is expected to be an array of {x,y} points in pixel coordinates
+    this.waypoints = path;
+    this.currentWaypointIndex = 0;
+  }
 }
