@@ -1123,6 +1123,20 @@ function gameLoop() {
   enemies.forEach((enemy, index) => {
     enemy.update(save_obj, moneyPopups);
 
+    // If enemy has reached the end of its waypoint path, mark for deletion and deduct life
+    if (
+      !enemy.markedForDeletion &&
+      enemy.waypoints &&
+      enemy.currentWaypointIndex >= enemy.waypoints.length
+    ) {
+      enemy.markedForDeletion = true;
+      save_obj.live--;
+      document.body.classList.add("red-flash");
+      setTimeout(() => {
+        document.body.classList.remove("red-flash");
+      }, 300);
+    }
+
     //* Markiere den Creeps zur Löschung, wenn er die Grenze überschreitet
     if (enemy.pos_x > 400) {
       enemy.markedForDeletion = true;
@@ -2279,6 +2293,21 @@ btn_load_game.addEventListener("click", () => {
   save_obj.wave -= 1;
   backgroundImage.src = save_obj.backgroundImage;
   waypoint_color = save_obj.waypoint_color;
+  // Ensure free-build grid initialized when loading a free-build save
+  if (save_obj.free_build) {
+    try {
+      pathGrid = createGrid(canvas.width, canvas.height, cellSize);
+      free_spawn_start = save_obj.spawn_start || { x: -50, y: 20 };
+      free_spawn_end = save_obj.spawn_end || { x: 450, y: 340 };
+      buildObstaclesFromTowers(
+        save_obj.tower_places || [],
+        pathGrid,
+        freeBuildPadding
+      );
+    } catch (e) {
+      console.log("Error initializing free-build on load:", e);
+    }
+  }
   game_is_running = true;
   // Start the game loop
   gameLoop();
