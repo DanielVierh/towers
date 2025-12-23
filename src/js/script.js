@@ -395,6 +395,17 @@ function loadGameFromLocalStorage() {
       console.log(error);
     }
     initializeTowerImages();
+    // If the saved game uses FreeBuild, re-initialize grid and spawn points
+    if (save_obj.free_build) {
+      try {
+        pathGrid = createGrid(canvas.width, canvas.height, cellSize);
+        free_spawn_start = save_obj.spawn_start || { x: -50, y: 20 };
+        free_spawn_end = save_obj.spawn_end || { x: 450, y: 340 };
+        buildObstaclesFromTowers(save_obj.tower_places || [], pathGrid, freeBuildPadding);
+      } catch (e) {
+        console.log("Error initializing free_build grid:", e);
+      }
+    }
   } else {
     btn_load_game.style.display = "none";
   }
@@ -626,22 +637,25 @@ function add_special_creep(
         const path = findPath({ x: posX, y: posY }, free_spawn_end, pathGrid);
         waypointsToUse = path || [free_spawn_end];
       }
-      enemies.push(
-        new Creep(
-          posX,
-          posY,
-          width,
-          height,
-          imgFolder,
-          scale,
-          waypointsToUse,
-          health,
-          velocity,
-          resistent,
-          extra_money,
-          invisible
-        )
-      );
+          // create creep and if we used a path from the pathfinder, set it explicitly
+          const creep = new Creep(
+            posX,
+            posY,
+            width,
+            height,
+            imgFolder,
+            scale,
+            save_obj.waypoints,
+            health,
+            velocity,
+            resistent,
+            extra_money,
+            invisible
+          );
+          if (save_obj.free_build && pathGrid && Array.isArray(waypointsToUse) && waypointsToUse.length) {
+            creep.setPath(waypointsToUse);
+          }
+          enemies.push(creep);
     }, i * 1200);
   }
 }
@@ -701,25 +715,29 @@ function spawnEnemy() {
     const resistent = creep_properties[creep_index].resistent;
     const extra_money = creep_properties[creep_index].extra_money_amount;
 
-    enemies.push(
-      new Creep(
-        posX,
-        posY,
-        width,
-        height,
-        imgFolder,
-        scale,
-        save_obj.free_build && pathGrid
-          ? findPath({ x: posX, y: posY }, free_spawn_end, pathGrid) || [
-              free_spawn_end,
-            ]
-          : save_obj.waypoints,
-        health,
-        velocity,
-        resistent,
-        extra_money
-      )
+    // determine path (if free_build) before creating creep
+    let initialWaypoints = save_obj.waypoints;
+    let usedPath = null;
+    if (save_obj.free_build && pathGrid) {
+      const p = findPath({ x: posX, y: posY }, free_spawn_end, pathGrid);
+      usedPath = p || [free_spawn_end];
+      initialWaypoints = save_obj.waypoints; // pass default, then set path
+    }
+    const newCreep = new Creep(
+      posX,
+      posY,
+      width,
+      height,
+      imgFolder,
+      scale,
+      initialWaypoints,
+      health,
+      velocity,
+      resistent,
+      extra_money
     );
+    if (usedPath) newCreep.setPath(usedPath);
+    enemies.push(newCreep);
     enemyCount++;
   }, 500);
 }
@@ -2335,6 +2353,9 @@ function initialize_game(level_details) {
     pathGrid = createGrid(canvas.width, canvas.height, cellSize);
     free_spawn_start = level.spawn_start || { x: -50, y: 20 };
     free_spawn_end = level.spawn_end || { x: 450, y: 340 };
+    // persist spawn positions so they are available on load
+    save_obj.spawn_start = free_spawn_start;
+    save_obj.spawn_end = free_spawn_end;
     buildObstaclesFromTowers(save_obj.tower_places, pathGrid, freeBuildPadding);
   } else {
     save_obj.free_build = false;

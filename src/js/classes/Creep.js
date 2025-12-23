@@ -42,6 +42,7 @@ export class Creep {
     this.frameTick = 0;
     this.counter = 0;
     this.invisible = invisible;
+    this.isPathfinderPath = false;
 
     // Lade alle Bilder aus dem Ordner
     for (let i = 1; i <= 17; i++) {
@@ -66,12 +67,13 @@ export class Creep {
   update(save_obj, moneyPopups) {
     if (this.currentWaypointIndex < this.waypoints.length) {
       const target = this.waypoints[this.currentWaypointIndex];
-      const dx = target.x - 20 - this.pos_x; // Korrigiere den Versatz um 20 Pixel
+      const offsetX = this.isPathfinderPath ? 0 : 20; // pathfinder nodes are already centered
+      const dx = target.x - offsetX - this.pos_x;
       const dy = target.y - this.pos_y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < this.velocity) {
-        this.pos_x = target.x - 20; // Setze die korrigierte Zielposition
+        this.pos_x = target.x - offsetX; // Setze die korrigierte Zielposition
         this.pos_y = target.y;
         this.currentWaypointIndex++;
       } else {
@@ -196,5 +198,6 @@ export class Creep {
     // Path is expected to be an array of {x,y} points in pixel coordinates
     this.waypoints = path;
     this.currentWaypointIndex = 0;
+    this.isPathfinderPath = true;
   }
 }
