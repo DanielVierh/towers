@@ -11,22 +11,69 @@ export function createGrid(width, height, cell = cellSize) {
   return { grid, cols, rows, cell };
 }
 
-export function buildObstaclesFromTowers(tower_places, gridObj, padPixels = 0) {
+export function buildObstaclesFromTowers(
+  tower_places,
+  gridObj,
+  padPixels = 0,
+  leftReduceCells = 0
+) {
   const { grid, cols, rows, cell } = gridObj;
   // reset
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) grid[r][c] = 0;
-  const padCells = Math.ceil(padPixels / cell);
+
+  const leftReducePixels = Math.max(0, leftReduceCells * cell);
+
   tower_places.forEach((tower) => {
     if (!tower.tower_is_build) return;
-    // padded rectangle
-    const startX = tower.x - padPixels;
-    const startY = tower.y - padPixels;
-    const endX = tower.x + 30 + padPixels;
-    const endY = tower.y + 30 + padPixels;
+
+    // If tower type requires specific block size (in cells), use that
+    const typeBlocks = {
+      destroyer: { w: 2, h: 2 },
+      anti_air: { w: 2, h: 2 },
+      slower: { w: 2, h: 2 },
+      toxic: { w: 2, h: 2 },
+      energy: { w: 2, h: 2 },
+      mine: { w: 1, h: 1 },
+      air_mine: { w: 1, h: 1 },
+    };
+
+    const blocks = typeBlocks[tower.tower_type];
+    let startX, startY, endX, endY;
+
+    if (blocks) {
+      // compute using integer grid cells to avoid floating-point shifts
+      const towerW = tower.width || 30;
+      const towerH = tower.height || 30;
+      const centerC = Math.round((tower.x + towerW / 2) / cell);
+      const centerR = Math.round((tower.y + towerH / 2) / cell);
+      const startC =
+        centerC - Math.floor(blocks.w / 2) + leftReducePixels / cell;
+      const startR = centerR - Math.floor(blocks.h / 2);
+      const endC = startC + blocks.w - 1;
+      const endR = startR + blocks.h - 1;
+      // convert back to pixel extents (center-based not needed below)
+      startX = startC * cell;
+      startY = startR * cell;
+      endX = (endC + 1) * cell - 1;
+      endY = (endR + 1) * cell - 1;
+    } else {
+      // fallback: use padded rectangle around tower (default behavior)
+      let padForTower = padPixels;
+      // small special-case: slightly reduce padding for destroyer if not covered above
+      if (tower.tower_type === "destroyer") {
+        padForTower = Math.max(0, padPixels - cell);
+      }
+      startX = tower.x - padForTower + leftReducePixels;
+      startY = tower.y - padForTower;
+      endX = tower.x + 30 + padForTower;
+      endY = tower.y + 30 + padForTower;
+    }
+
     const x1 = Math.floor(startX / cell);
     const y1 = Math.floor(startY / cell);
     const x2 = Math.floor(endX / cell);
     const y2 = Math.floor(endY / cell);
+
     for (let r = y1; r <= y2; r++) {
       for (let c = x1; c <= x2; c++) {
         if (r >= 0 && r < rows && c >= 0 && c < cols) grid[r][c] = 1;
