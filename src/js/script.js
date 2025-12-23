@@ -1590,7 +1590,14 @@ function updateWaveTimer() {
       }
       save_obj.enemy_max_health += 20;
     }
-    save_obj.money += Math.floor(save_obj.wave * 2);
+    // base income per wave
+    let baseIncome = Math.floor(save_obj.wave * 2);
+    if (save_obj.free_build && save_obj.free_build_per_wave_bonus) {
+      baseIncome += Math.floor(
+        save_obj.wave * save_obj.free_build_per_wave_bonus
+      );
+    }
+    save_obj.money += baseIncome;
     console.log(save_obj);
   }
 }
@@ -2436,6 +2443,17 @@ function start_game() {
   const game_difficulty = sel_difficulty.value;
 
   set_difficulty(game_difficulty);
+
+  // FreeBuild: give extra starting money and per-wave bonus
+  if (save_obj.free_build) {
+    // give a substantial starting money buffer for creative placement
+    const extraStart = 1500;
+    save_obj.money += extraStart;
+    // store per-wave bonus factor (added to default per-wave income)
+    save_obj.free_build_per_wave_bonus = 3; // multiplies wave factor
+  } else {
+    save_obj.free_build_per_wave_bonus = 0;
+  }
 
   game_is_running = true;
 
