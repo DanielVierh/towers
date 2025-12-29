@@ -67,14 +67,17 @@ export class Creep {
   update(save_obj, moneyPopups) {
     if (this.currentWaypointIndex < this.waypoints.length) {
       const target = this.waypoints[this.currentWaypointIndex];
-      const offsetX = this.isPathfinderPath ? 0 : 20; // pathfinder nodes are already centered
+      const halfW = (this.width * this.scale) / 2;
+      const halfH = (this.height * this.scale) / 2;
+      const offsetX = this.isPathfinderPath ? halfW : 20; // pathfinder nodes are centered on cell
+      const offsetY = this.isPathfinderPath ? halfH : 0;
       const dx = target.x - offsetX - this.pos_x;
-      const dy = target.y - this.pos_y;
+      const dy = target.y - offsetY - this.pos_y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < this.velocity) {
         this.pos_x = target.x - offsetX; // Setze die korrigierte Zielposition
-        this.pos_y = target.y;
+        this.pos_y = target.y - offsetY;
         this.currentWaypointIndex++;
       } else {
         this.pos_x += (dx / distance) * this.velocity;
