@@ -1,5 +1,5 @@
 // Simple grid-based A* pathfinding
-export const cellSize = 20;
+export const cellSize = 25;
 
 export function createGrid(width, height, cell = cellSize) {
   const cols = Math.ceil(width / cell);
