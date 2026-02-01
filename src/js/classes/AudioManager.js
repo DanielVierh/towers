@@ -169,10 +169,10 @@ export class AudioManager {
     switch (key) {
       case "laser_red":
         this._beep(t0, {
-          freq: 880,
-          dur: 0.04,
-          type: "square",
-          gain: 0.12 * volume,
+          freq: 620,
+          dur: 0.06,
+          type: "triangle",
+          gain: 0.075 * volume,
         });
         break;
       case "laser_blue":
