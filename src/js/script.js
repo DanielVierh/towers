@@ -3,6 +3,7 @@ import { BloodStain } from "./classes/BloodStain.js";
 import { Laser } from "./classes/Laser.js";
 import { GameMessage } from "./classes/GameMessage.js";
 import { DeathEffect } from "./classes/DeathEffect.js";
+import { AudioManager } from "./classes/AudioManager.js";
 
 import { drawWaypoints, set_level } from "./functions/level.js";
 import {
@@ -28,14 +29,14 @@ const gameOverModal = document.getElementById("gameOverModal");
 const closeModal = document.getElementById("closeModal");
 const mdl_towers = document.getElementById("mdl_towers");
 const btn_close_modal_towers = document.getElementById(
-  "btn_close_modal_towers"
+  "btn_close_modal_towers",
 );
 const btn_Slower = document.getElementById("btn_Slower");
 const btn_Destroyer = document.getElementById("btn_Destroyer");
 const btn_Toxic = document.getElementById("btn_Toxic");
 const btn_energy = document.getElementById("btn_energy");
 const btn_close_modal_upgrade = document.getElementById(
-  "btn_close_modal_upgrade"
+  "btn_close_modal_upgrade",
 );
 const mdl_upgrade = document.getElementById("mdl_upgrade");
 const btn_show_tower_range = document.getElementById("btn_show_tower_range");
@@ -77,12 +78,67 @@ const check_trap_discount = document.getElementById("check_trap_discount");
 const check_tower_discount = document.getElementById("check_tower_discount");
 const btn_life_upgrade = document.getElementById("btn_life_upgrade");
 const tile_upgrade_liveGenerator = document.getElementById(
-  "tile_upgrade_liveGenerator"
+  "tile_upgrade_liveGenerator",
 );
 const btn_livegen = document.getElementById("btn_livegen");
 const reset_game = document.getElementById("reset_game");
 const lbl_available_mines = document.getElementById("lbl_available_mines");
 const lbl_needed_energy = document.getElementById("lbl_needed_energy");
+
+// Audio
+const audio = new AudioManager();
+audio.bindUserGestureUnlock();
+
+const btn_audio_mute = document.getElementById("btn_audio_mute");
+const audio_volume = document.getElementById("audio_volume");
+
+function syncAudioControls() {
+  if (!btn_audio_mute || !audio_volume) return;
+  audio_volume.value = String(Math.round(audio.volume * 100));
+  if (audio.muted) {
+    btn_audio_mute.textContent = "Sound: aus";
+    btn_audio_mute.classList.add("is-muted");
+  } else {
+    btn_audio_mute.textContent = "Sound: an";
+    btn_audio_mute.classList.remove("is-muted");
+  }
+}
+
+if (btn_audio_mute) {
+  btn_audio_mute.addEventListener("click", () => {
+    audio.toggleMute();
+    syncAudioControls();
+  });
+}
+
+if (audio_volume) {
+  audio_volume.addEventListener("input", () => {
+    const v = Number(audio_volume.value) / 100;
+    audio.setVolume(v);
+    if (v > 0 && audio.muted) audio.setMuted(false);
+    syncAudioControls();
+  });
+}
+
+syncAudioControls();
+
+// Generic UI click SFX (kept subtle + rate-limited)
+document.addEventListener(
+  "click",
+  (event) => {
+    const target = event.target;
+    if (!target || !target.closest) return;
+    if (target.closest("#audio_controls")) return;
+    if (
+      target.closest(
+        "button, .button, .button2, .button-buy, .button-sell, .close-button, .tile",
+      )
+    ) {
+      audio.play("ui_click");
+    }
+  },
+  { capture: true },
+);
 
 canvas.width = 400;
 canvas.height = 400;
@@ -379,7 +435,7 @@ function loadGameFromLocalStorage() {
     console.log("saveGame", save_obj);
 
     lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
-      "de-DE"
+      "de-DE",
     )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
     include_new_SaveObj_Properties();
     if (save_obj.save_date !== undefined) {
@@ -404,7 +460,7 @@ function loadGameFromLocalStorage() {
         buildObstaclesFromTowers(
           save_obj.tower_places || [],
           pathGrid,
-          freeBuildPadding
+          freeBuildPadding,
         );
       } catch (e) {
         console.log("Error initializing free_build grid:", e);
@@ -586,7 +642,7 @@ function call_special_creep() {
       resistent,
       extra_money,
       invisible,
-      amount
+      amount,
     );
   }
 
@@ -615,7 +671,7 @@ function call_special_creep() {
       resistent,
       extra_money,
       invisible,
-      amount
+      amount,
     );
   }
 }
@@ -632,7 +688,7 @@ function add_special_creep(
   resistent,
   extra_money,
   invisible,
-  amount
+  amount,
 ) {
   for (let i = 1; i <= amount; i++) {
     setTimeout(() => {
@@ -654,7 +710,7 @@ function add_special_creep(
         velocity,
         resistent,
         extra_money,
-        invisible
+        invisible,
       );
       if (
         save_obj.free_build &&
@@ -712,7 +768,7 @@ function spawnEnemy() {
     const health =
       Math.floor(
         Math.random() *
-          (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1)
+          (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1),
       ) +
       save_obj.enemy_max_health / 2 +
       creep_properties[creep_index].extra_health;
@@ -743,7 +799,7 @@ function spawnEnemy() {
       health,
       velocity,
       resistent,
-      extra_money
+      extra_money,
     );
     if (usedPath) newCreep.setPath(usedPath);
     enemies.push(newCreep);
@@ -820,7 +876,7 @@ function drawTowerPlaces() {
         const parser = new DOMParser();
         const svgDoc = parser.parseFromString(
           low_energy_symbol,
-          "image/svg+xml"
+          "image/svg+xml",
         );
         const svgElement = svgDoc.documentElement;
         const svgData = new XMLSerializer().serializeToString(svgElement);
@@ -911,7 +967,7 @@ function calculateDistance(
   width1 = 0,
   height1 = 0,
   width2 = 0,
-  height2 = 0
+  height2 = 0,
 ) {
   const centerX1 = x1 + width1 / 2;
   const centerY1 = y1 + height1 / 2;
@@ -928,6 +984,7 @@ function showGameOverModal() {
   lbl_Live.innerHTML = "0 Leben";
   //* Assign new XP and XP-Coins
   if (!save_obj.assign_XP) {
+    audio.play("game_over", { force: true });
     save_obj.XP += Math.floor(save_obj.current_XP / 2);
     const game_difficulty = sel_difficulty.value;
     let base_XP_Coins = 500;
@@ -944,7 +1001,7 @@ function showGameOverModal() {
     }
     const live_Loss_Antibonus = lostLive * 20;
     let new_XP_Coins = Math.floor(
-      (base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus) / 1.5
+      (base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus) / 1.5,
     );
 
     save_obj.XP_Coins += new_XP_Coins;
@@ -1035,7 +1092,7 @@ function gameLoop() {
         free_spawn_start.y + 10,
         6,
         0,
-        Math.PI * 2
+        Math.PI * 2,
       );
       ctx.fill();
     }
@@ -1083,7 +1140,7 @@ function gameLoop() {
 
     if (effect.finished && !effect.spawnedBlood) {
       bloodStains.push(
-        new BloodStain(effect.x, effect.y, "src/assets/blood.png", 1.5)
+        new BloodStain(effect.x, effect.y, "src/assets/blood.png", 1.5),
       );
       effect.spawnedBlood = true;
     }
@@ -1131,6 +1188,7 @@ function gameLoop() {
     ) {
       enemy.markedForDeletion = true;
       save_obj.live--;
+      audio.play("life_lost");
       document.body.classList.add("red-flash");
       setTimeout(() => {
         document.body.classList.remove("red-flash");
@@ -1141,6 +1199,7 @@ function gameLoop() {
     if (enemy.pos_x > 400) {
       enemy.markedForDeletion = true;
       save_obj.live--;
+      audio.play("life_lost");
 
       document.body.classList.add("red-flash");
       setTimeout(() => {
@@ -1159,7 +1218,7 @@ function gameLoop() {
           enemy.width,
           enemy.height,
           30,
-          30 // 30x30 ist die Towergröße
+          30, // 30x30 ist die Towergröße
         );
 
         if (distance < tower.range) {
@@ -1177,9 +1236,11 @@ function gameLoop() {
               new DeathEffect(
                 enemy.pos_x + enemy.width / 2,
                 enemy.pos_y + enemy.height / 2,
-                1.3
-              )
+                1.3,
+              ),
             );
+
+            audio.play("creep_death");
 
             // Gegner markieren, damit er verschwindet
             enemy.markedForDeletion = true;
@@ -1201,7 +1262,7 @@ function gameLoop() {
             // Live-Generation durch Tower-Kills
             if (tower.live_gen === 1) {
               tower.kill_counter += 1;
-              console.log("Tower Upgrade kill"), tower.kill_counter;
+              (console.log("Tower Upgrade kill"), tower.kill_counter);
 
               if (tower.kill_counter === 20) {
                 save_obj.live++;
@@ -1245,9 +1306,10 @@ function gameLoop() {
                   tower.y,
                   enemy.pos_x,
                   enemy.pos_y,
-                  "blue"
-                )
+                  "blue",
+                ),
               );
+              audio.play("laser_blue");
             }
 
             tower.cooldown = 20; // Setze die Abklingzeit auf 20 Frames
@@ -1276,9 +1338,10 @@ function gameLoop() {
                     tower.y,
                     enemy.pos_x,
                     enemy.pos_y,
-                    "green"
-                  )
+                    "green",
+                  ),
                 );
+                audio.play("laser_green");
               }
               tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
             }
@@ -1295,9 +1358,10 @@ function gameLoop() {
                   tower.y,
                   enemy.pos_x,
                   enemy.pos_y,
-                  "red"
-                )
+                  "red",
+                ),
               );
+              audio.play("laser_red");
             }
             //* Cool Down
             tower.cooldown =
@@ -1320,9 +1384,10 @@ function gameLoop() {
                   tower.y,
                   enemy.pos_x,
                   enemy.pos_y,
-                  "missle"
-                )
+                  "missle",
+                ),
               );
+              audio.play("missile");
             }
             //* Cool Down
             tower.cooldown = 50;
@@ -1352,14 +1417,14 @@ function gameLoop() {
                     buildObstaclesFromTowers(
                       save_obj.tower_places,
                       pathGrid,
-                      freeBuildPadding
+                      freeBuildPadding,
                     );
                     enemies.forEach((enemy) => {
                       try {
                         const newPath = findPath(
                           { x: enemy.pos_x, y: enemy.pos_y },
                           free_spawn_end,
-                          pathGrid
+                          pathGrid,
                         );
                         if (newPath) enemy.setPath(newPath);
                       } catch (e) {}
@@ -1390,14 +1455,14 @@ function gameLoop() {
                     buildObstaclesFromTowers(
                       save_obj.tower_places,
                       pathGrid,
-                      freeBuildPadding
+                      freeBuildPadding,
                     );
                     enemies.forEach((enemy) => {
                       try {
                         const newPath = findPath(
                           { x: enemy.pos_x, y: enemy.pos_y },
                           free_spawn_end,
-                          pathGrid
+                          pathGrid,
                         );
                         if (newPath) enemy.setPath(newPath);
                       } catch (e) {}
@@ -1455,7 +1520,7 @@ function gameLoop() {
         explosion.x - 40,
         explosion.y - 40,
         80,
-        80
+        80,
       );
       explosion.frame++; // Nächstes Frame
     } else {
@@ -1486,6 +1551,7 @@ function triggerExplosion(x, y) {
     y: y,
     frame: 0, // Start bei Frame 0
   });
+  audio.play("explosion");
 }
 
 // Rufe diese Funktion beim Start des Spiels auf
@@ -1583,7 +1649,7 @@ function updateWaveTimer() {
       const baseInc = save_obj.wave;
       if (save_obj.free_build && save_obj.free_build_enemy_multiplier) {
         save_obj.max_enemy_amount += Math.ceil(
-          baseInc * save_obj.free_build_enemy_multiplier
+          baseInc * save_obj.free_build_enemy_multiplier,
         );
       } else {
         save_obj.max_enemy_amount += baseInc;
@@ -1594,7 +1660,7 @@ function updateWaveTimer() {
     let baseIncome = Math.floor(save_obj.wave * 2);
     if (save_obj.free_build && save_obj.free_build_per_wave_bonus) {
       baseIncome += Math.floor(
-        save_obj.wave * save_obj.free_build_per_wave_bonus
+        save_obj.wave * save_obj.free_build_per_wave_bonus,
       );
     }
     save_obj.money += baseIncome;
@@ -1608,7 +1674,7 @@ function won_game() {
   if (save_obj.assign_XP === false) {
     if (!save_obj.assign_XP) {
       save_obj.current_XP = Math.floor(
-        save_obj.current_XP + save_obj.wave * 30
+        save_obj.current_XP + save_obj.wave * 30,
       );
       save_obj.XP += save_obj.current_XP;
 
@@ -1627,15 +1693,15 @@ function won_game() {
       }
       const live_Loss_Antibonus = lostLive * 20;
       const new_XP_Coins = Math.floor(
-        base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus
+        base_XP_Coins + save_obj.current_XP - live_Loss_Antibonus,
       );
 
       save_obj.XP_Coins += new_XP_Coins;
       if (save_obj.current_XP > 0) {
         lbl_XP.innerHTML = ` +${save_obj.current_XP.toLocaleString(
-          "de-DE"
+          "de-DE",
         )} XP (${save_obj.XP.toLocaleString(
-          "de-DE"
+          "de-DE",
         )} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
       gxuShowEndscreen(true, {
@@ -1704,15 +1770,15 @@ canvas.addEventListener("click", (event) => {
       } else {
         //* ANCHOR - Open Modal for Upgrade the tower
         const lbl_upgr_current_money = document.getElementById(
-          "lbl_upgr_current_money"
+          "lbl_upgr_current_money",
         );
         const lbl_upgr_current_energy = document.getElementById(
-          "lbl_upgr_current_energy"
+          "lbl_upgr_current_energy",
         );
         //* Show Upgrade for live gen
         const upgrade_live_gen = return_Item_Amount_and_existence(
           save_obj,
-          "live_generator"
+          "live_generator",
         );
         console.log("upgrade_live_gen", upgrade_live_gen);
 
@@ -1834,7 +1900,7 @@ function show_trap_price() {
   const btn_ground_mine = document.getElementById("btn_ground_mine");
   const mine_rabatt = return_Item_Amount_and_existence(
     save_obj,
-    "trap_rabatt_50"
+    "trap_rabatt_50",
   );
   const is_mine_discount = check_trap_discount.checked;
   const trigger_btn_air_mine = document.getElementById("trigger_btn_air_mine");
@@ -1867,7 +1933,7 @@ const buy_btn_antiair = document.getElementById("buy_btn_antiair");
 function show_recuded_price_on_discount() {
   const towerDiscount = return_Item_Amount_and_existence(
     save_obj,
-    "tower_rabatt_50"
+    "tower_rabatt_50",
   );
   const tower_discount_selected = check_tower_discount.checked;
   if (towerDiscount) {
@@ -2026,7 +2092,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
           "Keine Minen mehr vorhanden",
           "Du hast keine Minen mehr für diese Welle verfügbar",
           "error",
-          3000
+          3000,
         ).show_Message();
         return;
       } else {
@@ -2057,14 +2123,14 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       buildObstaclesFromTowers(
         save_obj.tower_places,
         pathGrid,
-        freeBuildPadding
+        freeBuildPadding,
       );
       enemies.forEach((enemy) => {
         try {
           const newPath = findPath(
             { x: enemy.pos_x, y: enemy.pos_y },
             free_spawn_end,
-            pathGrid
+            pathGrid,
           );
           if (newPath) enemy.setPath(newPath);
         } catch (e) {
@@ -2077,7 +2143,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       "Kauf aktuell nicht möglich",
       "Du hast nicht genug Geld",
       "error",
-      2000
+      2000,
     ).show_Message();
   }
 }
@@ -2096,7 +2162,7 @@ const btn_SellTower = document.getElementById("btn_SellTower");
 
 btn_bigger_range.addEventListener("click", () => {
   const upgrade_price = parseInt(
-    btn_bigger_range.getAttribute("data-upgrade_price")
+    btn_bigger_range.getAttribute("data-upgrade_price"),
   );
   if (save_obj.money >= upgrade_price && tower.range < 140) {
     // Begrenze die Reichweite auf 140 (80 + 3 * 20)
@@ -2110,14 +2176,14 @@ btn_bigger_range.addEventListener("click", () => {
       "Maximale Reichweite erreicht!",
       "",
       "error",
-      2000
+      2000,
     ).show_Message();
   } else {
     const error_msg = new GameMessage(
       "Nicht genug Geld für das Upgrade!",
       "",
       "error",
-      2000
+      2000,
     ).show_Message();
   }
 });
@@ -2139,14 +2205,14 @@ btn_Stronger.addEventListener("click", () => {
       "Maximale Upgrade Stufe erreicht!",
       "",
       "error",
-      2000
+      2000,
     ).show_Message();
   } else {
     const error_msg = new GameMessage(
       "Nicht genug Geld für das Upgrade!",
       "",
       "error",
-      2000
+      2000,
     ).show_Message();
   }
 });
@@ -2164,7 +2230,7 @@ btn_livegen.addEventListener("click", () => {
         "Upgrade bereits aktiv!",
         "",
         "error",
-        2000
+        2000,
       ).show_Message();
       return;
     }
@@ -2178,7 +2244,7 @@ btn_livegen.addEventListener("click", () => {
       "Nicht genug Geld für das Upgrade!",
       "",
       "error",
-      2000
+      2000,
     ).show_Message();
   }
 });
@@ -2203,14 +2269,14 @@ btn_SellTower.addEventListener("click", () => {
         buildObstaclesFromTowers(
           save_obj.tower_places,
           pathGrid,
-          freeBuildPadding
+          freeBuildPadding,
         );
         enemies.forEach((enemy) => {
           try {
             const newPath = findPath(
               { x: enemy.pos_x, y: enemy.pos_y },
               free_spawn_end,
-              pathGrid
+              pathGrid,
             );
             if (newPath) enemy.setPath(newPath);
           } catch (e) {}
@@ -2294,7 +2360,7 @@ btn_save_game.addEventListener("click", () => {
     "Spiel gespeichert",
     "Das Spiel wurde erfolgreich gespeichert",
     "success",
-    5000
+    5000,
   ).show_Message();
 });
 
@@ -2316,7 +2382,7 @@ btn_load_game.addEventListener("click", () => {
       buildObstaclesFromTowers(
         save_obj.tower_places || [],
         pathGrid,
-        freeBuildPadding
+        freeBuildPadding,
       );
     } catch (e) {
       console.log("Error initializing free-build on load:", e);
@@ -2422,7 +2488,7 @@ function initialize_game(level_details) {
   save_obj.max_enemy_amount = 2;
   if (save_obj.free_build && save_obj.free_build_enemy_multiplier) {
     save_obj.max_enemy_amount = Math.ceil(
-      save_obj.max_enemy_amount * save_obj.free_build_enemy_multiplier
+      save_obj.max_enemy_amount * save_obj.free_build_enemy_multiplier,
     );
   }
   //* Set the maximum enemy velocity
@@ -2440,6 +2506,7 @@ function initialize_game(level_details) {
 
 function start_game() {
   menu_modal.classList.remove("active");
+  audio.play("start");
   const game_difficulty = sel_difficulty.value;
 
   set_difficulty(game_difficulty);
@@ -2512,14 +2579,14 @@ btn_pause.addEventListener("click", () => {
       "Spiel pausiert",
       "",
       "",
-      2000
+      2000,
     ).show_Message();
   } else {
     const msg_pause = new GameMessage(
       "Spiel fortgesetzt",
       "",
       "",
-      2000
+      2000,
     ).show_Message();
   }
   play_pause();
@@ -2549,7 +2616,7 @@ function play_pause() {
 function count_energy_level() {
   const energy_tower_amount = tower_type_amount(
     save_obj.tower_places,
-    "energy"
+    "energy",
   );
   save_obj.energy_level =
     energy_tower_amount * 100 + save_obj.energy_start_level;
@@ -2568,7 +2635,7 @@ function count_energy_level() {
     if (tower.tower_type === "destroyer") {
       destroyer_energy_amount += Math.max(
         0,
-        destroyer_energy + tower.tower_damage_lvl * 25 - 25
+        destroyer_energy + tower.tower_damage_lvl * 25 - 25,
       );
     }
   });
@@ -2580,7 +2647,7 @@ function count_energy_level() {
     if (tower.tower_type === "anti_air") {
       anti_air_energy_amount += Math.max(
         0,
-        anti_air_energy + tower.tower_damage_lvl * 25 - 25
+        anti_air_energy + tower.tower_damage_lvl * 25 - 25,
       );
     }
   });
@@ -2592,7 +2659,7 @@ function count_energy_level() {
     if (tower.tower_type === "toxic") {
       toxic_energy_amount += Math.max(
         0,
-        toxic_energy + tower.tower_damage_lvl * 25 - 25
+        toxic_energy + tower.tower_damage_lvl * 25 - 25,
       );
     }
   });
@@ -2604,7 +2671,7 @@ function count_energy_level() {
     if (tower.tower_type === "slower") {
       slower_energy_amount += Math.max(
         0,
-        slower_energy + tower.tower_damage_lvl * 25 - 25
+        slower_energy + tower.tower_damage_lvl * 25 - 25,
       );
     }
   });
@@ -2647,7 +2714,7 @@ function calc_energy_overdose() {
 
   needed_energy_labels.forEach((needed_energy_label) => {
     const needed_energy = parseInt(
-      needed_energy_label.getAttribute("data-needed_energy")
+      needed_energy_label.getAttribute("data-needed_energy"),
     );
     let existingSpan = needed_energy_label.querySelector("span");
     const diff = energy_level - needed_energy;
@@ -2691,7 +2758,7 @@ function set_class_for_overpriced_towers() {
 btn_trap_discount.addEventListener("click", () => {
   const price = btn_trap_discount.getAttribute("data-skill_price");
   const confirm = window.confirm(
-    `Möchtest du den Rabatt für Fallen für ${price} XP-Coins kaufen?`
+    `Möchtest du den Rabatt für Fallen für ${price} XP-Coins kaufen?`,
   );
   if (confirm) {
     const xp_transaction = check_XPCoins(price, "Fallen Rabatt");
@@ -2720,14 +2787,14 @@ btn_trap_discount.addEventListener("click", () => {
 btn_tower_discount.addEventListener("click", () => {
   const price = btn_tower_discount.getAttribute("data-skill_price");
   const confirm = window.confirm(
-    `Möchtest du den Tower Rabatt für ${price} XP-Coins kaufen?`
+    `Möchtest du den Tower Rabatt für ${price} XP-Coins kaufen?`,
   );
   if (confirm) {
     const xp_transaction = check_XPCoins(price, "Tower Rabatt");
     if (xp_transaction === true) {
       const item = return_Item_Amount_and_existence(
         save_obj,
-        "tower_rabatt_50"
+        "tower_rabatt_50",
       );
 
       if (item.available) {
@@ -2751,7 +2818,7 @@ btn_tower_discount.addEventListener("click", () => {
 btn_life_upgrade.addEventListener("click", () => {
   const price = btn_life_upgrade.getAttribute("data-skill_price");
   const confirm = window.confirm(
-    `Möchtest du das Upgrade zum Leben generieren für ${price} XP-Coins kaufen?`
+    `Möchtest du das Upgrade zum Leben generieren für ${price} XP-Coins kaufen?`,
   );
   if (confirm) {
     const xp_transaction = check_XPCoins(price, "Leben Generierer");
@@ -2763,7 +2830,7 @@ btn_life_upgrade.addEventListener("click", () => {
           "Fehler",
           "Upgrade bereits vorhanden",
           "error",
-          4000
+          4000,
         ).show_Message();
       } else {
         save_obj.XP_Store_Items.push({
@@ -2782,7 +2849,7 @@ btn_life_upgrade.addEventListener("click", () => {
 
 function render_xp_on_homescreen() {
   lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
-    "de-DE"
+    "de-DE",
   )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
 }
 
@@ -2791,19 +2858,21 @@ function check_XPCoins(price, xp_objectname) {
   const current_XPCoins = save_obj.XP_Coins;
   // const current_XPCoins = 9000; //* zum testen
   if (current_XPCoins >= price) {
+    audio.play("purchase_ok");
     const message = new GameMessage(
       "Kauf erfolgreich",
       `Kauf für "${xp_objectname}" abgeschlossen`,
       "success",
-      4000
+      4000,
     ).show_Message();
     return true;
   } else {
+    audio.play("purchase_fail");
     const message = new GameMessage(
       "Leider nicht möglich",
       `Zu wenig XPCredits für "${xp_objectname}"`,
       "error",
-      3000
+      3000,
     ).show_Message();
     return false;
   }

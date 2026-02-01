@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
@@ -83,6 +83,21 @@
       <div class="labels" id="lbl_live"></div>
       <div class="labels" id="lbl_wave"></div>
       <div class="labels" id="lbl_wave_timer"></div>
+      <div class="labels audio-controls" id="audio_controls">
+        <button class="audio-btn" id="btn_audio_mute" type="button">
+          Sound: an
+        </button>
+        <input
+          id="audio_volume"
+          class="audio-slider"
+          type="range"
+          min="0"
+          max="100"
+          value="35"
+          step="1"
+          aria-label="Sound Lautstärke"
+        />
+      </div>
     </div>
 
     <!-- Game Over Modal -->

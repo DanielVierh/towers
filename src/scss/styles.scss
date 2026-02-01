@@ -71,6 +71,35 @@ body.red-flash {
     border-radius: 15px;
     box-shadow: inset 0 0 10px white;
   }
+
+  .audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+
+    .audio-btn {
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 4px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    .audio-btn.is-muted {
+      opacity: 0.7;
+      color: #ffb3b3;
+      border-color: rgba(255, 180, 180, 0.55);
+    }
+
+    .audio-slider {
+      width: 110px;
+      accent-color: #7fffd4;
+    }
+  }
 }
 
 .modal {
@@ -215,7 +244,9 @@ body.red-flash {
         background-color: #61616378;
         border-radius: 5px;
         padding: 5px;
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
+        box-shadow:
+          0 0 15px rgba(255, 255, 255, 0.284),
+          inset 0 0 15px white;
         border: 1px solid rgba(255, 255, 255, 0.446);
       }
 
@@ -302,7 +333,9 @@ body.red-flash {
   justify-content: center;
   align-items: center;
   text-align: center;
-  box-shadow: inset 0 0 15px black, 0 0 15px black;
+  box-shadow:
+    inset 0 0 15px black,
+    0 0 15px black;
   text-transform: uppercase;
   text-shadow: 0 0 10px black;
   outline: 1px solid rgba(255, 255, 255, 0.595);
@@ -443,7 +476,9 @@ select {
       border-radius: 10px;
       text-align: center;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      transition:
+        transform 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out;
 
       &.overpriced {
         opacity: 0.2;
@@ -555,7 +590,8 @@ select {
   position: relative;
   background: linear-gradient(160deg, #000000, #162b12);
   border: 3px solid rgba(0, 200, 255, 0.45);
-  box-shadow: 0 0 40px rgba(0, 200, 255, 0.35),
+  box-shadow:
+    0 0 40px rgba(0, 200, 255, 0.35),
     inset 0 0 30px rgba(0, 140, 255, 0.22);
   animation: gxu-dropIn 0.45s cubic-bezier(0.18, 1.3, 0.45, 1);
 }
