@@ -11,7 +11,7 @@ export class Creep {
     velocity,
     resistent,
     extra_money,
-    invisible
+    invisible,
   ) {
     this.pos_x = pos_x;
     this.pos_y = pos_y;
@@ -42,7 +42,11 @@ export class Creep {
     this.frameTick = 0;
     this.counter = 0;
     this.invisible = invisible;
+    this.wasInvisible = Boolean(invisible);
     this.isPathfinderPath = false;
+
+    // Smooth HP bar (rendered health lags behind actual health)
+    this.displayHealth = health;
 
     // Lade alle Bilder aus dem Ordner
     for (let i = 1; i <= 17; i++) {
@@ -65,6 +69,15 @@ export class Creep {
   }
 
   update(save_obj, moneyPopups) {
+    // Smooth HP bar easing
+    if (typeof this.displayHealth !== "number")
+      this.displayHealth = this.health;
+    // quick but smooth (frame-based easing)
+    this.displayHealth += (this.health - this.displayHealth) * 0.12;
+    if (Math.abs(this.displayHealth - this.health) < 0.05) {
+      this.displayHealth = this.health;
+    }
+
     if (this.currentWaypointIndex < this.waypoints.length) {
       const target = this.waypoints[this.currentWaypointIndex];
       const halfW = (this.width * this.scale) / 2;
@@ -125,9 +138,8 @@ export class Creep {
   }
 
   draw(ctx) {
-    if (this.invisible) {
-      return; // Wenn der Creep unsichtbar ist, nichts zeichnen
-    }
+    if (this.invisible) return; // Unsichtbare Creeps bleiben weiterhin komplett unsichtbar
+
     const currentImage = this.imageFrames[this.imageIndex];
     if (currentImage.complete) {
       const scaledWidth = this.width * this.scale;
@@ -141,7 +153,7 @@ export class Creep {
           -this.pos_x - scaledWidth,
           this.pos_y,
           scaledWidth,
-          scaledHeight
+          scaledHeight,
         );
       } else {
         ctx.drawImage(
@@ -149,7 +161,7 @@ export class Creep {
           this.pos_x,
           this.pos_y,
           scaledWidth,
-          scaledHeight
+          scaledHeight,
         );
       }
       ctx.restore();
@@ -164,24 +176,41 @@ export class Creep {
       ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
 
       ctx.fillStyle = "green";
+      const clampedDisplayHealth = Math.max(
+        0,
+        Math.min(this.maxHealth, this.displayHealth ?? this.health),
+      );
       ctx.fillRect(
         healthBarX,
         healthBarY,
-        (this.health / this.maxHealth) * healthBarWidth,
-        healthBarHeight
+        (clampedDisplayHealth / this.maxHealth) * healthBarWidth,
+        healthBarHeight,
       );
 
-      // Zeichne einen grünen Punkt, wenn der Gegner toxicated ist
-      if (this.is_toxicated) {
-        const dotX = healthBarX + healthBarWidth / 2; // Punkt zentrieren
-        const dotY = healthBarY + healthBarHeight + 5; // Unter der Lebensanzeige
-        const dotRadius = 1; // Radius des Punkts
+      // Status icons (slow / toxic / invisible-type)
+      const icons = [];
+      if (this.isSlowed) icons.push({ color: "rgba(90,180,255,0.95)" });
+      if (this.is_toxicated) icons.push({ color: "rgba(80,220,120,0.95)" });
+      // show invisible icon only after reveal (type indicator)
+      if (this.wasInvisible && !this.invisible) {
+        icons.push({ color: "rgba(185,120,255,0.95)" });
+      }
 
-        ctx.beginPath();
-        ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2); // Kreis zeichnen
-        ctx.fillStyle = "green";
-        ctx.fill();
-        ctx.closePath();
+      if (icons.length) {
+        const iconRadius = 2.2;
+        const iconGap = 6;
+        const rowWidth = (icons.length - 1) * iconGap;
+        const baseX = healthBarX + healthBarWidth / 2 - rowWidth / 2;
+        const baseY = healthBarY + healthBarHeight + 7;
+
+        icons.forEach((icon, idx) => {
+          const x = baseX + idx * iconGap;
+          ctx.beginPath();
+          ctx.arc(x, baseY, iconRadius, 0, Math.PI * 2);
+          ctx.fillStyle = icon.color;
+          ctx.fill();
+          ctx.closePath();
+        });
       }
 
       // zeichne einen rahmen um den Creep

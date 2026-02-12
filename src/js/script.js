@@ -91,6 +91,57 @@ audio.bindUserGestureUnlock();
 
 const btn_audio_mute = document.getElementById("btn_audio_mute");
 const audio_volume = document.getElementById("audio_volume");
+const btn_fx_shake = document.getElementById("btn_fx_shake");
+
+// FX settings
+const FX_STORAGE_KEY = "towers.fx";
+const fxSettings = {
+  screenShakeEnabled: true,
+};
+
+function loadFxSettings() {
+  try {
+    const raw = localStorage.getItem(FX_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed?.screenShakeEnabled === "boolean") {
+      fxSettings.screenShakeEnabled = parsed.screenShakeEnabled;
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+function saveFxSettings() {
+  try {
+    localStorage.setItem(FX_STORAGE_KEY, JSON.stringify(fxSettings));
+  } catch (e) {
+    // ignore
+  }
+}
+
+function syncFxControls() {
+  if (!btn_fx_shake) return;
+  btn_fx_shake.textContent = fxSettings.screenShakeEnabled
+    ? "Shake: an"
+    : "Shake: aus";
+  if (fxSettings.screenShakeEnabled) {
+    btn_fx_shake.classList.remove("is-muted");
+  } else {
+    btn_fx_shake.classList.add("is-muted");
+  }
+}
+
+loadFxSettings();
+syncFxControls();
+
+if (btn_fx_shake) {
+  btn_fx_shake.addEventListener("click", () => {
+    fxSettings.screenShakeEnabled = !fxSettings.screenShakeEnabled;
+    saveFxSettings();
+    syncFxControls();
+  });
+}
 
 function syncAudioControls() {
   if (!btn_audio_mute || !audio_volume) return;
@@ -142,6 +193,237 @@ document.addEventListener(
 
 canvas.width = 400;
 canvas.height = 400;
+
+// Camera shake (screen shake / impact)
+const cameraShake = {
+  timeLeftMs: 0,
+  durationMs: 0,
+  intensityPx: 0,
+  seed: 0,
+  offsetX: 0,
+  offsetY: 0,
+};
+
+function triggerScreenShake(intensityPx, durationMs = 140) {
+  if (!fxSettings.screenShakeEnabled) return;
+  const i = Math.max(0, Number(intensityPx) || 0);
+  const d = Math.max(0, Number(durationMs) || 0);
+  if (i <= 0 || d <= 0) return;
+
+  // stack by taking the max intensity and extending time a bit
+  cameraShake.intensityPx = Math.max(cameraShake.intensityPx, i);
+  cameraShake.durationMs = Math.max(cameraShake.durationMs, d);
+  cameraShake.timeLeftMs = Math.min(
+    cameraShake.durationMs,
+    Math.max(cameraShake.timeLeftMs, d),
+  );
+  cameraShake.seed = (cameraShake.seed + 1) % 100000;
+}
+
+function updateCameraShake(deltaTimeMs) {
+  if (!fxSettings.screenShakeEnabled) {
+    cameraShake.timeLeftMs = 0;
+    cameraShake.offsetX = 0;
+    cameraShake.offsetY = 0;
+    return;
+  }
+  if (cameraShake.timeLeftMs <= 0) {
+    cameraShake.offsetX = 0;
+    cameraShake.offsetY = 0;
+    cameraShake.intensityPx = 0;
+    return;
+  }
+
+  cameraShake.timeLeftMs -= deltaTimeMs;
+  const t = Math.max(0, cameraShake.timeLeftMs);
+  const p = cameraShake.durationMs > 0 ? t / cameraShake.durationMs : 0;
+  const decay = p * p; // quadratic decay
+  const amp = cameraShake.intensityPx * decay;
+
+  // pseudo-random but stable-ish per frame
+  const r1 = Math.sin((performance.now() + cameraShake.seed * 17) * 0.05);
+  const r2 = Math.cos((performance.now() + cameraShake.seed * 29) * 0.07);
+  cameraShake.offsetX = r1 * amp;
+  cameraShake.offsetY = r2 * amp;
+}
+
+function applyCameraTransform(ctx) {
+  if (cameraShake.offsetX !== 0 || cameraShake.offsetY !== 0) {
+    ctx.translate(cameraShake.offsetX, cameraShake.offsetY);
+  }
+}
+
+// Particles (world-space + UI/screen-space)
+const worldParticles = [];
+const uiParticles = [];
+
+class Particle {
+  constructor(x, y, opts = {}) {
+    this.x = x;
+    this.y = y;
+    this.vx = opts.vx ?? 0;
+    this.vy = opts.vy ?? 0;
+    this.ax = opts.ax ?? 0;
+    this.ay = opts.ay ?? 0;
+    this.radius = opts.radius ?? 2;
+    this.lifeMs = opts.lifeMs ?? 350;
+    this.ageMs = 0;
+    this.color = opts.color ?? "rgba(255,255,255,0.9)";
+    this.fade = opts.fade ?? true;
+    this.grow = opts.grow ?? 0;
+    this.alpha = opts.alpha ?? 1;
+  }
+
+  update(dtMs) {
+    this.ageMs += dtMs;
+    const dt = dtMs / 1000;
+    this.vx += this.ax * dt;
+    this.vy += this.ay * dt;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.radius = Math.max(0.2, this.radius + this.grow * dt);
+  }
+
+  get dead() {
+    return this.ageMs >= this.lifeMs;
+  }
+
+  draw(ctx) {
+    const p = this.lifeMs > 0 ? Math.min(1, this.ageMs / this.lifeMs) : 1;
+    const a = this.fade ? (1 - p) * (this.alpha ?? 1) : (this.alpha ?? 1);
+    if (a <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function updateAndDrawParticles(ctx, dtMs, particles) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.update(dtMs);
+    p.draw(ctx);
+    if (p.dead) particles.splice(i, 1);
+  }
+}
+
+function colorForLaser(laserColor) {
+  switch (laserColor) {
+    case "blue":
+      return "rgba(90,180,255,0.95)";
+    case "green":
+      return "rgba(80,220,120,0.95)";
+    case "red":
+      return "rgba(255,90,90,0.95)";
+    case "missle":
+      return "rgba(255,210,120,0.95)";
+    default:
+      return "rgba(255,255,255,0.9)";
+  }
+}
+
+function spawnHitParticles(x, y, laserColor) {
+  const baseColor = colorForLaser(laserColor);
+  const count = laserColor === "missle" ? 14 : 8;
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const sp = (laserColor === "missle" ? 90 : 70) + Math.random() * 60;
+    worldParticles.push(
+      new Particle(x, y, {
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp,
+        ay: 80,
+        radius: 1.2 + Math.random() * 1.8,
+        lifeMs: 220 + Math.random() * 200,
+        color: baseColor,
+        alpha: 1,
+      }),
+    );
+  }
+
+  // small smoke puff for missiles
+  if (laserColor === "missle") {
+    for (let i = 0; i < 8; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 25 + Math.random() * 30;
+      worldParticles.push(
+        new Particle(x, y, {
+          vx: Math.cos(a) * sp,
+          vy: Math.sin(a) * sp,
+          ay: -10,
+          radius: 3.5 + Math.random() * 2,
+          grow: 10,
+          lifeMs: 420 + Math.random() * 220,
+          color: "rgba(70,70,70,0.9)",
+          alpha: 0.7,
+        }),
+      );
+    }
+  }
+}
+
+function spawnToxicFogAround(enemy, dtMs) {
+  if (!enemy?.is_toxicated) return;
+  enemy._toxicFogAccMs = (enemy._toxicFogAccMs ?? 0) + dtMs;
+  if (enemy._toxicFogAccMs < 90) return;
+  enemy._toxicFogAccMs = 0;
+
+  const cx = enemy.pos_x + (enemy.width * enemy.scale) / 2;
+  const cy = enemy.pos_y + (enemy.height * enemy.scale) / 2;
+  const puffCount = 2 + Math.floor(Math.random() * 2);
+  for (let i = 0; i < puffCount; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 6 + Math.random() * 10;
+    worldParticles.push(
+      new Particle(cx + Math.cos(a) * r, cy + Math.sin(a) * r, {
+        vx: (Math.random() - 0.5) * 18,
+        vy: -10 - Math.random() * 18,
+        ay: -4,
+        radius: 4 + Math.random() * 3,
+        grow: 8,
+        lifeMs: 650 + Math.random() * 250,
+        color: "rgba(80,220,120,0.8)",
+        alpha: 0.45,
+      }),
+    );
+  }
+}
+
+function spawnLowEnergySparks(dtMs) {
+  if (!(save_obj.energy_level < 0)) return;
+  if (!lbl_energy) return;
+
+  // throttle
+  spawnLowEnergySparks._accMs = (spawnLowEnergySparks._accMs ?? 0) + dtMs;
+  if (spawnLowEnergySparks._accMs < 60) return;
+  spawnLowEnergySparks._accMs = 0;
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const r = lbl_energy.getBoundingClientRect();
+  const x0 = r.left - canvasRect.left + r.width - 8;
+  const y0 = r.top - canvasRect.top + 10;
+
+  const count = 1 + (Math.random() < 0.25 ? 1 : 0);
+  for (let i = 0; i < count; i++) {
+    const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.0;
+    const sp = 120 + Math.random() * 90;
+    uiParticles.push(
+      new Particle(x0, y0, {
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp,
+        ay: 240,
+        radius: 1.1 + Math.random() * 1.2,
+        lifeMs: 220 + Math.random() * 120,
+        color: "rgba(255,220,120,0.95)",
+        alpha: 1,
+      }),
+    );
+  }
+}
 
 const enemies = [];
 const lasers = [];
@@ -643,6 +925,7 @@ function call_special_creep() {
       extra_money,
       invisible,
       amount,
+      true,
     );
   }
 
@@ -672,6 +955,7 @@ function call_special_creep() {
       extra_money,
       invisible,
       amount,
+      false,
     );
   }
 }
@@ -689,6 +973,7 @@ function add_special_creep(
   extra_money,
   invisible,
   amount,
+  isBoss = false,
 ) {
   for (let i = 1; i <= amount; i++) {
     setTimeout(() => {
@@ -712,6 +997,7 @@ function add_special_creep(
         extra_money,
         invisible,
       );
+      creep.isBoss = Boolean(isBoss);
       if (
         save_obj.free_build &&
         pathGrid &&
@@ -801,6 +1087,7 @@ function spawnEnemy() {
       resistent,
       extra_money,
     );
+    newCreep.isBoss = /boss/i.test(creep_properties[creep_index]?.name ?? "");
     if (usedPath) newCreep.setPath(usedPath);
     enemies.push(newCreep);
     enemyCount++;
@@ -1059,6 +1346,16 @@ function gameLoop() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  const now = performance.now();
+  const deltaTime = now - lastTime;
+  lastTime = now;
+
+  updateCameraShake(deltaTime);
+
+  // World render (shaken)
+  ctx.save();
+  applyCameraTransform(ctx);
+
   //* Hintergrundbild zeichnen
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
@@ -1130,10 +1427,6 @@ function gameLoop() {
     ctx.restore();
   }
 
-  const now = performance.now();
-  const deltaTime = now - lastTime;
-  lastTime = now;
-
   deathEffects.forEach((effect, i) => {
     effect.update(deltaTime);
     effect.draw(ctx);
@@ -1179,6 +1472,9 @@ function gameLoop() {
   //* Dann die Creeps darüber zeichnen
   enemies.forEach((enemy, index) => {
     enemy.update(save_obj, moneyPopups);
+
+    // Toxic fog particles
+    spawnToxicFogAround(enemy, deltaTime);
 
     // If enemy has reached the end of its waypoint path, mark for deletion and deduct life
     if (
@@ -1240,6 +1536,12 @@ function gameLoop() {
               ),
             );
 
+            // Impact
+            triggerScreenShake(
+              enemy.isBoss ? 6.2 : 3.6,
+              enemy.isBoss ? 220 : 150,
+            );
+
             audio.play("creep_death");
 
             // Gegner markieren, damit er verschwindet
@@ -1299,6 +1601,7 @@ function gameLoop() {
             //* Verlangsamen des Gegners, wenn nicht resistent
             if (!enemy.resistent.includes("slower")) {
               enemy.applySlowEffect(slow_val, slow_time);
+              if (enemy.isBoss) triggerScreenShake(2.2, 120);
               //* Erzeuge einen blauen Laser
               lasers.push(
                 new Laser(
@@ -1331,6 +1634,8 @@ function gameLoop() {
                 enemy.is_toxicated = true;
                 enemy.toxicated_lvl = toxic_power;
 
+                if (enemy.isBoss) triggerScreenShake(2.4, 130);
+
                 //* Green Laser
                 lasers.push(
                   new Laser(
@@ -1351,6 +1656,8 @@ function gameLoop() {
             //* Harm Enemy
             if (!enemy.resistent.includes("destroyer")) {
               enemy.health -= tower.tower_damage_lvl;
+              // Boss hit impact
+              if (enemy.isBoss) triggerScreenShake(2.6, 110);
               // *Erzeuge einen roten Laser
               lasers.push(
                 new Laser(
@@ -1372,11 +1679,14 @@ function gameLoop() {
             //* Discover invisible Enemy
             if (enemy.invisible) {
               enemy.invisible = false;
+              enemy.wasInvisible = true;
               enemy.resistent = ["slower", "anti_air", "air_mine"];
             }
             //* Harm Enemy
             if (!enemy.resistent.includes("anti_air")) {
               enemy.health -= tower.tower_damage_lvl * 70;
+              // Boss hit impact
+              if (enemy.isBoss) triggerScreenShake(3.4, 140);
               // *Erzeuge Missle
               lasers.push(
                 new Laser(
@@ -1498,6 +1808,7 @@ function gameLoop() {
 
     //* Entferne den Laser, wenn er das Ziel erreicht hat
     if (laser.posX === laser.targetX && laser.posY === laser.targetY) {
+      spawnHitParticles(laser.targetX, laser.targetY, laser.color);
       lasers.splice(index, 1);
     }
   });
@@ -1508,6 +1819,7 @@ function gameLoop() {
     btn_pause.classList.add("hidden");
     btn_save_game.classList.add("hidden");
     lbl_Live.style.color = "tomato";
+    ctx.restore();
     return; // Stop the game loop
   }
 
@@ -1528,6 +1840,16 @@ function gameLoop() {
       activeExplosions.splice(index, 1);
     }
   });
+
+  // Particles: world-space (shaken)
+  updateAndDrawParticles(ctx, deltaTime, worldParticles);
+
+  // end world render
+  ctx.restore();
+
+  // UI-space particles (not shaken)
+  spawnLowEnergySparks(deltaTime);
+  updateAndDrawParticles(ctx, deltaTime, uiParticles);
 
   setTimeout(() => {
     gameLoop();
@@ -1552,6 +1874,9 @@ function triggerExplosion(x, y) {
     frame: 0, // Start bei Frame 0
   });
   audio.play("explosion");
+
+  // Impact
+  triggerScreenShake(5.2, 180);
 }
 
 // Rufe diese Funktion beim Start des Spiels auf
