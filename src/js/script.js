@@ -54,8 +54,42 @@ const towerImages = new Map();
 const low_energy_symbol = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="yellow" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
   <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
 </svg>`;
+
+// Trap SVG icons (cached as Images for canvas draw)
+const TRAP_SVGS = {
+  mine: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <circle cx="32" cy="34" r="18" fill="#222"/>
+    <circle cx="26" cy="28" r="5" fill="#3a3a3a"/>
+    <path d="M32 14c8 0 14 6 14 14" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M46 16l6-6" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
+  </svg>`,
+  air_mine: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <circle cx="32" cy="34" r="18" fill="#222"/>
+    <circle cx="26" cy="28" r="5" fill="#3a3a3a"/>
+    <path d="M16 22l10 6" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M48 22l-10 6" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M32 14c8 0 14 6 14 14" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
+  </svg>`,
+  spikes: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <rect x="10" y="34" width="44" height="16" rx="3" fill="#2b2b2b"/>
+    <path d="M14 34 L20 18 L26 34 Z M24 34 L32 14 L40 34 Z M38 34 L46 18 L52 34 Z" fill="#eaeaea"/>
+    <rect x="12" y="48" width="40" height="2" fill="#111" opacity="0.6"/>
+  </svg>`,
+};
+
+const trapIconImages = new Map();
+function getTrapIconImage(trapType) {
+  const svg = TRAP_SVGS[trapType];
+  if (!svg) return null;
+  if (trapIconImages.has(trapType)) return trapIconImages.get(trapType);
+  const img = new Image();
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  trapIconImages.set(trapType, img);
+  return img;
+}
 const btn_show_instructions = document.getElementById("btn_show_instructions");
 const btn_mine = document.getElementById("btn_mine");
+const btn_spikes = document.getElementById("btn_spikes");
 const lbl_XP = document.getElementById("lbl_XP");
 const modal_select_lvl = document.getElementById("modal_select_lvl");
 const level_0 = document.getElementById("level_0");
@@ -750,6 +784,8 @@ function baseTowerCost(towerType) {
       return 70;
     case "air_mine":
       return 70;
+    case "spikes":
+      return 90;
     default:
       return 0;
   }
@@ -1239,9 +1275,60 @@ function getRangeColor(tower) {
 function drawTowerPlaces() {
   save_obj.tower_places.forEach((tower) => {
     if (tower.tower_is_build) {
-      const towerImage = towerImages.get(tower.tower_img);
-      if (towerImage) {
-        ctx.drawImage(towerImage, tower.x, tower.y - 10, 40, 55);
+      const isTrap =
+        tower.tower_type === "mine" ||
+        tower.tower_type === "air_mine" ||
+        tower.tower_type === "spikes";
+
+      // Default draw box (old sprites)
+      let drawX = tower.x;
+      let drawY = tower.y - 10;
+      let drawW = 40;
+      let drawH = 55;
+
+      if (tower.tower_type === "spikes") {
+        // Spikes use SVG icon
+        drawY = tower.y;
+        drawW = 30;
+        drawH = 30;
+        const trapImg = getTrapIconImage("spikes");
+        if (trapImg) {
+          ctx.drawImage(trapImg, drawX, drawY, drawW, drawH);
+        }
+      } else {
+        // All normal towers + normal mines use their original sprite
+        const towerImage = towerImages.get(tower.tower_img);
+        if (towerImage) {
+          ctx.drawImage(towerImage, drawX, drawY, drawW, drawH);
+        }
+      }
+
+      // Overlay: charges (mines) / remaining time (spikes)
+      if (isTrap) {
+        ctx.save();
+        ctx.font = "10px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const badgeX = drawX + drawW - 6;
+        const badgeY = drawY + 6;
+        ctx.fillStyle = "rgba(0,0,0,0.75)";
+        ctx.beginPath();
+        ctx.arc(badgeX, badgeY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "white";
+
+        if (tower.tower_type === "mine" || tower.tower_type === "air_mine") {
+          const charges = Number.isFinite(Number(tower.charges))
+            ? Math.max(0, Math.floor(Number(tower.charges)))
+            : 3;
+          tower.charges = charges;
+          ctx.fillText(String(charges), badgeX, badgeY);
+        } else if (tower.tower_type === "spikes") {
+          const remainingMs = (Number(tower.expiresAt) || 0) - Date.now();
+          const remainingS = Math.max(0, Math.ceil(remainingMs / 1000));
+          ctx.fillText(`${remainingS}s`, badgeX, badgeY);
+        }
+        ctx.restore();
       }
       //* Zeichne einen farbigen Rahmen um den Turm basierend auf der Upgrade-Stufe
       ctx.strokeStyle = getTowerColor(tower);
@@ -1302,6 +1389,8 @@ function drawTowerPlaces() {
           ctx.strokeStyle = "black"; // Grau für Anti Air
         } else if (tower.tower_type === "air_mine") {
           ctx.strokeStyle = "black"; // Grau für Anti Air
+        } else if (tower.tower_type === "spikes") {
+          ctx.strokeStyle = "black";
         } else {
           ctx.strokeStyle = "transparent"; // Standardfarbe
         }
@@ -1555,6 +1644,43 @@ function gameLoop() {
     }
   }
 
+  // Cleanup: abgelaufene Stachelfelder entfernen
+  {
+    const nowEpoch = Date.now();
+    let removedAny = false;
+    save_obj.tower_places.forEach((tower) => {
+      if (tower.tower_is_build && tower.tower_type === "spikes") {
+        const expiresAt = Number(tower.expiresAt) || 0;
+        if (expiresAt && nowEpoch >= expiresAt) {
+          tower.tower_is_build = false;
+          tower.tower_type = "";
+          tower.tower_img = "";
+          delete tower.expiresAt;
+          removedAny = true;
+        }
+      }
+    });
+    if (removedAny && save_obj.free_build && pathGrid) {
+      buildObstaclesFromTowers(
+        save_obj.tower_places,
+        pathGrid,
+        freeBuildPadding,
+      );
+      enemies.forEach((enemy) => {
+        try {
+          const newPath = findPath(
+            { x: enemy.pos_x, y: enemy.pos_y },
+            free_spawn_end,
+            pathGrid,
+          );
+          if (newPath) enemy.setPath(newPath);
+        } catch (e) {
+          // ignore
+        }
+      });
+    }
+  }
+
   //* Tower Places zeichnen
   drawTowerPlaces();
 
@@ -1622,6 +1748,16 @@ function gameLoop() {
         if (distance < tower.range) {
           //* Radius von 80 Pixeln
 
+          if (enemy.markedForDeletion) {
+            return;
+          }
+
+          // Stachelfeld: konstanter Schaden im Umkreis
+          if (tower.tower_type === "spikes") {
+            const dps = 390;
+            enemy.health -= dps * (deltaTime / 1000);
+          }
+
           if (enemy.health <= 0) {
             // Increase Total Kill Counter
             if (save_obj.total_kills === undefined) {
@@ -1686,7 +1822,9 @@ function gameLoop() {
 
           //* Verlangsamen des Gegners, wenn er von einem Slower-Turm getroffen wird
           //* Slower Tower
-          if (tower.tower_type === "slower") {
+          if (tower.tower_type === "spikes") {
+            // handled above (damage over time)
+          } else if (tower.tower_type === "slower") {
             let slow_val = 0.5;
             let slow_time = 10000;
             if (tower.tower_damage_lvl === 1) {
@@ -1807,6 +1945,13 @@ function gameLoop() {
             //* >>> Mine <<<
           } else if (tower.tower_type === "mine") {
             if (!enemy.resistent.includes("mine")) {
+              if (enemy.markedForDeletion) return;
+              const nowEpoch = Date.now();
+              const last = Number(tower.lastTriggeredAt) || 0;
+              if (nowEpoch - last < 250) return;
+              tower.lastTriggeredAt = nowEpoch;
+              if (tower.charges === undefined) tower.charges = 3;
+
               //* Mine Kill Count
               if (!got_killed) {
                 save_obj.total_kills++;
@@ -1821,32 +1966,49 @@ function gameLoop() {
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
-                  // Mine entfernen
-                  tower.tower_is_build = false;
-                  tower.tower_type = "";
-                  tower.tower_img = "";
-                  if (save_obj.free_build && pathGrid) {
-                    buildObstaclesFromTowers(
-                      save_obj.tower_places,
-                      pathGrid,
-                      freeBuildPadding,
-                    );
-                    enemies.forEach((enemy) => {
-                      try {
-                        const newPath = findPath(
-                          { x: enemy.pos_x, y: enemy.pos_y },
-                          free_spawn_end,
-                          pathGrid,
-                        );
-                        if (newPath) enemy.setPath(newPath);
-                      } catch (e) {}
-                    });
+
+                  // Charges reduzieren; nur bei 0 entfernen
+                  const nextCharges = Math.max(
+                    0,
+                    (Number(tower.charges) || 1) - 1,
+                  );
+                  tower.charges = nextCharges;
+                  if (nextCharges <= 0) {
+                    tower.tower_is_build = false;
+                    tower.tower_type = "";
+                    tower.tower_img = "";
+                    delete tower.charges;
+                    delete tower.lastTriggeredAt;
+                    if (save_obj.free_build && pathGrid) {
+                      buildObstaclesFromTowers(
+                        save_obj.tower_places,
+                        pathGrid,
+                        freeBuildPadding,
+                      );
+                      enemies.forEach((enemy) => {
+                        try {
+                          const newPath = findPath(
+                            { x: enemy.pos_x, y: enemy.pos_y },
+                            free_spawn_end,
+                            pathGrid,
+                          );
+                          if (newPath) enemy.setPath(newPath);
+                        } catch (e) {}
+                      });
+                    }
                   }
                 }, 50);
               }, 10);
             }
           } else if (tower.tower_type === "air_mine") {
             if (!enemy.resistent.includes("air_mine")) {
+              if (enemy.markedForDeletion) return;
+              const nowEpoch = Date.now();
+              const last = Number(tower.lastTriggeredAt) || 0;
+              if (nowEpoch - last < 250) return;
+              tower.lastTriggeredAt = nowEpoch;
+              if (tower.charges === undefined) tower.charges = 3;
+
               //* Mine Kill Count
               if (!got_killed) {
                 save_obj.total_kills++;
@@ -1859,26 +2021,36 @@ function gameLoop() {
                 setTimeout(() => {
                   // Explosion-Animation anzeigen
                   triggerExplosion(tower.x + 20, tower.y);
-                  // Mine entfernen
-                  tower.tower_is_build = false;
-                  tower.tower_type = "";
-                  tower.tower_img = "";
-                  if (save_obj.free_build && pathGrid) {
-                    buildObstaclesFromTowers(
-                      save_obj.tower_places,
-                      pathGrid,
-                      freeBuildPadding,
-                    );
-                    enemies.forEach((enemy) => {
-                      try {
-                        const newPath = findPath(
-                          { x: enemy.pos_x, y: enemy.pos_y },
-                          free_spawn_end,
-                          pathGrid,
-                        );
-                        if (newPath) enemy.setPath(newPath);
-                      } catch (e) {}
-                    });
+
+                  // Charges reduzieren; nur bei 0 entfernen
+                  const nextCharges = Math.max(
+                    0,
+                    (Number(tower.charges) || 1) - 1,
+                  );
+                  tower.charges = nextCharges;
+                  if (nextCharges <= 0) {
+                    tower.tower_is_build = false;
+                    tower.tower_type = "";
+                    tower.tower_img = "";
+                    delete tower.charges;
+                    delete tower.lastTriggeredAt;
+                    if (save_obj.free_build && pathGrid) {
+                      buildObstaclesFromTowers(
+                        save_obj.tower_places,
+                        pathGrid,
+                        freeBuildPadding,
+                      );
+                      enemies.forEach((enemy) => {
+                        try {
+                          const newPath = findPath(
+                            { x: enemy.pos_x, y: enemy.pos_y },
+                            free_spawn_end,
+                            pathGrid,
+                          );
+                          if (newPath) enemy.setPath(newPath);
+                        } catch (e) {}
+                      });
+                    }
                   }
                 }, 50);
               }, 10);
@@ -2324,7 +2496,10 @@ function show_trap_price() {
   const new_price_mine_ground = oldPrice_mine_ground / 2;
   const oldPrice_mine_air = 70;
   const new_price_mine_air = oldPrice_mine_air / 2;
+  const oldPrice_spikes = 90;
+  const new_price_spikes = oldPrice_spikes / 2;
   const btn_ground_mine = document.getElementById("btn_ground_mine");
+  const btn_spikes_buy = document.getElementById("btn_spikes_buy");
   const mine_rabatt = return_Item_Amount_and_existence(
     save_obj,
     "trap_rabatt_50",
@@ -2334,13 +2509,20 @@ function show_trap_price() {
   if (mine_rabatt.available && mine_rabatt.amount > 0 && is_mine_discount) {
     btn_mine.setAttribute("data-tower_price", new_price_mine_ground);
     btn_air_mine.setAttribute("data-tower_price", new_price_mine_air);
+    if (btn_spikes)
+      btn_spikes.setAttribute("data-tower_price", new_price_spikes);
     btn_ground_mine.innerHTML = `Kaufen ${new_price_mine_ground}€`;
     trigger_btn_air_mine.innerHTML = `Kaufen ${new_price_mine_air}€`;
+    if (btn_spikes_buy)
+      btn_spikes_buy.innerHTML = `Kaufen ${new_price_spikes}€`;
   } else {
     btn_mine.setAttribute("data-tower_price", oldPrice_mine_ground);
     btn_air_mine.setAttribute("data-tower_price", oldPrice_mine_air);
+    if (btn_spikes)
+      btn_spikes.setAttribute("data-tower_price", oldPrice_spikes);
     btn_ground_mine.innerHTML = `Kaufen ${oldPrice_mine_ground}€`;
     trigger_btn_air_mine.innerHTML = `Kaufen ${oldPrice_mine_air}€`;
+    if (btn_spikes_buy) btn_spikes_buy.innerHTML = `Kaufen ${oldPrice_spikes}€`;
   }
 }
 
@@ -2450,6 +2632,25 @@ btn_air_mine.addEventListener("click", () => {
 });
 
 //*#########################################################
+//* ANCHOR -Set Spikes
+//*#########################################################
+
+if (btn_spikes) {
+  btn_spikes.addEventListener("click", () => {
+    set_Tower(btn_spikes, "spikes", 0, mdl_traps);
+    const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
+    if (item.available && item.amount > 0) {
+      const is_trap_discount = check_trap_discount.checked;
+      if (is_trap_discount) {
+        save_obj.XP_Store_Items[item.index].amount -= 1;
+        render_amount(save_obj);
+        save_Game_without_saveDate();
+      }
+    }
+  });
+}
+
+//*#########################################################
 //* ANCHOR -Set Tower Destroyer
 //*#########################################################
 
@@ -2513,7 +2714,11 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     //* Vorhandene Minen reduzieren
     console.log("tower_type", tower_type);
 
-    if (tower_type === "mine" || tower_type === "air_mine") {
+    if (
+      tower_type === "mine" ||
+      tower_type === "air_mine" ||
+      tower_type === "spikes"
+    ) {
       if (current_mine_amount_per_wave === 0) {
         new GameMessage(
           "Keine Minen mehr vorhanden",
@@ -2535,6 +2740,17 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
     tower.tower_damage_lvl = tower_damage_lvl;
+
+    if (tower_type === "mine" || tower_type === "air_mine") {
+      if (tower.charges === undefined) tower.charges = 3;
+      tower.lastTriggeredAt = 0;
+    }
+
+    if (tower_type === "spikes") {
+      tower.expiresAt = Date.now() + 8000;
+      tower.range = 55;
+    }
+
     if (!towerImages.has(tower_img)) {
       const img = new Image();
       img.src = tower_img;
