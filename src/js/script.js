@@ -74,6 +74,11 @@ const mdl_skill_tree = document.getElementById("mdl_skill_tree");
 const btn_close_modal_skill = document.getElementById("btn_close_modal_skill");
 const btn_trap_discount = document.getElementById("btn_trap_discount");
 const btn_tower_discount = document.getElementById("btn_tower_discount");
+const btn_start_money = document.getElementById("btn_start_money");
+const btn_start_energy = document.getElementById("btn_start_energy");
+const btn_mine_plus = document.getElementById("btn_mine_plus");
+const btn_xp_multiplier = document.getElementById("btn_xp_multiplier");
+const btn_sell_refund = document.getElementById("btn_sell_refund");
 const check_trap_discount = document.getElementById("check_trap_discount");
 const check_tower_discount = document.getElementById("check_tower_discount");
 const btn_life_upgrade = document.getElementById("btn_life_upgrade");
@@ -655,10 +660,100 @@ let save_obj = {
       name: "trap_rabatt_50",
       amount: 0,
     },
+    {
+      name: "passive_start_money",
+      amount: 0,
+    },
+    {
+      name: "passive_start_energy",
+      amount: 0,
+    },
+    {
+      name: "passive_mine_plus",
+      amount: 0,
+    },
+    {
+      name: "passive_xp_multi",
+      amount: 0,
+    },
+    {
+      name: "passive_sell_refund",
+      amount: 0,
+    },
   ],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
   active_game_target_wave: 0,
 };
+
+function ensureXpStoreItem(name, defaultAmount = 0) {
+  if (!save_obj.XP_Store_Items) save_obj.XP_Store_Items = [];
+  const existing = return_Item_Amount_and_existence(save_obj, name);
+  if (!existing.available) {
+    save_obj.XP_Store_Items.push({
+      name,
+      amount: defaultAmount,
+    });
+  }
+}
+
+function getPassiveLevel(name) {
+  const item = return_Item_Amount_and_existence(save_obj, name);
+  if (!item.available) return 0;
+  const n = Number(item.amount);
+  return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+}
+
+function getXpMultiplier() {
+  const lvl = getPassiveLevel("passive_xp_multi");
+  // +10% pro Level
+  return 1 + lvl * 0.1;
+}
+
+function xpGain(baseXp) {
+  const base = Number(baseXp) || 0;
+  if (base <= 0) return 0;
+  const g = Math.round(base * getXpMultiplier());
+  return Math.max(1, g);
+}
+
+function mineBonusPerWave() {
+  return getPassiveLevel("passive_mine_plus");
+}
+
+function startMoneyBonus() {
+  return getPassiveLevel("passive_start_money") * 100;
+}
+
+function startEnergyBonus() {
+  return getPassiveLevel("passive_start_energy") * 25;
+}
+
+function getSellRefundFactor() {
+  // base 50% + 5% pro Level (max +25% durch Cap in purchase)
+  const lvl = getPassiveLevel("passive_sell_refund");
+  return 0.5 + lvl * 0.05;
+}
+
+function baseTowerCost(towerType) {
+  switch (towerType) {
+    case "energy":
+      return 70;
+    case "destroyer":
+      return 50;
+    case "slower":
+      return 100;
+    case "toxic":
+      return 300;
+    case "anti_air":
+      return 100;
+    case "mine":
+      return 70;
+    case "air_mine":
+      return 70;
+    default:
+      return 0;
+  }
+}
 
 //*#########################################################
 //* ANCHOR - Initialize Images for Tower
@@ -783,6 +878,13 @@ function include_new_SaveObj_Properties() {
     }
     saveGameToLocalStorage();
   }
+
+  // Ensure passive skills exist in older saves
+  ensureXpStoreItem("passive_start_money", 0);
+  ensureXpStoreItem("passive_start_energy", 0);
+  ensureXpStoreItem("passive_mine_plus", 0);
+  ensureXpStoreItem("passive_xp_multi", 0);
+  ensureXpStoreItem("passive_sell_refund", 0);
 }
 
 //*#########################################################
@@ -1558,7 +1660,7 @@ function gameLoop() {
             }
 
             earnedMoney += enemy.extra_money;
-            save_obj.current_XP += 1;
+            save_obj.current_XP += xpGain(1);
             save_obj.money += earnedMoney;
 
             // Live-Generation durch Tower-Kills
@@ -1940,9 +2042,9 @@ function updateWaveTimer() {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
   if (waveTimer <= 0) {
-    save_obj.wave > parseInt(save_obj.active_game_target_wave / 2)
-      ? (max_mine_amount_per_wave = 5)
-      : 3;
+    const baseMines =
+      save_obj.wave > Math.floor(save_obj.active_game_target_wave / 2) ? 5 : 3;
+    max_mine_amount_per_wave = baseMines + mineBonusPerWave();
     current_mine_amount_per_wave = max_mine_amount_per_wave;
     lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
     lbl_available_mines.classList.remove("empty");
@@ -1999,7 +2101,7 @@ function won_game() {
   if (save_obj.assign_XP === false) {
     if (!save_obj.assign_XP) {
       save_obj.current_XP = Math.floor(
-        save_obj.current_XP + save_obj.wave * 30,
+        save_obj.current_XP + xpGain(save_obj.wave * 30),
       );
       save_obj.XP += save_obj.current_XP;
 
@@ -2581,7 +2683,9 @@ btn_SellTower.addEventListener("click", () => {
   const confirm = window.confirm("Soll der Turm wirklich verkauft werden?");
   if (confirm) {
     if (tower && tower.tower_is_build) {
-      const sell_price = 30; // 50% des Kaufpreises zurückgeben
+      const cost = baseTowerCost(tower.tower_type);
+      const factor = Math.min(0.75, Math.max(0.5, getSellRefundFactor()));
+      const sell_price = cost > 0 ? Math.floor(cost * factor) : 30;
       save_obj.money += sell_price;
       tower.tower_is_build = false;
       tower.tower_type = "";
@@ -2845,6 +2949,17 @@ function start_game() {
     save_obj.free_build_per_wave_bonus = 3; // multiplies wave factor
   } else {
     save_obj.free_build_per_wave_bonus = 0;
+  }
+
+  // Apply passive start bonuses (from skill tree)
+  save_obj.money += startMoneyBonus();
+  save_obj.energy_start_level += startEnergyBonus();
+  // initial mines for wave 0 UI
+  max_mine_amount_per_wave = 3 + mineBonusPerWave();
+  current_mine_amount_per_wave = max_mine_amount_per_wave;
+  if (lbl_available_mines) {
+    lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
+    lbl_available_mines.classList.remove("empty");
   }
 
   game_is_running = true;
@@ -3171,6 +3286,115 @@ btn_life_upgrade.addEventListener("click", () => {
     }
   }
 });
+
+function purchasePassiveSkill({ key, displayName, price, maxLevel }) {
+  const current = getPassiveLevel(key);
+  if (current >= maxLevel) {
+    new GameMessage(
+      "Max. Stufe erreicht",
+      `"${displayName}" ist bereits auf Stufe ${maxLevel}.`,
+      "error",
+      3500,
+    ).show_Message();
+    return;
+  }
+
+  const ok = check_XPCoins(price, displayName);
+  if (!ok) return;
+
+  const item = return_Item_Amount_and_existence(save_obj, key);
+  if (item.available) {
+    save_obj.XP_Store_Items[item.index].amount += 1;
+  } else {
+    save_obj.XP_Store_Items.push({ name: key, amount: 1 });
+  }
+
+  save_obj.XP_Coins -= price;
+  render_XP_Coins(save_obj);
+  render_amount(save_obj);
+  render_xp_on_homescreen();
+  save_Game_without_saveDate();
+}
+
+if (btn_start_money) {
+  btn_start_money.addEventListener("click", () => {
+    const price = Number(btn_start_money.getAttribute("data-skill_price"));
+    const confirm = window.confirm(
+      `Möchtest du "Startgeld" für ${price} XP-Coins kaufen?`,
+    );
+    if (!confirm) return;
+    purchasePassiveSkill({
+      key: "passive_start_money",
+      displayName: "Startgeld",
+      price,
+      maxLevel: 5,
+    });
+  });
+}
+
+if (btn_start_energy) {
+  btn_start_energy.addEventListener("click", () => {
+    const price = Number(btn_start_energy.getAttribute("data-skill_price"));
+    const confirm = window.confirm(
+      `Möchtest du "Startenergie" für ${price} XP-Coins kaufen?`,
+    );
+    if (!confirm) return;
+    purchasePassiveSkill({
+      key: "passive_start_energy",
+      displayName: "Startenergie",
+      price,
+      maxLevel: 5,
+    });
+  });
+}
+
+if (btn_mine_plus) {
+  btn_mine_plus.addEventListener("click", () => {
+    const price = Number(btn_mine_plus.getAttribute("data-skill_price"));
+    const confirm = window.confirm(
+      `Möchtest du "+1 Mine pro Welle" für ${price} XP-Coins kaufen?`,
+    );
+    if (!confirm) return;
+    purchasePassiveSkill({
+      key: "passive_mine_plus",
+      displayName: "+1 Mine pro Welle",
+      price,
+      maxLevel: 3,
+    });
+  });
+}
+
+if (btn_xp_multiplier) {
+  btn_xp_multiplier.addEventListener("click", () => {
+    const price = Number(btn_xp_multiplier.getAttribute("data-skill_price"));
+    const confirm = window.confirm(
+      `Möchtest du "XP Multiplikator" für ${price} XP-Coins kaufen?`,
+    );
+    if (!confirm) return;
+    purchasePassiveSkill({
+      key: "passive_xp_multi",
+      displayName: "XP Multiplikator",
+      price,
+      maxLevel: 8,
+    });
+  });
+}
+
+if (btn_sell_refund) {
+  btn_sell_refund.addEventListener("click", () => {
+    const price = Number(btn_sell_refund.getAttribute("data-skill_price"));
+    const confirm = window.confirm(
+      `Möchtest du "Refund beim Verkaufen" für ${price} XP-Coins kaufen?`,
+    );
+    if (!confirm) return;
+    purchasePassiveSkill({
+      key: "passive_sell_refund",
+      displayName: "Refund beim Verkaufen",
+      price,
+      maxLevel: 5,
+    });
+  });
+}
 
 function render_xp_on_homescreen() {
   lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(

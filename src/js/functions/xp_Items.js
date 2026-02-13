@@ -1,20 +1,34 @@
 //* Display Amount of Items
 export function render_amount(save_obj) {
   const lbl_trap_discount_amount = document.getElementById(
-    "lbl_trap_discount_amount"
+    "lbl_trap_discount_amount",
   );
   const lbl_mine_discount_amount = document.getElementById(
-    "lbl_mine_discount_amount"
+    "lbl_mine_discount_amount",
   );
   const lbl_tower_discount_amount = document.getElementById(
-    "lbl_tower_discount_amount"
+    "lbl_tower_discount_amount",
   );
   const lbl_buymenu_tower_discount_amount = document.getElementById(
-    "lbl_buymenu_tower_discount_amount"
+    "lbl_buymenu_tower_discount_amount",
   );
   const checkbox_field_tower = document.getElementById("checkbox_field_tower");
   const checkbox_field_trap = document.getElementById("checkbox_field_trap");
   const tile_live_upgr = document.getElementById("tile_live_upgr");
+
+  const lbl_start_money_amount = document.getElementById(
+    "lbl_start_money_amount",
+  );
+  const lbl_start_energy_amount = document.getElementById(
+    "lbl_start_energy_amount",
+  );
+  const lbl_mine_plus_amount = document.getElementById("lbl_mine_plus_amount");
+  const lbl_xp_multiplier_amount = document.getElementById(
+    "lbl_xp_multiplier_amount",
+  );
+  const lbl_sell_refund_amount = document.getElementById(
+    "lbl_sell_refund_amount",
+  );
 
   let use_discount = {
     trap_discount: false,
@@ -37,7 +51,7 @@ export function render_amount(save_obj) {
   //* Show Amount of Tower Discount
   const tower_item = return_Item_Amount_and_existence(
     save_obj,
-    "tower_rabatt_50"
+    "tower_rabatt_50",
   );
   if (tower_item.available) {
     lbl_tower_discount_amount.innerHTML = `${tower_item.amount}X`;
@@ -47,17 +61,58 @@ export function render_amount(save_obj) {
   //* Show if live upgrade is available
   const live_upgr = return_Item_Amount_and_existence(
     save_obj,
-    "live_generator"
+    "live_generator",
   );
   if (live_upgr.available) {
     tile_live_upgr.classList.add("is-active");
+  }
+
+  // Passive skills (levels)
+  const startMoney = return_Item_Amount_and_existence(
+    save_obj,
+    "passive_start_money",
+  );
+  if (lbl_start_money_amount && startMoney.available) {
+    lbl_start_money_amount.innerHTML = `Lv ${startMoney.amount}`;
+  }
+
+  const startEnergy = return_Item_Amount_and_existence(
+    save_obj,
+    "passive_start_energy",
+  );
+  if (lbl_start_energy_amount && startEnergy.available) {
+    lbl_start_energy_amount.innerHTML = `Lv ${startEnergy.amount}`;
+  }
+
+  const minePlus = return_Item_Amount_and_existence(
+    save_obj,
+    "passive_mine_plus",
+  );
+  if (lbl_mine_plus_amount && minePlus.available) {
+    lbl_mine_plus_amount.innerHTML = `Lv ${minePlus.amount}`;
+  }
+
+  const xpMulti = return_Item_Amount_and_existence(
+    save_obj,
+    "passive_xp_multi",
+  );
+  if (lbl_xp_multiplier_amount && xpMulti.available) {
+    lbl_xp_multiplier_amount.innerHTML = `Lv ${xpMulti.amount}`;
+  }
+
+  const sellRefund = return_Item_Amount_and_existence(
+    save_obj,
+    "passive_sell_refund",
+  );
+  if (lbl_sell_refund_amount && sellRefund.available) {
+    lbl_sell_refund_amount.innerHTML = `Lv ${sellRefund.amount}`;
   }
 }
 
 export function render_XP_Coins(save_obj) {
   const lbl_xp_store_coins = document.getElementById("lbl_xp_store_coins");
   lbl_xp_store_coins.innerHTML = `${save_obj.XP_Coins.toLocaleString(
-    "de-DE"
+    "de-DE",
   )} XP-Coins`;
 }
 
