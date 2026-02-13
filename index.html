@@ -113,6 +113,71 @@
       </div>
     </div>
 
+    <!-- Daily Loot Modal -->
+    <div id="dailyLootModal" class="modal daily-loot-modal" aria-hidden="true">
+      <div
+        class="daily-loot-content"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Daily Loot"
+      >
+        <div class="daily-loot-header">
+          <h2>Daily Loot</h2>
+          <p>Öffne 3 Kisten – 1x pro Tag</p>
+        </div>
+
+        <div class="daily-loot-boxes" id="dailyLootBoxes">
+          <button
+            class="daily-loot-box"
+            type="button"
+            data-box-index="0"
+            aria-label="Lootbox 1"
+          >
+            <span class="dlb-face dlb-front">?</span>
+            <span class="dlb-face dlb-back"
+              ><span class="dlb-reward"></span
+            ></span>
+          </button>
+          <button
+            class="daily-loot-box"
+            type="button"
+            data-box-index="1"
+            aria-label="Lootbox 2"
+          >
+            <span class="dlb-face dlb-front">?</span>
+            <span class="dlb-face dlb-back"
+              ><span class="dlb-reward"></span
+            ></span>
+          </button>
+          <button
+            class="daily-loot-box"
+            type="button"
+            data-box-index="2"
+            aria-label="Lootbox 3"
+          >
+            <span class="dlb-face dlb-front">?</span>
+            <span class="dlb-face dlb-back"
+              ><span class="dlb-reward"></span
+            ></span>
+          </button>
+        </div>
+
+        <div class="daily-loot-footer">
+          <div class="daily-loot-hint" id="dailyLootHint">
+            Öffne alle 3 Boxen, um fortzufahren.
+          </div>
+          <button
+            id="dailyLootClose"
+            class="daily-loot-close"
+            type="button"
+            disabled
+          >
+            Weiter
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- New Modal for the end of the game -->
     <div id="gxu-overlay">
       <div class="gxu-modal" id="gxu-modal-box">

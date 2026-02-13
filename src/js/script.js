@@ -134,6 +134,12 @@ const btn_audio_mute = document.getElementById("btn_audio_mute");
 const audio_volume = document.getElementById("audio_volume");
 const btn_fx_shake = document.getElementById("btn_fx_shake");
 
+// Daily loot modal
+const dailyLootModal = document.getElementById("dailyLootModal");
+const dailyLootBoxesRoot = document.getElementById("dailyLootBoxes");
+const dailyLootClose = document.getElementById("dailyLootClose");
+const dailyLootHint = document.getElementById("dailyLootHint");
+
 // FX settings
 const FX_STORAGE_KEY = "towers.fx";
 const fxSettings = {
@@ -159,6 +165,223 @@ function saveFxSettings() {
   } catch (e) {
     // ignore
   }
+}
+
+//*#########################################################
+//* ANCHOR -Daily Loot
+//*#########################################################
+
+const DAILY_LOOT_STORAGE_KEY = "towers.daily_loot.v1";
+
+function getLocalDateKey() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function loadDailyLootState() {
+  try {
+    const raw = localStorage.getItem(DAILY_LOOT_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveDailyLootState(state) {
+  try {
+    localStorage.setItem(DAILY_LOOT_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // ignore
+  }
+}
+
+function weightedPick(items) {
+  const total = items.reduce((s, it) => s + (it.weight || 0), 0);
+  let r = Math.random() * total;
+  for (const it of items) {
+    r -= it.weight || 0;
+    if (r <= 0) return it.value;
+  }
+  return items[items.length - 1].value;
+}
+
+function generateDailyRewards() {
+  const pool = [
+    { weight: 40, value: { kind: "xp_coins", amount: 250 } },
+    { weight: 25, value: { kind: "xp_coins", amount: 500 } },
+    { weight: 10, value: { kind: "xp_coins", amount: 1000 } },
+    { weight: 12, value: { kind: "item", name: "trap_rabatt_50", amount: 2 } },
+    {
+      weight: 10,
+      value: { kind: "item", name: "mine_charges_3_pack", amount: 2 },
+    },
+    { weight: 6, value: { kind: "item", name: "tower_rabatt_50", amount: 2 } },
+  ];
+
+  const rewards = [];
+  for (let i = 0; i < 3; i++) {
+    rewards.push(weightedPick(pool));
+  }
+  return rewards;
+}
+
+function formatDailyReward(reward) {
+  if (!reward) return "";
+  if (reward.kind === "xp_coins") {
+    return `+${Number(reward.amount).toLocaleString("de-DE")} XP-Coins`;
+  }
+  if (reward.kind === "item") {
+    const nameMap = {
+      trap_rabatt_50: "Fallen-Rabatt",
+      tower_rabatt_50: "Tower-Rabatt",
+      mine_charges_3_pack: "3er-Minen-Pack",
+    };
+    const label = nameMap[reward.name] ?? reward.name;
+    return `+${reward.amount}x ${label}`;
+  }
+  return "Geschenk";
+}
+
+function addXpStoreAmount(itemName, delta) {
+  const item = return_Item_Amount_and_existence(save_obj, itemName);
+  if (item.available) {
+    save_obj.XP_Store_Items[item.index].amount += delta;
+  } else {
+    save_obj.XP_Store_Items.push({ name: itemName, amount: delta });
+  }
+}
+
+function applyDailyReward(reward) {
+  if (!reward) return;
+
+  if (reward.kind === "xp_coins") {
+    save_obj.XP_Coins += Number(reward.amount) || 0;
+    render_XP_Coins(save_obj);
+    render_xp_on_homescreen();
+    save_Game_without_saveDate();
+    return;
+  }
+
+  if (reward.kind === "item") {
+    addXpStoreAmount(reward.name, Number(reward.amount) || 0);
+    render_amount(save_obj);
+    save_Game_without_saveDate();
+  }
+}
+
+function initDailyLoot() {
+  if (!dailyLootModal || !dailyLootBoxesRoot || !dailyLootClose) return;
+
+  const today = getLocalDateKey();
+  let state = loadDailyLootState();
+
+  const needsNew =
+    !state ||
+    state.dateKey !== today ||
+    !Array.isArray(state.rewards) ||
+    state.rewards.length !== 3;
+
+  if (needsNew) {
+    state = {
+      dateKey: today,
+      rewards: generateDailyRewards(),
+      opened: [false, false, false],
+    };
+    saveDailyLootState(state);
+  }
+
+  if (!Array.isArray(state.opened) || state.opened.length !== 3) {
+    state.opened = [false, false, false];
+    saveDailyLootState(state);
+  }
+
+  const openedCount = state.opened.filter(Boolean).length;
+  if (openedCount >= 3) {
+    dailyLootModal.classList.remove("active");
+    dailyLootModal.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  // Show modal on first open of day (or until all 3 opened)
+  dailyLootModal.classList.add("active");
+  dailyLootModal.setAttribute("aria-hidden", "false");
+
+  const boxButtons = dailyLootBoxesRoot.querySelectorAll(".daily-loot-box");
+  boxButtons.forEach((btn) => {
+    const index = Number(btn.getAttribute("data-box-index"));
+    const frontEl = btn.querySelector(".dlb-front");
+    const rewardEl = btn.querySelector(".dlb-reward");
+
+    btn.classList.remove("is-opening");
+    btn.classList.toggle("is-opened", Boolean(state.opened[index]));
+    if (frontEl) {
+      frontEl.textContent = state.opened[index]
+        ? formatDailyReward(state.rewards[index])
+        : "?";
+    }
+    if (rewardEl) rewardEl.textContent = "";
+
+    btn.disabled = Boolean(state.opened[index]);
+
+    btn.addEventListener(
+      "click",
+      () => {
+        // reload latest state to avoid race
+        const latest = loadDailyLootState() || state;
+        if (latest.dateKey !== today) return;
+        if (latest.opened?.[index]) return;
+
+        btn.classList.add("is-opening");
+        btn.disabled = true;
+
+        const reward = latest.rewards[index];
+        // Apply reward immediately (persist), then animate reveal
+        applyDailyReward(reward);
+        latest.opened[index] = true;
+        saveDailyLootState(latest);
+
+        setTimeout(() => {
+          btn.classList.remove("is-opening");
+          btn.classList.add("is-opened");
+          const fEl = btn.querySelector(".dlb-front");
+          if (fEl) {
+            fEl.textContent = formatDailyReward(reward);
+          } else {
+            btn.textContent = formatDailyReward(reward);
+          }
+          const rEl = btn.querySelector(".dlb-reward");
+          if (rEl) rEl.textContent = "";
+
+          const count = (latest.opened || []).filter(Boolean).length;
+          if (dailyLootHint) {
+            dailyLootHint.textContent =
+              count >= 3
+                ? "Belohnungen eingesammelt!"
+                : `Noch ${3 - count} Box(en) öffnen…`;
+          }
+
+          if (count >= 3) {
+            dailyLootClose.disabled = false;
+          }
+        }, 520);
+      },
+      { once: false },
+    );
+  });
+
+  // initial close state
+  dailyLootClose.disabled = openedCount < 3;
+  dailyLootClose.addEventListener("click", () => {
+    const latest = loadDailyLootState() || state;
+    const count = (latest.opened || []).filter(Boolean).length;
+    if (count < 3) return;
+    dailyLootModal.classList.remove("active");
+    dailyLootModal.setAttribute("aria-hidden", "true");
+  });
 }
 
 function syncFxControls() {
@@ -946,6 +1169,12 @@ btn_show_instructions.addEventListener("click", () => {
 
 window.onload = () => {
   loadGameFromLocalStorage();
+  try {
+    // ensure UI state is up to date (also controls checkbox visibility)
+    render_amount(save_obj);
+    render_XP_Coins(save_obj);
+  } catch (e) {}
+  initDailyLoot();
   // const greeting = new GameMessage(
   //   "Willkommen zurück",
   //   "Du erhälst heute 500 XP-Coins",

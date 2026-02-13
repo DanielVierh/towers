@@ -67,14 +67,14 @@ body.red-flash {
   border-radius: 15px;
   box-shadow: inset 0 0 10px white;
 }
-
 .labels-wrapper .audio-controls {
   display: flex;
   align-items: center;
   gap: 8px;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
-
 .labels-wrapper .audio-controls .audio-btn {
   background: rgba(0, 0, 0, 0.4);
   color: white;
@@ -85,13 +85,11 @@ body.red-flash {
   font-weight: 700;
   font-size: 0.75rem;
 }
-
 .labels-wrapper .audio-controls .audio-btn.is-muted {
   opacity: 0.7;
   color: #ffb3b3;
   border-color: rgba(255, 180, 180, 0.55);
 }
-
 .labels-wrapper .audio-controls .audio-slider {
   width: 110px;
   accent-color: #7fffd4;
@@ -108,6 +106,197 @@ body.red-flash {
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Daily Loot */
+.daily-loot-modal {
+  z-index: 6000;
+  background: radial-gradient(circle at 50% 20%, rgba(120, 255, 220, 0.18), rgba(0, 0, 0, 0.75) 60%), rgba(0, 0, 0, 0.55);
+}
+.daily-loot-modal.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.daily-loot-content {
+  width: min(860px, 94vw);
+  border-radius: 18px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(10, 11, 27, 0.92), rgba(0, 0, 0, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 40px rgba(127, 255, 212, 0.12), inset 0 0 25px rgba(255, 255, 255, 0.08);
+}
+
+.daily-loot-header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+.daily-loot-header h2 {
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(127, 255, 212, 0.35);
+}
+.daily-loot-header p {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.daily-loot-boxes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+}
+
+@keyframes dlb-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes dlb-shake {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-4deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(4deg) scale(1.04);
+  }
+  75% {
+    transform: rotate(-3deg) scale(1.02);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+.daily-loot-box {
+  width: 150px;
+  height: 190px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(24, 54, 50, 0.9), rgba(24, 24, 65, 0.9));
+  box-shadow: 0 0 18px rgba(127, 255, 212, 0.12), inset 0 0 18px rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  transform-style: preserve-3d;
+  transition: transform 420ms ease, box-shadow 420ms ease, filter 420ms ease;
+  animation: dlb-float 2.6s ease-in-out infinite;
+  outline: none;
+}
+.daily-loot-box::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 0%, rgba(127, 255, 212, 0.25), transparent 60%);
+  opacity: 0.8;
+  filter: blur(8px);
+  z-index: 0;
+}
+.daily-loot-box:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 0 28px rgba(127, 255, 212, 0.18), inset 0 0 18px rgba(255, 255, 255, 0.1);
+}
+.daily-loot-box:disabled {
+  cursor: default;
+  filter: grayscale(0.05);
+}
+.daily-loot-box.is-opening {
+  animation: dlb-shake 520ms ease-in-out 1;
+}
+.daily-loot-box.is-opened {
+  transform: none;
+  animation: none;
+}
+
+.daily-loot-box.is-opened .dlb-back {
+  display: none;
+}
+
+.daily-loot-box.is-opened .dlb-front {
+  font-size: 0.95rem;
+  padding: 14px;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.dlb-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.95);
+  align-items: center;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  z-index: 1;
+}
+
+.dlb-front {
+  transform: rotateY(0deg);
+  font-size: 3.4rem;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.35), 0 0 28px rgba(127, 255, 212, 0.22);
+}
+
+.dlb-back {
+  transform: rotateY(180deg);
+  padding: 14px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.06));
+}
+
+.dlb-reward {
+  display: block;
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 0 12px rgba(127, 255, 212, 0.12);
+}
+
+.daily-loot-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.daily-loot-hint {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.daily-loot-close {
+  background-color: rgb(24, 24, 65);
+  padding: 10px 18px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8), 0 0 16px rgba(127, 255, 212, 0.14);
+}
+.daily-loot-close:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .modal-content {
@@ -181,7 +370,6 @@ body.red-flash {
   font-size: 1.2rem;
   z-index: 9999;
 }
-
 .modal-towers #checkbox_field_tower,
 .modal-towers #checkbox_field_trap,
 .modal-towers #checkbox_field_trap_charges,
@@ -202,7 +390,6 @@ body.red-flash {
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: rgba(0, 0, 0, 0.25);
 }
-
 .modal-towers #checkbox_field_tower label,
 .modal-towers #checkbox_field_trap label,
 .modal-towers #checkbox_field_trap_charges label,
@@ -214,18 +401,19 @@ body.red-flash {
 .modal-skill #checkbox_field_trap_charges label {
   font-size: 0.85rem;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
-
-.modal-towers #checkbox_field_tower input[type="checkbox"],
-.modal-towers #checkbox_field_trap input[type="checkbox"],
-.modal-towers #checkbox_field_trap_charges input[type="checkbox"],
-.modal-upgrade #checkbox_field_tower input[type="checkbox"],
-.modal-upgrade #checkbox_field_trap input[type="checkbox"],
-.modal-upgrade #checkbox_field_trap_charges input[type="checkbox"],
-.modal-skill #checkbox_field_tower input[type="checkbox"],
-.modal-skill #checkbox_field_trap input[type="checkbox"],
-.modal-skill #checkbox_field_trap_charges input[type="checkbox"] {
+.modal-towers #checkbox_field_tower input[type=checkbox],
+.modal-towers #checkbox_field_trap input[type=checkbox],
+.modal-towers #checkbox_field_trap_charges input[type=checkbox],
+.modal-upgrade #checkbox_field_tower input[type=checkbox],
+.modal-upgrade #checkbox_field_trap input[type=checkbox],
+.modal-upgrade #checkbox_field_trap_charges input[type=checkbox],
+.modal-skill #checkbox_field_tower input[type=checkbox],
+.modal-skill #checkbox_field_trap input[type=checkbox],
+.modal-skill #checkbox_field_trap_charges input[type=checkbox] {
   width: 20px;
   height: 20px;
   cursor: pointer;
@@ -244,7 +432,7 @@ body.red-flash {
 .modal-skill .grid-wrapper .tile {
   background: linear-gradient(45deg, rgb(24, 54, 50), transparent);
   -webkit-backdrop-filter: blur(13px);
-  backdrop-filter: blur(13px);
+          backdrop-filter: blur(13px);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -303,15 +491,13 @@ body.red-flash {
   width: 60px;
   height: 50px;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
   -o-object-position: top;
-  object-position: top;
+     object-position: top;
   background-color: rgba(97, 97, 99, 0.4705882353);
   border-radius: 5px;
   padding: 5px;
-  box-shadow:
-    0 0 15px rgba(255, 255, 255, 0.284),
-    inset 0 0 15px white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile .button-buy,
@@ -396,9 +582,7 @@ body.red-flash {
   justify-content: center;
   align-items: center;
   text-align: center;
-  box-shadow:
-    inset 0 0 15px black,
-    0 0 15px black;
+  box-shadow: inset 0 0 15px black, 0 0 15px black;
   text-transform: uppercase;
   text-shadow: 0 0 10px black;
   outline: 1px solid rgba(255, 255, 255, 0.595);
@@ -428,8 +612,8 @@ body.red-flash {
 
 select {
   -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   background-color: #333;
   color: white;
   padding: 10px;
@@ -470,7 +654,7 @@ select option {
   width: 70px;
   height: auto;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
   background: black;
 }
 
@@ -537,9 +721,7 @@ select option {
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
-  transition:
-    transform 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 .modal-sel-lvl .grid-wrapper .tile.overpriced {
   opacity: 0.2;
@@ -552,7 +734,7 @@ select option {
   width: 150px;
   height: 150px;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
   border-radius: 50%;
   margin-bottom: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
@@ -623,7 +805,7 @@ select option {
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
   -webkit-backdrop-filter: blur(6px) brightness(1.2);
-  backdrop-filter: blur(6px) brightness(1.2);
+          backdrop-filter: blur(6px) brightness(1.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -644,9 +826,7 @@ select option {
   position: relative;
   background: linear-gradient(160deg, #000000, #162b12);
   border: 3px solid rgba(0, 200, 255, 0.45);
-  box-shadow:
-    0 0 40px rgba(0, 200, 255, 0.35),
-    inset 0 0 30px rgba(0, 140, 255, 0.22);
+  box-shadow: 0 0 40px rgba(0, 200, 255, 0.35), inset 0 0 30px rgba(0, 140, 255, 0.22);
   animation: gxu-dropIn 0.45s cubic-bezier(0.18, 1.3, 0.45, 1);
 }
 
@@ -667,6 +847,7 @@ select option {
   font-weight: 900;
   margin-bottom: 24px;
   background: linear-gradient(90deg, #b1f696, #04490b);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 18px rgba(0, 180, 255, 0.55);
@@ -686,7 +867,7 @@ select option {
   border: 1px solid rgba(0, 200, 255, 0.25);
   box-shadow: inset 0 0 12px rgba(0, 200, 255, 0.08);
   -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
 }
 
 .gxu-stat-box span {
@@ -730,11 +911,7 @@ select option {
   transform: translateX(-50%);
   width: 260px;
   height: 260px;
-  background: radial-gradient(
-    circle,
-    rgba(0, 234, 255, 0.3333333333),
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(0, 234, 255, 0.3333333333), transparent 70%);
   filter: blur(22px);
   opacity: 0;
   transition: opacity 0.4s;
@@ -758,11 +935,7 @@ select option {
 }
 
 .gxu-gameover {
-  background: linear-gradient(
-    90deg,
-    rgba(247, 100, 64, 0.5803921569),
-    rgba(159, 14, 14, 0.2588235294)
-  ) !important;
+  background: linear-gradient(90deg, rgba(247, 100, 64, 0.5803921569), rgba(159, 14, 14, 0.2588235294)) !important;
   text-shadow: 0 0 1px rgb(247, 235, 235) !important;
   border-radius: 8px;
-} /*# sourceMappingURL=styles.css.map */
+}/*# sourceMappingURL=styles.css.map */
