@@ -140,6 +140,107 @@ const dailyLootBoxesRoot = document.getElementById("dailyLootBoxes");
 const dailyLootClose = document.getElementById("dailyLootClose");
 const dailyLootHint = document.getElementById("dailyLootHint");
 
+// Wave intro banner
+const waveIntroBanner = document.getElementById("waveIntroBanner");
+const waveIntroSpriteMain = document.getElementById("waveIntroSpriteMain");
+const waveIntroSpriteSpecial1 = document.getElementById(
+  "waveIntroSpriteSpecial1",
+);
+const waveIntroSpriteSpecial2 = document.getElementById(
+  "waveIntroSpriteSpecial2",
+);
+const waveIntroText = document.getElementById("waveIntroText");
+let waveIntroLastWaveKey = null;
+
+function creepPreviewFrame1Src(creepIndex) {
+  const idx = Number(creepIndex);
+  if (!Number.isFinite(idx) || idx < 0) return null;
+  const base = creep_properties?.[idx]?.src;
+  if (!base || typeof base !== "string") return null;
+  return `${base}/frame_1.png`;
+}
+
+function specialPreviewFrame1Src(specialIndex) {
+  const idx = Number(specialIndex);
+  if (!Number.isFinite(idx) || idx < 0) return null;
+  const base = special_creeps?.[idx]?.src;
+  if (!base || typeof base !== "string") return null;
+  return `${base}/frame_1.png`;
+}
+
+function setWaveIntroVisible(visible) {
+  if (!waveIntroBanner) return;
+  if (visible) {
+    waveIntroBanner.classList.add("active");
+    waveIntroBanner.setAttribute("aria-hidden", "false");
+  } else {
+    waveIntroBanner.classList.remove("active");
+    waveIntroBanner.classList.remove("animate");
+    waveIntroBanner.setAttribute("aria-hidden", "true");
+  }
+}
+
+function setWaveIntroSprites(mainSrc, specialSrcs = []) {
+  const applyImg = (el, src) => {
+    if (!el) return;
+    if (!src) {
+      el.style.display = "none";
+      return;
+    }
+    el.style.display = "block";
+    el.src = src;
+    el.onerror = () => {
+      el.style.display = "none";
+    };
+  };
+
+  applyImg(waveIntroSpriteMain, mainSrc);
+  applyImg(waveIntroSpriteSpecial1, specialSrcs[0]);
+  applyImg(waveIntroSpriteSpecial2, specialSrcs[1]);
+}
+
+function showWaveIntroCountdown({ waveNumber, creepIndex, secondsLeft }) {
+  if (!waveIntroBanner || !waveIntroText) return;
+
+  const mainSrc = creepPreviewFrame1Src(creepIndex);
+  const specialSrcs = [];
+  // Special creeps spawn rules are based on the wave number (`call_special_creep()`)
+  const upcomingWave = Number(waveNumber);
+  if (
+    Number.isFinite(upcomingWave) &&
+    upcomingWave !== 0 &&
+    upcomingWave % 6 === 0
+  ) {
+    specialSrcs.push(specialPreviewFrame1Src(0));
+  }
+  if (
+    Number.isFinite(upcomingWave) &&
+    upcomingWave !== 0 &&
+    upcomingWave % 10 === 0
+  ) {
+    specialSrcs.push(specialPreviewFrame1Src(1));
+  }
+  setWaveIntroSprites(mainSrc, specialSrcs.filter(Boolean));
+
+  waveIntroText.textContent = `Welle ${waveNumber} in ${secondsLeft}s`;
+  setWaveIntroVisible(true);
+}
+
+function triggerWaveIntroAnimateAndSound(waveNumber) {
+  if (!waveIntroBanner) return;
+  // Avoid replaying every second for the same wave
+  const key = String(waveNumber);
+  if (waveIntroLastWaveKey === key) return;
+  waveIntroLastWaveKey = key;
+
+  // restart animation
+  waveIntroBanner.classList.remove("animate");
+  void waveIntroBanner.offsetWidth;
+  waveIntroBanner.classList.add("animate");
+
+  audio.play("wave_intro", { force: true, cooldownMs: 0, volume: 0.95 });
+}
+
 // FX settings
 const FX_STORAGE_KEY = "towers.fx";
 const fxSettings = {
@@ -2451,7 +2552,30 @@ function updateWaveTimer() {
   if (save_obj.wave === save_obj.active_game_target_wave) {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
+
+  // Show wave banner during the last 3 seconds before the next wave
+  const upcomingWaveNumber = save_obj.wave + 1;
+  const isEndPhase = save_obj.wave === save_obj.active_game_target_wave;
+  if (!isEndPhase && upcomingWaveNumber <= save_obj.active_game_target_wave) {
+    if (waveTimer > 0 && waveTimer <= 3) {
+      showWaveIntroCountdown({
+        waveNumber: upcomingWaveNumber,
+        creepIndex: next_round_creep_index,
+        secondsLeft: waveTimer,
+      });
+      if (waveTimer === 3) {
+        triggerWaveIntroAnimateAndSound(upcomingWaveNumber);
+      }
+    } else {
+      setWaveIntroVisible(false);
+    }
+  } else {
+    setWaveIntroVisible(false);
+  }
+
   if (waveTimer <= 0) {
+    setWaveIntroVisible(false);
+
     const baseMines =
       save_obj.wave > Math.floor(save_obj.active_game_target_wave / 2) ? 5 : 3;
     max_mine_amount_per_wave = baseMines + mineBonusPerWave();

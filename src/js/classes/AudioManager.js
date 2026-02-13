@@ -139,6 +139,8 @@ export class AudioManager {
         return 2000;
       case "start":
         return 800;
+      case "wave_intro":
+        return 900;
       default:
         return 80;
     }
@@ -266,6 +268,26 @@ export class AudioManager {
           dur: 0.06,
           type: "triangle",
           gain: 0.1 * volume,
+        });
+        break;
+      case "wave_intro":
+        this._beep(t0, {
+          freq: 392,
+          dur: 0.05,
+          type: "triangle",
+          gain: 0.11 * volume,
+        });
+        this._beep(t0 + 0.055, {
+          freq: 523.25,
+          dur: 0.06,
+          type: "triangle",
+          gain: 0.12 * volume,
+        });
+        this._beep(t0 + 0.12, {
+          freq: 784,
+          dur: 0.07,
+          type: "triangle",
+          gain: 0.12 * volume,
         });
         break;
       default:
