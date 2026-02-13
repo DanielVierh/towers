@@ -181,6 +181,34 @@ body.red-flash {
     z-index: 9999;
   }
 
+  #checkbox_field_tower,
+  #checkbox_field_trap,
+  #checkbox_field_trap_charges {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: min(520px, 92vw);
+    margin: 10px auto 0;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.25);
+
+    label {
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #7fffd4;
+    }
+  }
+
   .grid-wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

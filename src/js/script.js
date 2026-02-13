@@ -107,6 +107,7 @@ const btn_open_skill_menu = document.getElementById("btn_open_skill_menu");
 const mdl_skill_tree = document.getElementById("mdl_skill_tree");
 const btn_close_modal_skill = document.getElementById("btn_close_modal_skill");
 const btn_trap_discount = document.getElementById("btn_trap_discount");
+const btn_mine_charges_pack = document.getElementById("btn_mine_charges_pack");
 const btn_tower_discount = document.getElementById("btn_tower_discount");
 const btn_start_money = document.getElementById("btn_start_money");
 const btn_start_energy = document.getElementById("btn_start_energy");
@@ -114,6 +115,7 @@ const btn_mine_plus = document.getElementById("btn_mine_plus");
 const btn_xp_multiplier = document.getElementById("btn_xp_multiplier");
 const btn_sell_refund = document.getElementById("btn_sell_refund");
 const check_trap_discount = document.getElementById("check_trap_discount");
+const check_mine_charges = document.getElementById("check_mine_charges");
 const check_tower_discount = document.getElementById("check_tower_discount");
 const btn_life_upgrade = document.getElementById("btn_life_upgrade");
 const tile_upgrade_liveGenerator = document.getElementById(
@@ -695,6 +697,10 @@ let save_obj = {
       amount: 0,
     },
     {
+      name: "mine_charges_3_pack",
+      amount: 0,
+    },
+    {
       name: "passive_start_money",
       amount: 0,
     },
@@ -921,6 +927,9 @@ function include_new_SaveObj_Properties() {
   ensureXpStoreItem("passive_mine_plus", 0);
   ensureXpStoreItem("passive_xp_multi", 0);
   ensureXpStoreItem("passive_sell_refund", 0);
+
+  // Ensure consumables exist in older saves
+  ensureXpStoreItem("mine_charges_3_pack", 0);
 }
 
 //*#########################################################
@@ -1320,7 +1329,7 @@ function drawTowerPlaces() {
         if (tower.tower_type === "mine" || tower.tower_type === "air_mine") {
           const charges = Number.isFinite(Number(tower.charges))
             ? Math.max(0, Math.floor(Number(tower.charges)))
-            : 3;
+            : 1;
           tower.charges = charges;
           ctx.fillText(String(charges), badgeX, badgeY);
         } else if (tower.tower_type === "spikes") {
@@ -1950,7 +1959,7 @@ function gameLoop() {
               const last = Number(tower.lastTriggeredAt) || 0;
               if (nowEpoch - last < 250) return;
               tower.lastTriggeredAt = nowEpoch;
-              if (tower.charges === undefined) tower.charges = 3;
+              if (tower.charges === undefined) tower.charges = 1;
 
               //* Mine Kill Count
               if (!got_killed) {
@@ -2007,7 +2016,7 @@ function gameLoop() {
               const last = Number(tower.lastTriggeredAt) || 0;
               if (nowEpoch - last < 250) return;
               tower.lastTriggeredAt = nowEpoch;
-              if (tower.charges === undefined) tower.charges = 3;
+              if (tower.charges === undefined) tower.charges = 1;
 
               //* Mine Kill Count
               if (!got_killed) {
@@ -2742,7 +2751,21 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     tower.tower_damage_lvl = tower_damage_lvl;
 
     if (tower_type === "mine" || tower_type === "air_mine") {
-      if (tower.charges === undefined) tower.charges = 3;
+      let charges = 1;
+      const packs = return_Item_Amount_and_existence(
+        save_obj,
+        "mine_charges_3_pack",
+      );
+      const usePacks = Boolean(
+        check_mine_charges && check_mine_charges.checked,
+      );
+      if (usePacks && packs.available && packs.amount > 0) {
+        charges = 3;
+        save_obj.XP_Store_Items[packs.index].amount -= 1;
+        render_amount(save_obj);
+        save_Game_without_saveDate();
+      }
+      tower.charges = charges;
       tower.lastTriggeredAt = 0;
     }
 
@@ -3438,6 +3461,40 @@ btn_trap_discount.addEventListener("click", () => {
     }
   }
 });
+
+//* Mine 3er-Pack (Charges)
+if (btn_mine_charges_pack) {
+  btn_mine_charges_pack.addEventListener("click", () => {
+    const price = btn_mine_charges_pack.getAttribute("data-skill_price");
+    const confirm = window.confirm(
+      `Möchtest du das 10er 3er-Minen-Pack für ${price} XP-Coins kaufen?`,
+    );
+    if (confirm) {
+      const xp_transaction = check_XPCoins(price, "3er-Minen-Pack");
+      if (xp_transaction === true) {
+        const item = return_Item_Amount_and_existence(
+          save_obj,
+          "mine_charges_3_pack",
+        );
+
+        if (item.available) {
+          save_obj.XP_Store_Items[item.index].amount += 10;
+        } else {
+          save_obj.XP_Store_Items.push({
+            name: "mine_charges_3_pack",
+            amount: 10,
+          });
+        }
+
+        save_obj.XP_Coins -= price;
+        render_XP_Coins(save_obj);
+        render_amount(save_obj);
+        render_xp_on_homescreen();
+        save_Game_without_saveDate();
+      }
+    }
+  });
+}
 
 //* Tower Discount
 btn_tower_discount.addEventListener("click", () => {

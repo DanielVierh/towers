@@ -6,6 +6,12 @@ export function render_amount(save_obj) {
   const lbl_mine_discount_amount = document.getElementById(
     "lbl_mine_discount_amount",
   );
+  const lbl_mine_charges_pack_amount = document.getElementById(
+    "lbl_mine_charges_pack_amount",
+  );
+  const lbl_mine_charges_amount = document.getElementById(
+    "lbl_mine_charges_amount",
+  );
   const lbl_tower_discount_amount = document.getElementById(
     "lbl_tower_discount_amount",
   );
@@ -14,6 +20,10 @@ export function render_amount(save_obj) {
   );
   const checkbox_field_tower = document.getElementById("checkbox_field_tower");
   const checkbox_field_trap = document.getElementById("checkbox_field_trap");
+  const checkbox_field_trap_charges = document.getElementById(
+    "checkbox_field_trap_charges",
+  );
+  const check_mine_charges = document.getElementById("check_mine_charges");
   const tile_live_upgr = document.getElementById("tile_live_upgr");
 
   const lbl_start_money_amount = document.getElementById(
@@ -42,9 +52,32 @@ export function render_amount(save_obj) {
     lbl_mine_discount_amount.innerHTML = `${item.amount} X 50% Rabatt`;
 
     if (item.amount > 0) {
-      checkbox_field_trap.style.display = "block";
+      checkbox_field_trap.style.display = "flex";
     } else {
       checkbox_field_trap.style.display = "none";
+    }
+  }
+
+  //* Show Amount of 3x Mine Charges packs
+  const mineCharges = return_Item_Amount_and_existence(
+    save_obj,
+    "mine_charges_3_pack",
+  );
+  if (mineCharges.available) {
+    if (lbl_mine_charges_pack_amount) {
+      lbl_mine_charges_pack_amount.innerHTML = `${mineCharges.amount}X`;
+    }
+    if (lbl_mine_charges_amount) {
+      lbl_mine_charges_amount.innerHTML = `${mineCharges.amount} X 3er-Minen-Pack`;
+    }
+
+    if (checkbox_field_trap_charges) {
+      if (mineCharges.amount > 0) {
+        checkbox_field_trap_charges.style.display = "flex";
+      } else {
+        checkbox_field_trap_charges.style.display = "none";
+        if (check_mine_charges) check_mine_charges.checked = false;
+      }
     }
   }
 

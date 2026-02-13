@@ -181,6 +181,56 @@ body.red-flash {
   font-size: 1.2rem;
   z-index: 9999;
 }
+
+.modal-towers #checkbox_field_tower,
+.modal-towers #checkbox_field_trap,
+.modal-towers #checkbox_field_trap_charges,
+.modal-upgrade #checkbox_field_tower,
+.modal-upgrade #checkbox_field_trap,
+.modal-upgrade #checkbox_field_trap_charges,
+.modal-skill #checkbox_field_tower,
+.modal-skill #checkbox_field_trap,
+.modal-skill #checkbox_field_trap_charges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(520px, 92vw);
+  margin: 10px auto 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.modal-towers #checkbox_field_tower label,
+.modal-towers #checkbox_field_trap label,
+.modal-towers #checkbox_field_trap_charges label,
+.modal-upgrade #checkbox_field_tower label,
+.modal-upgrade #checkbox_field_trap label,
+.modal-upgrade #checkbox_field_trap_charges label,
+.modal-skill #checkbox_field_tower label,
+.modal-skill #checkbox_field_trap label,
+.modal-skill #checkbox_field_trap_charges label {
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modal-towers #checkbox_field_tower input[type="checkbox"],
+.modal-towers #checkbox_field_trap input[type="checkbox"],
+.modal-towers #checkbox_field_trap_charges input[type="checkbox"],
+.modal-upgrade #checkbox_field_tower input[type="checkbox"],
+.modal-upgrade #checkbox_field_trap input[type="checkbox"],
+.modal-upgrade #checkbox_field_trap_charges input[type="checkbox"],
+.modal-skill #checkbox_field_tower input[type="checkbox"],
+.modal-skill #checkbox_field_trap input[type="checkbox"],
+.modal-skill #checkbox_field_trap_charges input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #7fffd4;
+}
 .modal-towers .grid-wrapper,
 .modal-upgrade .grid-wrapper,
 .modal-skill .grid-wrapper {

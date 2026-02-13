@@ -254,6 +254,24 @@
           </div>
         </div>
 
+        <div class="tile">
+          <div id="lbl_mine_charges_pack_amount" class="label-amount">0X</div>
+          <h3>10 x 3er-Minen-Pack</h3>
+          <p>
+            Jede platzierte Mine / Air Mine kann 3x auslösen statt nur 1x
+            (verbraucht pro Platzierung 1 Pack, im Fallen-Menü aktivierbar).
+          </p>
+          <br />
+          <div
+            class="button-buy"
+            id="btn_mine_charges_pack"
+            data-skill_price="2000"
+          >
+            Kaufen 2.000 <br />
+            XP-Coins
+          </div>
+        </div>
+
         <div class="tile" id="tile_passive_start_money">
           <div id="lbl_start_money_amount" class="label-amount">Lv 0</div>
           <h3>Startgeld</h3>
@@ -527,9 +545,15 @@
       <div class="close-button" id="btn_close_modal_traps">x</div>
       <h2>Fallen</h2>
       <div id="lbl_mine_discount_amount"></div>
-      <p id="checkbox_field_trap">
+      <p id="checkbox_field_trap" style="display: none">
         <label for="check_trap_discount">Nutze Fallen Rabatt</label>
         <input type="checkbox" id="check_trap_discount" />
+      </p>
+
+      <div id="lbl_mine_charges_amount"></div>
+      <p id="checkbox_field_trap_charges" style="display: none">
+        <label for="check_mine_charges">Nutze 3er-Minen-Pack</label>
+        <input type="checkbox" id="check_mine_charges" />
       </p>
       <div id="lbl_available_mines"></div>
 
