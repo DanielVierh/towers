@@ -1093,9 +1093,9 @@ function startEnergyBonus() {
 }
 
 function getSellRefundFactor() {
-  // base 50% + 5% pro Level (max +25% durch Cap in purchase)
+  // base 60% + 5% pro Skill-Level
   const lvl = getPassiveLevel("passive_sell_refund");
-  return 0.5 + lvl * 0.05;
+  return 0.6 + lvl * 0.05;
 }
 
 function baseTowerCost(towerType) {
@@ -1119,6 +1119,97 @@ function baseTowerCost(towerType) {
     default:
       return 0;
   }
+}
+
+function parseMoneyValue(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.floor(n));
+}
+
+function estimateUpgradeInvestment(tower) {
+  let invested = 0;
+  const damageLvl = parseMoneyValue(tower?.tower_damage_lvl) || 1;
+  if (damageLvl >= 2) invested += 300;
+  if (damageLvl >= 3) invested += 500;
+
+  const towerRange = parseMoneyValue(tower?.range) || 80;
+  const rangeSteps = Math.max(0, Math.floor((towerRange - 80) / 20));
+  invested += rangeSteps * 300;
+
+  if (Number(tower?.live_gen) === 1) invested += 700;
+  return invested;
+}
+
+function ensureTowerEconomyState(tower) {
+  if (!tower) return;
+
+  if (!tower.tower_is_build) {
+    tower.purchase_price_paid = 0;
+    tower.upgrade_spent = 0;
+    return;
+  }
+
+  if (tower.purchase_price_paid === undefined) {
+    tower.purchase_price_paid = baseTowerCost(tower.tower_type);
+  } else {
+    tower.purchase_price_paid = parseMoneyValue(tower.purchase_price_paid);
+  }
+
+  if (tower.upgrade_spent === undefined) {
+    tower.upgrade_spent = estimateUpgradeInvestment(tower);
+  } else {
+    tower.upgrade_spent = parseMoneyValue(tower.upgrade_spent);
+  }
+}
+
+function ensureTowerEconomyStateAll() {
+  if (!Array.isArray(save_obj.tower_places)) return;
+  save_obj.tower_places.forEach((towerPlace) =>
+    ensureTowerEconomyState(towerPlace),
+  );
+}
+
+function addTowerUpgradeInvestment(tower, amount) {
+  if (!tower) return;
+  ensureTowerEconomyState(tower);
+  tower.upgrade_spent =
+    parseMoneyValue(tower.upgrade_spent) + parseMoneyValue(amount);
+}
+
+function getTowerTotalInvestment(tower) {
+  if (!tower || !tower.tower_is_build) return 0;
+  ensureTowerEconomyState(tower);
+  return (
+    parseMoneyValue(tower.purchase_price_paid) +
+    parseMoneyValue(tower.upgrade_spent)
+  );
+}
+
+function getTowerSellPrice(tower) {
+  if (!tower || !tower.tower_is_build) return 30;
+  const totalInvestment = getTowerTotalInvestment(tower);
+  const factor = Math.min(0.95, Math.max(0.25, getSellRefundFactor()));
+  const fallbackCost = baseTowerCost(tower.tower_type);
+  const basis = totalInvestment > 0 ? totalInvestment : fallbackCost;
+  return basis > 0 ? Math.floor(basis * factor) : 30;
+}
+
+function resetTowerPlaceState(tower) {
+  if (!tower) return;
+  tower.tower_is_build = false;
+  tower.tower_type = "";
+  tower.tower_img = "";
+  tower.tower_damage_lvl = 1;
+  tower.range = 80;
+  tower.cooldown = 0;
+  tower.live_gen = 0;
+  tower.kill_counter = 0;
+  tower.purchase_price_paid = 0;
+  tower.upgrade_spent = 0;
+  delete tower.expiresAt;
+  delete tower.charges;
+  delete tower.lastTriggeredAt;
 }
 
 //*#########################################################
@@ -1254,6 +1345,9 @@ function include_new_SaveObj_Properties() {
 
   // Ensure consumables exist in older saves
   ensureXpStoreItem("mine_charges_3_pack", 0);
+
+  // Ensure tower economy fields exist in older saves
+  ensureTowerEconomyStateAll();
 }
 
 //*#########################################################
@@ -1991,10 +2085,7 @@ function gameLoop() {
       if (tower.tower_is_build && tower.tower_type === "spikes") {
         const expiresAt = Number(tower.expiresAt) || 0;
         if (expiresAt && nowEpoch >= expiresAt) {
-          tower.tower_is_build = false;
-          tower.tower_type = "";
-          tower.tower_img = "";
-          delete tower.expiresAt;
+          resetTowerPlaceState(tower);
           removedAny = true;
         }
       }
@@ -2313,11 +2404,7 @@ function gameLoop() {
                   );
                   tower.charges = nextCharges;
                   if (nextCharges <= 0) {
-                    tower.tower_is_build = false;
-                    tower.tower_type = "";
-                    tower.tower_img = "";
-                    delete tower.charges;
-                    delete tower.lastTriggeredAt;
+                    resetTowerPlaceState(tower);
                     if (save_obj.free_build && pathGrid) {
                       buildObstaclesFromTowers(
                         save_obj.tower_places,
@@ -2368,11 +2455,7 @@ function gameLoop() {
                   );
                   tower.charges = nextCharges;
                   if (nextCharges <= 0) {
-                    tower.tower_is_build = false;
-                    tower.tower_type = "";
-                    tower.tower_img = "";
-                    delete tower.charges;
-                    delete tower.lastTriggeredAt;
+                    resetTowerPlaceState(tower);
                     if (save_obj.free_build && pathGrid) {
                       buildObstaclesFromTowers(
                         save_obj.tower_places,
@@ -2759,6 +2842,8 @@ canvas.addEventListener("click", (event) => {
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
         towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
         towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
+        const currentSellPrice = getTowerSellPrice(tower);
+        btn_SellTower.innerHTML = `Verkaufen +${currentSellPrice} €`;
         if (tower.tower_type === "energy") {
           lbl_needed_energy.style.display = "none";
         } else {
@@ -2820,6 +2905,10 @@ canvas.addEventListener("click", (event) => {
       tower_img: "",
       range: 80,
       cooldown: 0,
+      live_gen: 0,
+      kill_counter: 0,
+      purchase_price_paid: 0,
+      upgrade_spent: 0,
     };
     save_obj.tower_places.push(newPlace);
     tower = newPlace;
@@ -3070,8 +3159,11 @@ function substract_tower_discount() {
 //*#########################################################
 
 function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
-  const tower_price = tower_btn.getAttribute("data-tower_price");
+  const tower_price = parseMoneyValue(
+    tower_btn.getAttribute("data-tower_price"),
+  );
   const tower_img = tower_btn.getAttribute("data-tower_img");
+  ensureTowerEconomyState(tower);
   if (save_obj.money >= tower_price) {
     //* Vorhandene Minen reduzieren
     console.log("tower_type", tower_type);
@@ -3102,6 +3194,8 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     tower.tower_img = tower_img;
     tower.tower_is_build = true;
     tower.tower_damage_lvl = tower_damage_lvl;
+    tower.purchase_price_paid = tower_price;
+    tower.upgrade_spent = 0;
 
     if (tower_type === "mine" || tower_type === "air_mine") {
       let charges = 1;
@@ -3187,6 +3281,7 @@ btn_bigger_range.addEventListener("click", () => {
     // Begrenze die Reichweite auf 140 (80 + 3 * 20)
     tower.range += 20;
     save_obj.money -= upgrade_price;
+    addTowerUpgradeInvestment(tower, upgrade_price);
     towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
     mdl_upgrade.style.display = "none";
     play_pause();
@@ -3216,6 +3311,7 @@ btn_Stronger.addEventListener("click", () => {
     // Begrenze den Schaden auf Stufe 3
     tower.tower_damage_lvl += 1;
     save_obj.money -= upgrade_price;
+    addTowerUpgradeInvestment(tower, upgrade_price);
     towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
     mdl_upgrade.style.display = "none";
     play_pause();
@@ -3256,6 +3352,7 @@ btn_livegen.addEventListener("click", () => {
     tower.live_gen = 1;
     tower.kill_counter = 0;
     save_obj.money -= upgrade_price;
+    addTowerUpgradeInvestment(tower, upgrade_price);
     mdl_upgrade.style.display = "none";
     play_pause();
   } else {
@@ -3275,15 +3372,9 @@ btn_SellTower.addEventListener("click", () => {
   const confirm = window.confirm("Soll der Turm wirklich verkauft werden?");
   if (confirm) {
     if (tower && tower.tower_is_build) {
-      const cost = baseTowerCost(tower.tower_type);
-      const factor = Math.min(0.75, Math.max(0.5, getSellRefundFactor()));
-      const sell_price = cost > 0 ? Math.floor(cost * factor) : 30;
+      const sell_price = getTowerSellPrice(tower);
       save_obj.money += sell_price;
-      tower.tower_is_build = false;
-      tower.tower_type = "";
-      tower.tower_img = "";
-      tower.tower_damage_lvl = 1;
-      tower.range = 80;
+      resetTowerPlaceState(tower);
       mdl_upgrade.style.display = "none";
       play_pause();
       if (save_obj.free_build && pathGrid) {
