@@ -1921,9 +1921,10 @@ function showGameOverModal() {
       save_obj.current_XP = 2;
       new_XP_Coins = 5;
     }
+    const xpReward = Math.max(0, Math.floor(save_obj.current_XP / 2));
     gxuShowEndscreen(false, {
       kills: save_obj.total_kills.toLocaleString("de-DE"),
-      xp: `${save_obj.current_XP.toLocaleString("de-DE") / 2}`,
+      xp: xpReward,
       coins: new_XP_Coins.toLocaleString("de-DE"),
       waves: save_obj.wave - 1,
     });
@@ -4159,6 +4160,33 @@ canvas.addEventListener("mousemove", function (event) {
 function gxuShowEndscreen(win, stats) {
   const title = document.getElementById("gxu-title");
   const box = document.getElementById("gxu-modal-box");
+  const overlay = document.getElementById("gxu-overlay");
+
+  const parseStatNumber = (value) => {
+    if (typeof value === "number") return Math.max(0, Math.floor(value));
+    const digitsOnly = String(value ?? "").replace(/[^\d-]/g, "");
+    const parsed = Number(digitsOnly);
+    return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : 0;
+  };
+
+  const animateCount = (element, targetValue, duration = 900) => {
+    if (!element) return;
+    const target = Math.max(0, Math.floor(targetValue));
+    const startAt = performance.now();
+
+    const step = (now) => {
+      const elapsed = now - startAt;
+      const t = Math.min(1, elapsed / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const current = Math.floor(target * eased);
+      element.textContent = current.toLocaleString("de-DE");
+      if (t < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  };
 
   if (win) {
     title.textContent = "Gewonnen!";
@@ -4170,12 +4198,26 @@ function gxuShowEndscreen(win, stats) {
     title.classList.add("gxu-gameover");
   }
 
-  document.getElementById("gxu-s-kills").textContent = stats.kills;
-  document.getElementById("gxu-s-xp").textContent = stats.xp;
-  document.getElementById("gxu-s-coins").textContent = stats.coins;
-  document.getElementById("gxu-s-waves").textContent = stats.waves;
+  const elKills = document.getElementById("gxu-s-kills");
+  const elXp = document.getElementById("gxu-s-xp");
+  const elCoins = document.getElementById("gxu-s-coins");
+  const elWaves = document.getElementById("gxu-s-waves");
 
-  document.getElementById("gxu-overlay").classList.add("gxu-active");
+  const kills = parseStatNumber(stats?.kills);
+  const xp = parseStatNumber(stats?.xp);
+  const coins = parseStatNumber(stats?.coins);
+  const waves = parseStatNumber(stats?.waves);
+
+  animateCount(elKills, kills, 850);
+  animateCount(elXp, xp, 1050);
+  animateCount(elCoins, coins, 1200);
+  animateCount(elWaves, waves, 900);
+
+  box.classList.remove("gxu-ready");
+  void box.offsetWidth;
+  box.classList.add("gxu-ready");
+
+  overlay.classList.add("gxu-active");
 }
 function gxuClose() {
   document.getElementById("gxu-overlay").classList.remove("gxu-active");
