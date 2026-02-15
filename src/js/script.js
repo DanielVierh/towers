@@ -70,15 +70,23 @@ const TRAP_SVGS = {
     <path d="M48 22l-10 6" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
     <path d="M32 14c8 0 14 6 14 14" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round"/>
   </svg>`,
-  spikes: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-    <rect x="10" y="34" width="44" height="16" rx="3" fill="#2b2b2b"/>
-    <path d="M14 34 L20 18 L26 34 Z M24 34 L32 14 L40 34 Z M38 34 L46 18 L52 34 Z" fill="#eaeaea"/>
-    <rect x="12" y="48" width="40" height="2" fill="#111" opacity="0.6"/>
-  </svg>`,
+};
+
+const TRAP_IMAGE_SOURCES = {
+  spikes: "src/assets/mine/trap.png",
 };
 
 const trapIconImages = new Map();
 function getTrapIconImage(trapType) {
+  const imageSrc = TRAP_IMAGE_SOURCES[trapType];
+  if (imageSrc) {
+    if (trapIconImages.has(trapType)) return trapIconImages.get(trapType);
+    const img = new Image();
+    img.src = imageSrc;
+    trapIconImages.set(trapType, img);
+    return img;
+  }
+
   const svg = TRAP_SVGS[trapType];
   if (!svg) return null;
   if (trapIconImages.has(trapType)) return trapIconImages.get(trapType);
@@ -1721,11 +1729,17 @@ function drawTowerPlaces() {
 
       if (tower.tower_type === "spikes") {
         // Spikes use SVG icon
-        drawY = tower.y;
-        drawW = 30;
-        drawH = 30;
+        drawX = tower.x - 15;
+        drawY = tower.y - 15;
+        drawW = 60;
+        drawH = 60;
         const trapImg = getTrapIconImage("spikes");
-        if (trapImg) {
+        if (
+          trapImg &&
+          trapImg.complete &&
+          trapImg.naturalWidth > 0 &&
+          trapImg.naturalHeight > 0
+        ) {
           ctx.drawImage(trapImg, drawX, drawY, drawW, drawH);
         }
       } else {
