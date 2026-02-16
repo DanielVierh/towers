@@ -2383,6 +2383,7 @@ function gameLoop() {
                   enemy.pos_x,
                   enemy.pos_y,
                   "blue",
+                  { targetRef: enemy, hitRadius: 10 },
                 ),
               );
               audio.play("laser_blue");
@@ -2417,6 +2418,7 @@ function gameLoop() {
                     enemy.pos_x,
                     enemy.pos_y,
                     "green",
+                    { targetRef: enemy, hitRadius: 10 },
                   ),
                 );
                 audio.play("laser_green");
@@ -2439,6 +2441,7 @@ function gameLoop() {
                   enemy.pos_x,
                   enemy.pos_y,
                   "red",
+                  { targetRef: enemy, hitRadius: 10 },
                 ),
               );
               audio.play("laser_red");
@@ -2460,6 +2463,7 @@ function gameLoop() {
                   enemy.pos_x,
                   enemy.pos_y,
                   "sniper",
+                  { targetRef: enemy, hitRadius: 12 },
                 ),
               );
               audio.play("laser_red");
@@ -2541,6 +2545,7 @@ function gameLoop() {
                   enemy.pos_x,
                   enemy.pos_y,
                   "missle",
+                  { targetRef: enemy, hitRadius: 12 },
                 ),
               );
               audio.play("missile");
@@ -2679,7 +2684,10 @@ function gameLoop() {
     laser.draw(ctx);
 
     //* Entferne den Laser, wenn er das Ziel erreicht hat
-    if (laser.posX === laser.targetX && laser.posY === laser.targetY) {
+    if (
+      laser.finished ||
+      (laser.posX === laser.targetX && laser.posY === laser.targetY)
+    ) {
       spawnHitParticles(laser.targetX, laser.targetY, laser.color);
       lasers.splice(index, 1);
     }
