@@ -34,6 +34,7 @@ const btn_close_modal_towers = document.getElementById(
 const btn_Slower = document.getElementById("btn_Slower");
 const btn_Destroyer = document.getElementById("btn_Destroyer");
 const btn_Toxic = document.getElementById("btn_Toxic");
+const btn_Sniper = document.getElementById("btn_Sniper");
 const btn_energy = document.getElementById("btn_energy");
 const btn_close_modal_upgrade = document.getElementById(
   "btn_close_modal_upgrade",
@@ -122,6 +123,9 @@ const btn_start_energy = document.getElementById("btn_start_energy");
 const btn_mine_plus = document.getElementById("btn_mine_plus");
 const btn_xp_multiplier = document.getElementById("btn_xp_multiplier");
 const btn_sell_refund = document.getElementById("btn_sell_refund");
+const btn_unlock_sniper_tower = document.getElementById(
+  "btn_unlock_sniper_tower",
+);
 const check_trap_discount = document.getElementById("check_trap_discount");
 const check_mine_charges = document.getElementById("check_mine_charges");
 const check_tower_discount = document.getElementById("check_tower_discount");
@@ -694,6 +698,8 @@ function colorForLaser(laserColor) {
       return "rgba(255,90,90,0.95)";
     case "missle":
       return "rgba(255,210,120,0.95)";
+    case "sniper":
+      return "rgba(255, 235, 120, 0.98)";
     default:
       return "rgba(255,255,255,0.9)";
   }
@@ -1052,6 +1058,10 @@ let save_obj = {
       name: "passive_sell_refund",
       amount: 0,
     },
+    {
+      name: "unlock_sniper_tower",
+      amount: 0,
+    },
   ],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
   active_game_target_wave: 0,
@@ -1106,6 +1116,26 @@ function getSellRefundFactor() {
   return 0.6 + lvl * 0.05;
 }
 
+function getTowerBaseRange(towerType) {
+  if (towerType === "sniper") return 180;
+  return 80;
+}
+
+function getTowerMaxRange(towerType) {
+  if (towerType === "sniper") return 240;
+  return 140;
+}
+
+function getSniperCooldownByLevel(level) {
+  if (level >= 3) return 120;
+  if (level >= 2) return 170;
+  return 220;
+}
+
+function isSniperUnlocked() {
+  return getPassiveLevel("unlock_sniper_tower") > 0;
+}
+
 function baseTowerCost(towerType) {
   switch (towerType) {
     case "energy":
@@ -1115,6 +1145,8 @@ function baseTowerCost(towerType) {
     case "slower":
       return 100;
     case "toxic":
+      return 300;
+    case "sniper":
       return 300;
     case "anti_air":
       return 100;
@@ -1141,8 +1173,9 @@ function estimateUpgradeInvestment(tower) {
   if (damageLvl >= 2) invested += 300;
   if (damageLvl >= 3) invested += 500;
 
-  const towerRange = parseMoneyValue(tower?.range) || 80;
-  const rangeSteps = Math.max(0, Math.floor((towerRange - 80) / 20));
+  const baseRange = getTowerBaseRange(tower?.tower_type);
+  const towerRange = parseMoneyValue(tower?.range) || baseRange;
+  const rangeSteps = Math.max(0, Math.floor((towerRange - baseRange) / 20));
   invested += rangeSteps * 300;
 
   if (Number(tower?.live_gen) === 1) invested += 700;
@@ -1289,6 +1322,7 @@ function loadGameFromLocalStorage() {
     try {
       render_amount(save_obj);
       render_XP_Coins(save_obj);
+      syncSniperUnlockUI();
     } catch (error) {
       console.log(error);
     }
@@ -1350,12 +1384,34 @@ function include_new_SaveObj_Properties() {
   ensureXpStoreItem("passive_mine_plus", 0);
   ensureXpStoreItem("passive_xp_multi", 0);
   ensureXpStoreItem("passive_sell_refund", 0);
+  ensureXpStoreItem("unlock_sniper_tower", 0);
 
   // Ensure consumables exist in older saves
   ensureXpStoreItem("mine_charges_3_pack", 0);
 
   // Ensure tower economy fields exist in older saves
   ensureTowerEconomyStateAll();
+}
+
+function syncSniperUnlockUI() {
+  const unlocked = isSniperUnlocked();
+  if (btn_Sniper) {
+    if (unlocked) {
+      btn_Sniper.classList.remove("hidden");
+    } else {
+      btn_Sniper.classList.add("hidden");
+    }
+  }
+
+  if (btn_unlock_sniper_tower) {
+    if (unlocked) {
+      btn_unlock_sniper_tower.innerHTML = "Freigeschaltet";
+      btn_unlock_sniper_tower.classList.add("disabled");
+    } else {
+      btn_unlock_sniper_tower.innerHTML = "Kaufen 15.000 <br />XP Coins";
+      btn_unlock_sniper_tower.classList.remove("disabled");
+    }
+  }
 }
 
 //*#########################################################
@@ -1376,6 +1432,7 @@ window.onload = () => {
     // ensure UI state is up to date (also controls checkbox visibility)
     render_amount(save_obj);
     render_XP_Coins(save_obj);
+    syncSniperUnlockUI();
   } catch (e) {}
   initDailyLoot();
   // const greeting = new GameMessage(
@@ -1704,6 +1761,14 @@ function getRangeColor(tower) {
       return "rgb(255, 217, 0)"; // Rot für Stufe 3
     case 140:
       return "rgba(255, 0, 0, 0.6)"; // Rot für Stufe 4
+    case 180:
+      return "rgba(160, 140, 255, 0.85)";
+    case 200:
+      return "rgba(132, 102, 255, 0.9)";
+    case 220:
+      return "rgba(106, 58, 255, 0.95)";
+    case 240:
+      return "rgba(82, 30, 222, 1)";
     default:
       return "rgba(255, 255, 255, 0.2)"; // Schwarz für Stufe 0
   }
@@ -1838,6 +1903,8 @@ function drawTowerPlaces() {
           ctx.strokeStyle = "black"; // Grau für Anti Air
         } else if (tower.tower_type === "spikes") {
           ctx.strokeStyle = "black";
+        } else if (tower.tower_type === "sniper") {
+          ctx.strokeStyle = "purple";
         } else {
           ctx.strokeStyle = "transparent"; // Standardfarbe
         }
@@ -2359,6 +2426,79 @@ function gameLoop() {
             tower.cooldown =
               1 + tower.tower_damage_lvl * 4 + low_energy_load_slowing_effect;
 
+            //* >>> Sniper Tower <<<
+          } else if (tower.tower_type === "sniper") {
+            if (!enemy.markedForDeletion) {
+              enemy.health = 0;
+              if (enemy.isBoss) triggerScreenShake(4.4, 170);
+
+              lasers.push(
+                new Laser(
+                  tower.x + 15,
+                  tower.y,
+                  enemy.pos_x,
+                  enemy.pos_y,
+                  "sniper",
+                ),
+              );
+              audio.play("laser_red");
+
+              if (save_obj.total_kills === undefined) {
+                save_obj.total_kills = 1;
+              } else {
+                save_obj.total_kills += 1;
+              }
+
+              deathEffects.push(
+                new DeathEffect(
+                  enemy.pos_x + enemy.width / 2,
+                  enemy.pos_y + enemy.height / 2,
+                  1.3,
+                ),
+              );
+
+              triggerScreenShake(
+                enemy.isBoss ? 6.2 : 3.6,
+                enemy.isBoss ? 220 : 150,
+              );
+              audio.play("creep_death");
+
+              enemy.markedForDeletion = true;
+
+              let earnedMoney = 0;
+              if (save_obj.wave > 20) {
+                earnedMoney = 2;
+              } else if (save_obj.wave >= 4) {
+                earnedMoney = 4;
+              } else {
+                earnedMoney = 10;
+              }
+
+              earnedMoney += enemy.extra_money;
+              save_obj.current_XP += xpGain(1);
+              save_obj.money += earnedMoney;
+
+              if (tower.live_gen === 1) {
+                tower.kill_counter += 1;
+
+                if (tower.kill_counter === 20) {
+                  save_obj.live++;
+                  tower.kill_counter = 0;
+                }
+              }
+
+              moneyPopups.push({
+                x: enemy.pos_x,
+                y: enemy.pos_y,
+                amount: `+${earnedMoney}`,
+                opacity: 1,
+              });
+            }
+
+            tower.cooldown =
+              getSniperCooldownByLevel(tower.tower_damage_lvl) +
+              low_energy_load_slowing_effect;
+
             //* >>> Anti Air Tower <<<
           } else if (tower.tower_type === "anti_air") {
             //* Discover invisible Enemy
@@ -2818,6 +2958,7 @@ canvas.addEventListener("click", (event) => {
       if (!place.tower_is_build) {
         //*Open Modal for Baumenu and show current Money and Energy
         mdl_towers.style.display = "flex";
+        syncSniperUnlockUI();
         const lbl_current_money = document.getElementById("lbl_current_money");
         const lbl_current_energy =
           document.getElementById("lbl_current_energy");
@@ -2855,8 +2996,14 @@ canvas.addEventListener("click", (event) => {
         lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
         tower_img.src = tower.tower_img;
         towerTypeElement.innerHTML = `Typ: ${tower.tower_type}`;
-        towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
-        towerRangeElement.innerHTML = `Reichweite: ${tower.range} / 140`;
+        if (tower.tower_type === "sniper") {
+          towerDamageLvlElement.innerHTML = `Cooldown-Stufe: ${tower.tower_damage_lvl} / 3`;
+        } else {
+          towerDamageLvlElement.innerHTML = `Stärke: Stufe ${tower.tower_damage_lvl} / 3`;
+        }
+        towerRangeElement.innerHTML = `Reichweite: ${tower.range} / ${getTowerMaxRange(
+          tower.tower_type,
+        )}`;
         const currentSellPrice = getTowerSellPrice(tower);
         btn_SellTower.innerHTML = `Verkaufen +${currentSellPrice} €`;
         if (tower.tower_type === "energy") {
@@ -2876,7 +3023,7 @@ canvas.addEventListener("click", (event) => {
           btn_Stronger.setAttribute("data-tower_price", "300");
         }
         //* Display "Max Range" on the purchase button or show the price
-        if (tower.range === 140) {
+        if (tower.range >= getTowerMaxRange(tower.tower_type)) {
           btn_bigger_range.innerHTML = "Max. Reichweite";
         } else {
           btn_bigger_range.innerHTML = "Kaufen 300€";
@@ -2900,10 +3047,17 @@ canvas.addEventListener("click", (event) => {
           btn_bigger_range.style.display = "flex";
           document.getElementById("tile_upgrade_range").style.display = "flex";
           document.getElementById("tower_stats").style.display = "flex";
-          document.getElementById("tile_upgrade_stronger_title").innerHTML =
-            "Stärke Upgrade";
-          document.getElementById("tile_upgrade_stronger_descr").innerHTML =
-            "Erhöht die Stärke des Turms <br> 25 " + low_energy_symbol;
+          if (tower.tower_type === "sniper") {
+            document.getElementById("tile_upgrade_stronger_title").innerHTML =
+              "Cool Down Upgrade";
+            document.getElementById("tile_upgrade_stronger_descr").innerHTML =
+              "Reduziert die Abklingzeit des Snipers deutlich";
+          } else {
+            document.getElementById("tile_upgrade_stronger_title").innerHTML =
+              "Stärke Upgrade";
+            document.getElementById("tile_upgrade_stronger_descr").innerHTML =
+              "Erhöht die Stärke des Turms <br> 25 " + low_energy_symbol;
+          }
         }
       }
     }
@@ -2933,6 +3087,7 @@ canvas.addEventListener("click", (event) => {
     }
     play_pause();
     mdl_towers.style.display = "flex";
+    syncSniperUnlockUI();
     const lbl_current_money = document.getElementById("lbl_current_money");
     const lbl_current_energy = document.getElementById("lbl_current_energy");
     lbl_current_money.innerHTML = `${save_obj.money} €`;
@@ -3004,6 +3159,7 @@ const buy_btn_destroyer = document.getElementById("buy_btn_destroyer");
 const buy_btn_slower = document.getElementById("buy_btn_slower");
 const buy_btn_toxic = document.getElementById("buy_btn_toxic");
 const buy_btn_antiair = document.getElementById("buy_btn_antiair");
+const buy_btn_sniper = document.getElementById("buy_btn_sniper");
 
 function show_recuded_price_on_discount() {
   const towerDiscount = return_Item_Amount_and_existence(
@@ -3017,12 +3173,14 @@ function show_recuded_price_on_discount() {
     const original_slower_price = 100;
     const original_toxic_price = 300;
     const original_antiair_price = 100;
+    const original_sniper_price = 300;
 
     const new_powerplant_price = 70 / 2;
     const new_destroyer_price = 50 / 2;
     const new_slower_price = 100 / 2;
     const new_toxic_price = 300 / 2;
     const new_antiair_price = 100 / 2;
+    const new_sniper_price = 300 / 2;
 
     if (
       towerDiscount.available &&
@@ -3039,6 +3197,10 @@ function show_recuded_price_on_discount() {
       btn_Toxic.setAttribute("data-tower_price", new_toxic_price);
       buy_btn_antiair.innerHTML = `Kaufen ${new_antiair_price}€`;
       btn_Anti_Air.setAttribute("data-tower_price", new_antiair_price);
+      if (buy_btn_sniper && btn_Sniper) {
+        buy_btn_sniper.innerHTML = `Kaufen ${new_sniper_price}€`;
+        btn_Sniper.setAttribute("data-tower_price", new_sniper_price);
+      }
     } else {
       buy_btn_powerplant.innerHTML = `Kaufen ${original_powerplant_price}€`;
       btn_energy.setAttribute("data-tower_price", original_powerplant_price);
@@ -3050,6 +3212,10 @@ function show_recuded_price_on_discount() {
       btn_Toxic.setAttribute("data-tower_price", original_toxic_price);
       buy_btn_antiair.innerHTML = `Kaufen ${original_antiair_price}€`;
       btn_Anti_Air.setAttribute("data-tower_price", original_antiair_price);
+      if (buy_btn_sniper && btn_Sniper) {
+        buy_btn_sniper.innerHTML = `Kaufen ${original_sniper_price}€`;
+        btn_Sniper.setAttribute("data-tower_price", original_sniper_price);
+      }
     }
   }
 }
@@ -3146,6 +3312,25 @@ btn_Anti_Air.addEventListener("click", () => {
 });
 
 //*#########################################################
+//* ANCHOR -Set Sniper Tower
+//*#########################################################
+if (btn_Sniper) {
+  btn_Sniper.addEventListener("click", () => {
+    if (!isSniperUnlocked()) {
+      new GameMessage(
+        "Sniper gesperrt",
+        "Schalte den Sniper zuerst im Skill Store frei.",
+        "error",
+        2500,
+      ).show_Message();
+      return;
+    }
+    set_Tower(btn_Sniper, "sniper", 1, mdl_towers);
+    substract_tower_discount();
+  });
+}
+
+//*#########################################################
 //* ANCHOR -Set Tower Energy
 //*#########################################################
 
@@ -3236,6 +3421,10 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       tower.range = 55;
     }
 
+    if (tower_type === "sniper") {
+      tower.range = getTowerBaseRange("sniper");
+    }
+
     if (!towerImages.has(tower_img)) {
       const img = new Image();
       img.src = tower_img;
@@ -3292,15 +3481,16 @@ btn_bigger_range.addEventListener("click", () => {
   const upgrade_price = parseInt(
     btn_bigger_range.getAttribute("data-upgrade_price"),
   );
-  if (save_obj.money >= upgrade_price && tower.range < 140) {
-    // Begrenze die Reichweite auf 140 (80 + 3 * 20)
+  const maxRange = getTowerMaxRange(tower?.tower_type);
+  if (save_obj.money >= upgrade_price && tower.range < maxRange) {
+    // Begrenze die Reichweite entsprechend des Tower-Typs
     tower.range += 20;
     save_obj.money -= upgrade_price;
     addTowerUpgradeInvestment(tower, upgrade_price);
-    towerRangeElement.innerHTML = `Reichweite: ${tower.range}`;
+    towerRangeElement.innerHTML = `Reichweite: ${tower.range} / ${maxRange}`;
     mdl_upgrade.style.display = "none";
     play_pause();
-  } else if (tower.range >= 140) {
+  } else if (tower.range >= maxRange) {
     const error_msg = new GameMessage(
       "Maximale Reichweite erreicht!",
       "",
@@ -3327,7 +3517,11 @@ btn_Stronger.addEventListener("click", () => {
     tower.tower_damage_lvl += 1;
     save_obj.money -= upgrade_price;
     addTowerUpgradeInvestment(tower, upgrade_price);
-    towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
+    if (tower.tower_type === "sniper") {
+      towerDamageLvlElement.innerHTML = `Cooldown-Stufe: ${tower.tower_damage_lvl} / 3`;
+    } else {
+      towerDamageLvlElement.innerHTML = `Schaden: Stufe ${tower.tower_damage_lvl}`;
+    }
     mdl_upgrade.style.display = "none";
     play_pause();
   } else if (tower.tower_damage_lvl >= 3) {
@@ -3814,12 +4008,25 @@ function count_energy_level() {
     }
   });
 
+  //* Every Sniper Tower needs 100 Energy Points, reduced by 25 per upgrade level
+  const sniper_energy = 100;
+  let sniper_energy_amount = 0;
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === "sniper") {
+      sniper_energy_amount += Math.max(
+        0,
+        sniper_energy + tower.tower_damage_lvl * 25 - 25,
+      );
+    }
+  });
+
   save_obj.energy_level =
     save_obj.energy_level -
     destroyer_energy_amount -
     toxic_energy_amount -
     slower_energy_amount -
-    anti_air_energy_amount;
+    anti_air_energy_amount -
+    sniper_energy_amount;
 }
 
 //*#########################################################
@@ -4018,6 +4225,51 @@ btn_life_upgrade.addEventListener("click", () => {
     }
   }
 });
+
+if (btn_unlock_sniper_tower) {
+  btn_unlock_sniper_tower.addEventListener("click", () => {
+    if (isSniperUnlocked()) {
+      new GameMessage(
+        "Bereits freigeschaltet",
+        "Der Sniper Tower ist bereits verfügbar.",
+        "error",
+        2500,
+      ).show_Message();
+      return;
+    }
+
+    const price = Number(
+      btn_unlock_sniper_tower.getAttribute("data-skill_price"),
+    );
+    const confirm = window.confirm(
+      `Möchtest du den Sniper Tower für ${price} XP-Coins freischalten?`,
+    );
+    if (!confirm) return;
+
+    const xp_transaction = check_XPCoins(price, "Sniper Tower");
+    if (xp_transaction !== true) return;
+
+    const unlockItem = return_Item_Amount_and_existence(
+      save_obj,
+      "unlock_sniper_tower",
+    );
+    if (unlockItem.available) {
+      save_obj.XP_Store_Items[unlockItem.index].amount = 1;
+    } else {
+      save_obj.XP_Store_Items.push({
+        name: "unlock_sniper_tower",
+        amount: 1,
+      });
+    }
+
+    save_obj.XP_Coins -= price;
+    render_XP_Coins(save_obj);
+    render_amount(save_obj);
+    render_xp_on_homescreen();
+    syncSniperUnlockUI();
+    save_Game_without_saveDate();
+  });
+}
 
 function purchasePassiveSkill({ key, displayName, price, maxLevel }) {
   const current = getPassiveLevel(key);

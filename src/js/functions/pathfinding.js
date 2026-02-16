@@ -15,7 +15,7 @@ export function buildObstaclesFromTowers(
   tower_places,
   gridObj,
   padPixels = 0,
-  leftReduceCells = 0
+  leftReduceCells = 0,
 ) {
   const { grid, cols, rows, cell } = gridObj;
   // reset
@@ -32,6 +32,7 @@ export function buildObstaclesFromTowers(
       anti_air: { w: 2, h: 2 },
       slower: { w: 2, h: 2 },
       toxic: { w: 2, h: 2 },
+      sniper: { w: 2, h: 2 },
       energy: { w: 2, h: 2 },
       mine: { w: 1, h: 1 },
       air_mine: { w: 1, h: 1 },
