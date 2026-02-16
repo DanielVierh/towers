@@ -1127,9 +1127,9 @@ function getTowerMaxRange(towerType) {
 }
 
 function getSniperCooldownByLevel(level) {
-  if (level >= 3) return 120;
-  if (level >= 2) return 170;
-  return 220;
+  if (level >= 3) return 200;
+  if (level >= 2) return 250;
+  return 300;
 }
 
 function isSniperUnlocked() {
