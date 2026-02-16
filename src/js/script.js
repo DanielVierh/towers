@@ -126,6 +126,30 @@ const btn_sell_refund = document.getElementById("btn_sell_refund");
 const btn_unlock_sniper_tower = document.getElementById(
   "btn_unlock_sniper_tower",
 );
+const mdl_skill_purchase = document.getElementById("mdl_skill_purchase");
+const btn_close_skill_purchase = document.getElementById(
+  "btn_close_skill_purchase",
+);
+const btn_skill_qty_minus = document.getElementById("btn_skill_qty_minus");
+const btn_skill_qty_plus = document.getElementById("btn_skill_qty_plus");
+const btn_confirm_skill_purchase = document.getElementById(
+  "btn_confirm_skill_purchase",
+);
+const lbl_skill_purchase_title = document.getElementById(
+  "lbl_skill_purchase_title",
+);
+const lbl_skill_purchase_price = document.getElementById(
+  "lbl_skill_purchase_price",
+);
+const lbl_skill_purchase_qty = document.getElementById(
+  "lbl_skill_purchase_qty",
+);
+const lbl_skill_purchase_total = document.getElementById(
+  "lbl_skill_purchase_total",
+);
+const lbl_skill_purchase_remaining = document.getElementById(
+  "lbl_skill_purchase_remaining",
+);
 const check_trap_discount = document.getElementById("check_trap_discount");
 const check_mine_charges = document.getElementById("check_mine_charges");
 const check_tower_discount = document.getElementById("check_tower_discount");
@@ -216,7 +240,6 @@ function showWaveIntroCountdown({ waveNumber, creepIndex, secondsLeft }) {
 
   const mainSrc = creepPreviewFrame1Src(creepIndex);
   const specialSrcs = [];
-  // Special creeps spawn rules are based on the wave number (`call_special_creep()`)
   const upcomingWave = Number(waveNumber);
   if (
     Number.isFinite(upcomingWave) &&
@@ -240,12 +263,10 @@ function showWaveIntroCountdown({ waveNumber, creepIndex, secondsLeft }) {
 
 function triggerWaveIntroAnimateAndSound(waveNumber) {
   if (!waveIntroBanner) return;
-  // Avoid replaying every second for the same wave
   const key = String(waveNumber);
   if (waveIntroLastWaveKey === key) return;
   waveIntroLastWaveKey = key;
 
-  // restart animation
   waveIntroBanner.classList.remove("animate");
   void waveIntroBanner.offsetWidth;
   waveIntroBanner.classList.add("animate");
@@ -4099,215 +4120,288 @@ function set_class_for_overpriced_towers() {
 }
 
 //*ANCHOR - XP Store
-//* Trap Discount
-btn_trap_discount.addEventListener("click", () => {
-  const price = btn_trap_discount.getAttribute("data-skill_price");
-  const confirm = window.confirm(
-    `Möchtest du den Rabatt für Fallen für ${price} XP-Coins kaufen?`,
-  );
-  if (confirm) {
-    const xp_transaction = check_XPCoins(price, "Fallen Rabatt");
-    if (xp_transaction === true) {
-      const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
+let skillPurchaseState = null;
 
-      if (item.available) {
-        const item_index = item.index;
-        save_obj.XP_Store_Items[item_index].amount += 10;
-      } else {
-        save_obj.XP_Store_Items.push({
-          name: "trap_rabatt_50",
-          amount: 10,
-        });
-      }
-      save_obj.XP_Coins -= price;
-      render_XP_Coins(save_obj);
-      render_amount(save_obj);
-      render_xp_on_homescreen();
-      save_Game_without_saveDate();
-    }
-  }
-});
-
-//* Mine 3er-Pack (Charges)
-if (btn_mine_charges_pack) {
-  btn_mine_charges_pack.addEventListener("click", () => {
-    const price = btn_mine_charges_pack.getAttribute("data-skill_price");
-    const confirm = window.confirm(
-      `Möchtest du das 10er 3er-Minen-Pack für ${price} XP-Coins kaufen?`,
-    );
-    if (confirm) {
-      const xp_transaction = check_XPCoins(price, "3er-Minen-Pack");
-      if (xp_transaction === true) {
-        const item = return_Item_Amount_and_existence(
-          save_obj,
-          "mine_charges_3_pack",
-        );
-
-        if (item.available) {
-          save_obj.XP_Store_Items[item.index].amount += 10;
-        } else {
-          save_obj.XP_Store_Items.push({
-            name: "mine_charges_3_pack",
-            amount: 10,
-          });
-        }
-
-        save_obj.XP_Coins -= price;
-        render_XP_Coins(save_obj);
-        render_amount(save_obj);
-        render_xp_on_homescreen();
-        save_Game_without_saveDate();
-      }
-    }
-  });
+function maxQtyByCoins(price) {
+  const p = Number(price) || 0;
+  if (p <= 0) return 0;
+  return Math.max(0, Math.floor(save_obj.XP_Coins / p));
 }
 
-//* Tower Discount
-btn_tower_discount.addEventListener("click", () => {
-  const price = btn_tower_discount.getAttribute("data-skill_price");
-  const confirm = window.confirm(
-    `Möchtest du den Tower Rabatt für ${price} XP-Coins kaufen?`,
-  );
-  if (confirm) {
-    const xp_transaction = check_XPCoins(price, "Tower Rabatt");
-    if (xp_transaction === true) {
-      const item = return_Item_Amount_and_existence(
-        save_obj,
-        "tower_rabatt_50",
-      );
-
-      if (item.available) {
-        const item_index = item.index;
-        save_obj.XP_Store_Items[item_index].amount += 10;
-      } else {
-        save_obj.XP_Store_Items.push({
-          name: "tower_rabatt_50",
-          amount: 10,
-        });
-      }
-      save_obj.XP_Coins -= price;
-      render_XP_Coins(save_obj);
-      render_amount(save_obj);
-      render_xp_on_homescreen();
-      save_Game_without_saveDate();
-    }
-  }
-});
-
-btn_life_upgrade.addEventListener("click", () => {
-  const price = btn_life_upgrade.getAttribute("data-skill_price");
-  const confirm = window.confirm(
-    `Möchtest du das Upgrade zum Leben generieren für ${price} XP-Coins kaufen?`,
-  );
-  if (confirm) {
-    const xp_transaction = check_XPCoins(price, "Leben Generierer");
-    if (xp_transaction === true) {
-      const item = return_Item_Amount_and_existence(save_obj, "live_generator");
-
-      if (item.available) {
-        new GameMessage(
-          "Fehler",
-          "Upgrade bereits vorhanden",
-          "error",
-          4000,
-        ).show_Message();
-      } else {
-        save_obj.XP_Store_Items.push({
-          name: "live_generator",
-          amount: 1,
-        });
-        save_obj.XP_Coins -= price;
-        render_XP_Coins(save_obj);
-        render_amount(save_obj);
-        render_xp_on_homescreen();
-        save_Game_without_saveDate();
-      }
-    }
-  }
-});
-
-if (btn_unlock_sniper_tower) {
-  btn_unlock_sniper_tower.addEventListener("click", () => {
-    if (isSniperUnlocked()) {
-      new GameMessage(
-        "Bereits freigeschaltet",
-        "Der Sniper Tower ist bereits verfügbar.",
-        "error",
-        2500,
-      ).show_Message();
-      return;
-    }
-
-    const price = Number(
-      btn_unlock_sniper_tower.getAttribute("data-skill_price"),
-    );
-    const confirm = window.confirm(
-      `Möchtest du den Sniper Tower für ${price} XP-Coins freischalten?`,
-    );
-    if (!confirm) return;
-
-    const xp_transaction = check_XPCoins(price, "Sniper Tower");
-    if (xp_transaction !== true) return;
-
-    const unlockItem = return_Item_Amount_and_existence(
-      save_obj,
-      "unlock_sniper_tower",
-    );
-    if (unlockItem.available) {
-      save_obj.XP_Store_Items[unlockItem.index].amount = 1;
-    } else {
-      save_obj.XP_Store_Items.push({
-        name: "unlock_sniper_tower",
-        amount: 1,
-      });
-    }
-
-    save_obj.XP_Coins -= price;
-    render_XP_Coins(save_obj);
-    render_amount(save_obj);
-    render_xp_on_homescreen();
-    syncSniperUnlockUI();
-    save_Game_without_saveDate();
-  });
+function closeSkillPurchaseModal() {
+  if (!mdl_skill_purchase) return;
+  mdl_skill_purchase.classList.remove("active");
+  mdl_skill_purchase.style.display = "none";
+  mdl_skill_purchase.setAttribute("aria-hidden", "true");
+  skillPurchaseState = null;
 }
 
-function purchasePassiveSkill({ key, displayName, price, maxLevel }) {
-  const current = getPassiveLevel(key);
-  if (current >= maxLevel) {
+function updateSkillPurchaseModalUI() {
+  if (!skillPurchaseState) return;
+  const { qty, maxQty, price, displayName } = skillPurchaseState;
+  const total = qty * price;
+  const remaining = save_obj.XP_Coins - total;
+
+  if (lbl_skill_purchase_title) {
+    lbl_skill_purchase_title.innerHTML = `${displayName}`;
+  }
+  if (lbl_skill_purchase_price) {
+    lbl_skill_purchase_price.innerHTML = `Preis pro Kauf: ${price.toLocaleString("de-DE")} XP-Coins`;
+  }
+  if (lbl_skill_purchase_qty) {
+    lbl_skill_purchase_qty.innerHTML = `${qty}`;
+  }
+  if (lbl_skill_purchase_total) {
+    lbl_skill_purchase_total.innerHTML = `Gesamt: ${total.toLocaleString("de-DE")} XP-Coins`;
+  }
+  if (lbl_skill_purchase_remaining) {
+    lbl_skill_purchase_remaining.innerHTML = `Verbleibend: ${remaining.toLocaleString("de-DE")} XP-Coins`;
+    lbl_skill_purchase_remaining.style.color =
+      remaining < 0 ? "tomato" : "white";
+  }
+
+  if (btn_skill_qty_minus) btn_skill_qty_minus.disabled = qty <= 1;
+  if (btn_skill_qty_plus) btn_skill_qty_plus.disabled = qty >= maxQty;
+  if (btn_confirm_skill_purchase) {
+    btn_confirm_skill_purchase.disabled = qty <= 0 || remaining < 0;
+    btn_confirm_skill_purchase.innerHTML =
+      qty > 1 ? `Kaufen (${qty}x)` : "Kaufen";
+  }
+}
+
+function openSkillPurchaseModal({
+  displayName,
+  price,
+  maxQty,
+  applyPurchase,
+  blockedMessage,
+}) {
+  if (!mdl_skill_purchase) return;
+
+  const normalizedPrice = Math.max(1, Number(price) || 0);
+  const normalizedMaxQty = Math.max(0, Math.floor(Number(maxQty) || 0));
+
+  if (normalizedMaxQty <= 0) {
     new GameMessage(
-      "Max. Stufe erreicht",
-      `"${displayName}" ist bereits auf Stufe ${maxLevel}.`,
+      "Kauf aktuell nicht möglich",
+      blockedMessage || "Zu wenig XP-Coins oder bereits auf Maximum.",
       "error",
-      3500,
+      3000,
     ).show_Message();
     return;
   }
 
-  const ok = check_XPCoins(price, displayName);
+  skillPurchaseState = {
+    displayName,
+    price: normalizedPrice,
+    maxQty: normalizedMaxQty,
+    qty: 1,
+    applyPurchase,
+  };
+
+  mdl_skill_purchase.style.display = "flex";
+  mdl_skill_purchase.classList.add("active");
+  mdl_skill_purchase.setAttribute("aria-hidden", "false");
+  updateSkillPurchaseModalUI();
+}
+
+function finalizeSkillPurchase() {
+  if (!skillPurchaseState) return;
+
+  const { qty, price, displayName, applyPurchase } = skillPurchaseState;
+  const totalCost = qty * price;
+  const ok = check_XPCoins(totalCost, displayName);
   if (!ok) return;
 
-  const item = return_Item_Amount_and_existence(save_obj, key);
-  if (item.available) {
-    save_obj.XP_Store_Items[item.index].amount += 1;
-  } else {
-    save_obj.XP_Store_Items.push({ name: key, amount: 1 });
-  }
+  const applied =
+    typeof applyPurchase === "function" ? applyPurchase(qty) : false;
+  if (!applied) return;
 
-  save_obj.XP_Coins -= price;
+  save_obj.XP_Coins -= totalCost;
   render_XP_Coins(save_obj);
   render_amount(save_obj);
   render_xp_on_homescreen();
+  syncSniperUnlockUI();
   save_Game_without_saveDate();
+  closeSkillPurchaseModal();
+}
+
+if (btn_skill_qty_minus) {
+  btn_skill_qty_minus.addEventListener("click", () => {
+    if (!skillPurchaseState) return;
+    skillPurchaseState.qty = Math.max(1, skillPurchaseState.qty - 1);
+    updateSkillPurchaseModalUI();
+  });
+}
+
+if (btn_skill_qty_plus) {
+  btn_skill_qty_plus.addEventListener("click", () => {
+    if (!skillPurchaseState) return;
+    skillPurchaseState.qty = Math.min(
+      skillPurchaseState.maxQty,
+      skillPurchaseState.qty + 1,
+    );
+    updateSkillPurchaseModalUI();
+  });
+}
+
+if (btn_confirm_skill_purchase) {
+  btn_confirm_skill_purchase.addEventListener("click", () => {
+    finalizeSkillPurchase();
+  });
+}
+
+if (btn_close_skill_purchase) {
+  btn_close_skill_purchase.addEventListener("click", () => {
+    closeSkillPurchaseModal();
+  });
+}
+
+if (mdl_skill_purchase) {
+  mdl_skill_purchase.addEventListener("click", (event) => {
+    if (event.target === mdl_skill_purchase) {
+      closeSkillPurchaseModal();
+    }
+  });
+}
+
+function openPassiveSkillPurchase({ key, displayName, price, maxLevel }) {
+  const current = getPassiveLevel(key);
+  const remainingLevels = Math.max(0, maxLevel - current);
+  const allowedQty = Math.min(maxQtyByCoins(price), remainingLevels);
+
+  openSkillPurchaseModal({
+    displayName,
+    price,
+    maxQty: allowedQty,
+    blockedMessage:
+      current >= maxLevel
+        ? `"${displayName}" ist bereits auf Stufe ${maxLevel}.`
+        : "Zu wenig XP-Coins.",
+    applyPurchase: (qty) => {
+      addXpStoreAmount(key, qty);
+      return true;
+    },
+  });
+}
+
+//* Trap Discount
+if (btn_trap_discount) {
+  btn_trap_discount.addEventListener("click", () => {
+    const price = Number(btn_trap_discount.getAttribute("data-skill_price"));
+    openSkillPurchaseModal({
+      displayName: "Fallen Rabatt",
+      price,
+      maxQty: maxQtyByCoins(price),
+      blockedMessage: "Zu wenig XP-Coins für Fallen Rabatt.",
+      applyPurchase: (qty) => {
+        addXpStoreAmount("trap_rabatt_50", qty * 10);
+        return true;
+      },
+    });
+  });
+}
+
+//* Mine 3er-Pack (Charges)
+if (btn_mine_charges_pack) {
+  btn_mine_charges_pack.addEventListener("click", () => {
+    const price = Number(
+      btn_mine_charges_pack.getAttribute("data-skill_price"),
+    );
+    openSkillPurchaseModal({
+      displayName: "3er-Minen-Pack",
+      price,
+      maxQty: maxQtyByCoins(price),
+      blockedMessage: "Zu wenig XP-Coins für das 3er-Minen-Pack.",
+      applyPurchase: (qty) => {
+        addXpStoreAmount("mine_charges_3_pack", qty * 10);
+        return true;
+      },
+    });
+  });
+}
+
+//* Tower Discount
+if (btn_tower_discount) {
+  btn_tower_discount.addEventListener("click", () => {
+    const price = Number(btn_tower_discount.getAttribute("data-skill_price"));
+    openSkillPurchaseModal({
+      displayName: "Tower Rabatt",
+      price,
+      maxQty: maxQtyByCoins(price),
+      blockedMessage: "Zu wenig XP-Coins für Tower Rabatt.",
+      applyPurchase: (qty) => {
+        addXpStoreAmount("tower_rabatt_50", qty * 10);
+        return true;
+      },
+    });
+  });
+}
+
+if (btn_life_upgrade) {
+  btn_life_upgrade.addEventListener("click", () => {
+    const lifeItem = return_Item_Amount_and_existence(
+      save_obj,
+      "live_generator",
+    );
+    const price = Number(btn_life_upgrade.getAttribute("data-skill_price"));
+    const maxQty = lifeItem.available ? 0 : Math.min(1, maxQtyByCoins(price));
+
+    openSkillPurchaseModal({
+      displayName: "Leben Generierer",
+      price,
+      maxQty,
+      blockedMessage: lifeItem.available
+        ? "Upgrade bereits vorhanden"
+        : "Zu wenig XP-Coins.",
+      applyPurchase: () => {
+        if (lifeItem.available) return false;
+        addXpStoreAmount("live_generator", 1);
+        return true;
+      },
+    });
+  });
+}
+
+if (btn_unlock_sniper_tower) {
+  btn_unlock_sniper_tower.addEventListener("click", () => {
+    const alreadyUnlocked = isSniperUnlocked();
+    const price = Number(
+      btn_unlock_sniper_tower.getAttribute("data-skill_price"),
+    );
+    const maxQty = alreadyUnlocked ? 0 : Math.min(1, maxQtyByCoins(price));
+
+    openSkillPurchaseModal({
+      displayName: "Sniper Tower",
+      price,
+      maxQty,
+      blockedMessage: alreadyUnlocked
+        ? "Der Sniper Tower ist bereits freigeschaltet."
+        : "Zu wenig XP-Coins.",
+      applyPurchase: () => {
+        if (isSniperUnlocked()) return false;
+        const unlockItem = return_Item_Amount_and_existence(
+          save_obj,
+          "unlock_sniper_tower",
+        );
+        if (unlockItem.available) {
+          save_obj.XP_Store_Items[unlockItem.index].amount = 1;
+        } else {
+          save_obj.XP_Store_Items.push({
+            name: "unlock_sniper_tower",
+            amount: 1,
+          });
+        }
+        return true;
+      },
+    });
+  });
 }
 
 if (btn_start_money) {
   btn_start_money.addEventListener("click", () => {
     const price = Number(btn_start_money.getAttribute("data-skill_price"));
-    const confirm = window.confirm(
-      `Möchtest du "Startgeld" für ${price} XP-Coins kaufen?`,
-    );
-    if (!confirm) return;
-    purchasePassiveSkill({
+    openPassiveSkillPurchase({
       key: "passive_start_money",
       displayName: "Startgeld",
       price,
@@ -4319,11 +4413,7 @@ if (btn_start_money) {
 if (btn_start_energy) {
   btn_start_energy.addEventListener("click", () => {
     const price = Number(btn_start_energy.getAttribute("data-skill_price"));
-    const confirm = window.confirm(
-      `Möchtest du "Startenergie" für ${price} XP-Coins kaufen?`,
-    );
-    if (!confirm) return;
-    purchasePassiveSkill({
+    openPassiveSkillPurchase({
       key: "passive_start_energy",
       displayName: "Startenergie",
       price,
@@ -4335,11 +4425,7 @@ if (btn_start_energy) {
 if (btn_mine_plus) {
   btn_mine_plus.addEventListener("click", () => {
     const price = Number(btn_mine_plus.getAttribute("data-skill_price"));
-    const confirm = window.confirm(
-      `Möchtest du "+1 Mine pro Welle" für ${price} XP-Coins kaufen?`,
-    );
-    if (!confirm) return;
-    purchasePassiveSkill({
+    openPassiveSkillPurchase({
       key: "passive_mine_plus",
       displayName: "+1 Mine pro Welle",
       price,
@@ -4351,11 +4437,7 @@ if (btn_mine_plus) {
 if (btn_xp_multiplier) {
   btn_xp_multiplier.addEventListener("click", () => {
     const price = Number(btn_xp_multiplier.getAttribute("data-skill_price"));
-    const confirm = window.confirm(
-      `Möchtest du "XP Multiplikator" für ${price} XP-Coins kaufen?`,
-    );
-    if (!confirm) return;
-    purchasePassiveSkill({
+    openPassiveSkillPurchase({
       key: "passive_xp_multi",
       displayName: "XP Multiplikator",
       price,
@@ -4367,11 +4449,7 @@ if (btn_xp_multiplier) {
 if (btn_sell_refund) {
   btn_sell_refund.addEventListener("click", () => {
     const price = Number(btn_sell_refund.getAttribute("data-skill_price"));
-    const confirm = window.confirm(
-      `Möchtest du "Refund beim Verkaufen" für ${price} XP-Coins kaufen?`,
-    );
-    if (!confirm) return;
-    purchasePassiveSkill({
+    openPassiveSkillPurchase({
       key: "passive_sell_refund",
       displayName: "Refund beim Verkaufen",
       price,

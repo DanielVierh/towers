@@ -870,6 +870,79 @@ select {
   }
 }
 
+#mdl_skill_purchase {
+  z-index: 4000;
+
+  &.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.skill-purchase-content {
+  width: min(420px, 92vw);
+  min-height: 260px;
+  background: rgba(10, 11, 27, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  font-size: 0.9rem;
+
+  h3 {
+    margin: 0;
+    text-align: center;
+  }
+
+  p {
+    margin: 0;
+    text-align: center;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+}
+
+.skill-purchase-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0;
+
+  #lbl_skill_purchase_qty {
+    min-width: 42px;
+    text-align: center;
+    font-size: 1.1rem;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .button-buy {
+    min-width: 46px;
+    min-height: 42px;
+    padding: 6px 10px;
+    font-size: 1.2rem;
+  }
+}
+
+#btn_confirm_skill_purchase {
+  margin-top: 8px;
+  min-width: 170px;
+}
+
 .message-body {
   position: fixed;
   top: 20px;
