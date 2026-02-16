@@ -25,6 +25,7 @@ export function render_amount(save_obj) {
   );
   const check_mine_charges = document.getElementById("check_mine_charges");
   const tile_live_upgr = document.getElementById("tile_live_upgr");
+  const tile_unlock_sniper = document.getElementById("tile_unlock_sniper");
 
   const lbl_start_money_amount = document.getElementById(
     "lbl_start_money_amount",
@@ -98,6 +99,23 @@ export function render_amount(save_obj) {
   );
   if (live_upgr.available) {
     tile_live_upgr.classList.add("is-active");
+  } else if (tile_live_upgr) {
+    tile_live_upgr.classList.remove("is-active");
+  }
+
+  //* Show if sniper unlock is available
+  const sniper_unlock = return_Item_Amount_and_existence(
+    save_obj,
+    "unlock_sniper_tower",
+  );
+  if (
+    tile_unlock_sniper &&
+    sniper_unlock.available &&
+    Number(sniper_unlock.amount) > 0
+  ) {
+    tile_unlock_sniper.classList.add("is-active");
+  } else if (tile_unlock_sniper) {
+    tile_unlock_sniper.classList.remove("is-active");
   }
 
   // Passive skills (levels)
