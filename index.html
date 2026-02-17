@@ -332,6 +332,23 @@
           </div>
         </div>
         <div class="tile">
+          <div id="lbl_upgrade_discount_amount" class="label-amount">0X</div>
+          <h3>10 x 50% Rabatt auf Upgrades</h3>
+          <p>
+            Erhalte 10 Mal einen Rabatt von 50% auf Turm-Upgrades (Reichweite,
+            Stärke und Life-Generator im Upgrademenü).
+          </p>
+          <br />
+          <div
+            class="button-buy"
+            id="btn_upgrade_discount"
+            data-skill_price="2000"
+          >
+            Kaufen 2.000 <br />
+            XP-Coins
+          </div>
+        </div>
+        <div class="tile">
           <div id="lbl_trap_discount_amount" class="label-amount">0X</div>
           <h3>10 x 50% Rabatt auf Fallen</h3>
           <p>
@@ -795,6 +812,12 @@
           </svg>
         </div>
       </div>
+
+      <div id="lbl_upgrade_discount_modal_amount"></div>
+      <p id="checkbox_field_upgrade" style="display: none">
+        <label for="check_upgrade_discount">Nutze Upgrade Rabatt</label>
+        <input type="checkbox" id="check_upgrade_discount" />
+      </p>
 
       <div class="grid-wrapper">
         <div class="tile" id="tile_upgrade_range">

@@ -118,6 +118,7 @@ const btn_close_modal_skill = document.getElementById("btn_close_modal_skill");
 const btn_trap_discount = document.getElementById("btn_trap_discount");
 const btn_mine_charges_pack = document.getElementById("btn_mine_charges_pack");
 const btn_tower_discount = document.getElementById("btn_tower_discount");
+const btn_upgrade_discount = document.getElementById("btn_upgrade_discount");
 const btn_start_money = document.getElementById("btn_start_money");
 const btn_start_energy = document.getElementById("btn_start_energy");
 const btn_mine_plus = document.getElementById("btn_mine_plus");
@@ -153,6 +154,7 @@ const lbl_skill_purchase_remaining = document.getElementById(
 const check_trap_discount = document.getElementById("check_trap_discount");
 const check_mine_charges = document.getElementById("check_mine_charges");
 const check_tower_discount = document.getElementById("check_tower_discount");
+const check_upgrade_discount = document.getElementById("check_upgrade_discount");
 const btn_life_upgrade = document.getElementById("btn_life_upgrade");
 const tile_upgrade_liveGenerator = document.getElementById(
   "tile_upgrade_liveGenerator",
@@ -1152,6 +1154,10 @@ let save_obj = {
       amount: 0,
     },
     {
+      name: "upgrade_rabatt_50",
+      amount: 0,
+    },
+    {
       name: "passive_start_money",
       amount: 0,
     },
@@ -1501,6 +1507,7 @@ function include_new_SaveObj_Properties() {
 
   // Ensure consumables exist in older saves
   ensureXpStoreItem("mine_charges_3_pack", 0);
+  ensureXpStoreItem("upgrade_rabatt_50", 0);
 
   // Ensure tower economy fields exist in older saves
   ensureTowerEconomyStateAll();
@@ -3188,6 +3195,7 @@ canvas.addEventListener("click", (event) => {
               "Erhöht die Stärke des Turms <br> 25 " + low_energy_symbol;
           }
         }
+        applyUpgradeDiscountToModalPrices();
       }
     }
   });
@@ -3349,6 +3357,58 @@ function show_recuded_price_on_discount() {
   }
 }
 
+function getUpgradeDiscountedPrice(basePrice) {
+  const item = return_Item_Amount_and_existence(save_obj, "upgrade_rabatt_50");
+  const useDiscount =
+    Boolean(check_upgrade_discount?.checked) &&
+    item.available &&
+    Number(item.amount) > 0;
+  const base = Number(basePrice) || 0;
+  return useDiscount ? Math.floor(base / 2) : base;
+}
+
+function applyUpgradeDiscountToModalPrices() {
+  render_amount(save_obj);
+
+  if (!tower || !tower.tower_is_build) return;
+
+  const rangeBasePrice = 300;
+  if (tower.range < getTowerMaxRange(tower.tower_type)) {
+    const rangePrice = getUpgradeDiscountedPrice(rangeBasePrice);
+    btn_bigger_range.setAttribute("data-upgrade_price", String(rangePrice));
+    btn_bigger_range.innerHTML = `Kaufen ${rangePrice}€`;
+  }
+
+  if (tower.tower_damage_lvl < 3) {
+    const strongerBasePrice = tower.tower_damage_lvl === 2 ? 500 : 300;
+    const strongerPrice = getUpgradeDiscountedPrice(strongerBasePrice);
+    btn_Stronger.setAttribute("data-tower_price", String(strongerPrice));
+    btn_Stronger.innerHTML = `Kaufen ${strongerPrice}€`;
+  }
+
+  if (
+    tile_upgrade_liveGenerator &&
+    !tile_upgrade_liveGenerator.classList.contains("hidden")
+  ) {
+    if (tower.live_gen === 1) {
+      btn_livegen.innerHTML = "Aktiv";
+      btn_livegen.setAttribute("data-tower_price", "700");
+    } else {
+      const liveGenPrice = getUpgradeDiscountedPrice(700);
+      btn_livegen.setAttribute("data-tower_price", String(liveGenPrice));
+      btn_livegen.innerHTML = `Kaufen ${liveGenPrice}€`;
+    }
+  }
+}
+
+if (check_upgrade_discount) {
+  check_upgrade_discount.addEventListener("click", () => {
+    applyUpgradeDiscountToModalPrices();
+    calc_energy_overdose();
+    set_class_for_overpriced_towers();
+  });
+}
+
 //*#########################################################
 //* ANCHOR -Set Tower Slower
 //*#########################################################
@@ -3481,6 +3541,19 @@ function substract_tower_discount() {
       save_Game_without_saveDate();
     }
   }
+}
+
+function substract_upgrade_discount() {
+  const item = return_Item_Amount_and_existence(save_obj, "upgrade_rabatt_50");
+  if (!item.available || item.amount <= 0) return;
+  if (!check_upgrade_discount || !check_upgrade_discount.checked) return;
+
+  save_obj.XP_Store_Items[item.index].amount -= 1;
+  if (save_obj.XP_Store_Items[item.index].amount < 0) {
+    save_obj.XP_Store_Items[item.index].amount = 0;
+  }
+  render_amount(save_obj);
+  save_Game_without_saveDate();
 }
 
 //*#########################################################
@@ -3616,6 +3689,7 @@ btn_bigger_range.addEventListener("click", () => {
     tower.range += 20;
     save_obj.money -= upgrade_price;
     addTowerUpgradeInvestment(tower, upgrade_price);
+    substract_upgrade_discount();
     towerRangeElement.innerHTML = `Reichweite: ${tower.range} / ${maxRange}`;
     mdl_upgrade.style.display = "none";
     play_pause();
@@ -3646,6 +3720,7 @@ btn_Stronger.addEventListener("click", () => {
     tower.tower_damage_lvl += 1;
     save_obj.money -= upgrade_price;
     addTowerUpgradeInvestment(tower, upgrade_price);
+    substract_upgrade_discount();
     if (tower.tower_type === "sniper") {
       towerDamageLvlElement.innerHTML = `Cooldown-Stufe: ${tower.tower_damage_lvl} / 3`;
     } else {
@@ -3691,6 +3766,7 @@ btn_livegen.addEventListener("click", () => {
     tower.kill_counter = 0;
     save_obj.money -= upgrade_price;
     addTowerUpgradeInvestment(tower, upgrade_price);
+    substract_upgrade_discount();
     mdl_upgrade.style.display = "none";
     play_pause();
   } else {
@@ -4440,6 +4516,23 @@ if (btn_tower_discount) {
       blockedMessage: "Zu wenig XP-Coins für Tower Rabatt.",
       applyPurchase: (qty) => {
         addXpStoreAmount("tower_rabatt_50", qty * 10);
+        return true;
+      },
+    });
+  });
+}
+
+//* Upgrade Discount
+if (btn_upgrade_discount) {
+  btn_upgrade_discount.addEventListener("click", () => {
+    const price = Number(btn_upgrade_discount.getAttribute("data-skill_price"));
+    openSkillPurchaseModal({
+      displayName: "Upgrade Rabatt",
+      price,
+      maxQty: maxQtyByCoins(price),
+      blockedMessage: "Zu wenig XP-Coins für Upgrade Rabatt.",
+      applyPurchase: (qty) => {
+        addXpStoreAmount("upgrade_rabatt_50", qty * 10);
         return true;
       },
     });

@@ -15,6 +15,12 @@ export function render_amount(save_obj) {
   const lbl_tower_discount_amount = document.getElementById(
     "lbl_tower_discount_amount",
   );
+  const lbl_upgrade_discount_amount = document.getElementById(
+    "lbl_upgrade_discount_amount",
+  );
+  const lbl_upgrade_discount_modal_amount = document.getElementById(
+    "lbl_upgrade_discount_modal_amount",
+  );
   const lbl_buymenu_tower_discount_amount = document.getElementById(
     "lbl_buymenu_tower_discount_amount",
   );
@@ -22,6 +28,12 @@ export function render_amount(save_obj) {
   const checkbox_field_trap = document.getElementById("checkbox_field_trap");
   const checkbox_field_trap_charges = document.getElementById(
     "checkbox_field_trap_charges",
+  );
+  const checkbox_field_upgrade = document.getElementById(
+    "checkbox_field_upgrade",
+  );
+  const check_upgrade_discount = document.getElementById(
+    "check_upgrade_discount",
   );
   const check_mine_charges = document.getElementById("check_mine_charges");
   const tile_live_upgr = document.getElementById("tile_live_upgr");
@@ -90,6 +102,28 @@ export function render_amount(save_obj) {
   if (tower_item.available) {
     lbl_tower_discount_amount.innerHTML = `${tower_item.amount}X`;
     lbl_buymenu_tower_discount_amount.innerHTML = `${tower_item.amount} X 50% Rabatt`;
+  }
+
+  //* Show Amount of Upgrade Discount
+  const upgrade_item = return_Item_Amount_and_existence(
+    save_obj,
+    "upgrade_rabatt_50",
+  );
+  if (upgrade_item.available) {
+    if (lbl_upgrade_discount_amount) {
+      lbl_upgrade_discount_amount.innerHTML = `${upgrade_item.amount}X`;
+    }
+    if (lbl_upgrade_discount_modal_amount) {
+      lbl_upgrade_discount_modal_amount.innerHTML = `${upgrade_item.amount} X 50% Rabatt`;
+    }
+    if (checkbox_field_upgrade) {
+      if (upgrade_item.amount > 0) {
+        checkbox_field_upgrade.style.display = "flex";
+      } else {
+        checkbox_field_upgrade.style.display = "none";
+        if (check_upgrade_discount) check_upgrade_discount.checked = false;
+      }
+    }
   }
 
   //* Show if live upgrade is available

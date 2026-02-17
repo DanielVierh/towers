@@ -476,12 +476,15 @@ body.red-flash {
 .modal-towers #checkbox_field_tower,
 .modal-towers #checkbox_field_trap,
 .modal-towers #checkbox_field_trap_charges,
+.modal-towers #checkbox_field_upgrade,
 .modal-upgrade #checkbox_field_tower,
 .modal-upgrade #checkbox_field_trap,
 .modal-upgrade #checkbox_field_trap_charges,
+.modal-upgrade #checkbox_field_upgrade,
 .modal-skill #checkbox_field_tower,
 .modal-skill #checkbox_field_trap,
-.modal-skill #checkbox_field_trap_charges {
+.modal-skill #checkbox_field_trap_charges,
+.modal-skill #checkbox_field_upgrade {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -496,12 +499,15 @@ body.red-flash {
 .modal-towers #checkbox_field_tower label,
 .modal-towers #checkbox_field_trap label,
 .modal-towers #checkbox_field_trap_charges label,
+.modal-towers #checkbox_field_upgrade label,
 .modal-upgrade #checkbox_field_tower label,
 .modal-upgrade #checkbox_field_trap label,
 .modal-upgrade #checkbox_field_trap_charges label,
+.modal-upgrade #checkbox_field_upgrade label,
 .modal-skill #checkbox_field_tower label,
 .modal-skill #checkbox_field_trap label,
-.modal-skill #checkbox_field_trap_charges label {
+.modal-skill #checkbox_field_trap_charges label,
+.modal-skill #checkbox_field_upgrade label {
   font-size: 0.85rem;
   cursor: pointer;
   -webkit-user-select: none;
@@ -511,12 +517,15 @@ body.red-flash {
 .modal-towers #checkbox_field_tower input[type="checkbox"],
 .modal-towers #checkbox_field_trap input[type="checkbox"],
 .modal-towers #checkbox_field_trap_charges input[type="checkbox"],
+.modal-towers #checkbox_field_upgrade input[type="checkbox"],
 .modal-upgrade #checkbox_field_tower input[type="checkbox"],
 .modal-upgrade #checkbox_field_trap input[type="checkbox"],
 .modal-upgrade #checkbox_field_trap_charges input[type="checkbox"],
+.modal-upgrade #checkbox_field_upgrade input[type="checkbox"],
 .modal-skill #checkbox_field_tower input[type="checkbox"],
 .modal-skill #checkbox_field_trap input[type="checkbox"],
-.modal-skill #checkbox_field_trap_charges input[type="checkbox"] {
+.modal-skill #checkbox_field_trap_charges input[type="checkbox"],
+.modal-skill #checkbox_field_upgrade input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
