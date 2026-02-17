@@ -1647,8 +1647,10 @@ const special_creeps = [
   },
 ];
 
-function call_special_creep() {
-  if (save_obj.wave % 6 === 0) {
+function call_special_creep(waveNumber = save_obj.wave) {
+  const waveToSpawn = Number(waveNumber);
+
+  if (waveToSpawn % 6 === 0) {
     const posX = -100;
     const posY = 20;
     const width = 60;
@@ -1678,7 +1680,7 @@ function call_special_creep() {
     );
   }
 
-  if (save_obj.wave % 10 === 0) {
+  if (waveToSpawn % 10 === 0) {
     const posX = -100;
     const posY = 20;
     const width = 60;
@@ -1781,7 +1783,7 @@ function initialize_Creeps_for_next_round() {
       save_obj.wave < 10
         ? Math.floor(Math.random() * (creep_properties.length - 2)) + 2
         : Math.floor(Math.random() * creep_properties.length);
-    call_special_creep();
+    call_special_creep(save_obj.wave + 1);
     spawnEnemy();
   }
 }
