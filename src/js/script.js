@@ -155,7 +155,9 @@ const lbl_skill_purchase_remaining = document.getElementById(
 const check_trap_discount = document.getElementById("check_trap_discount");
 const check_mine_charges = document.getElementById("check_mine_charges");
 const check_tower_discount = document.getElementById("check_tower_discount");
-const check_upgrade_discount = document.getElementById("check_upgrade_discount");
+const check_upgrade_discount = document.getElementById(
+  "check_upgrade_discount",
+);
 const btn_life_upgrade = document.getElementById("btn_life_upgrade");
 const tile_upgrade_liveGenerator = document.getElementById(
   "tile_upgrade_liveGenerator",
