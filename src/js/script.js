@@ -169,6 +169,7 @@ audio.bindUserGestureUnlock();
 const btn_audio_mute = document.getElementById("btn_audio_mute");
 const audio_volume = document.getElementById("audio_volume");
 const btn_fx_shake = document.getElementById("btn_fx_shake");
+const btn_fx_perf = document.getElementById("btn_fx_perf");
 
 // Daily loot modal
 const dailyLootModal = document.getElementById("dailyLootModal");
@@ -276,9 +277,41 @@ function triggerWaveIntroAnimateAndSound(waveNumber) {
 
 // FX settings
 const FX_STORAGE_KEY = "towers.fx";
+const PERFORMANCE_PROFILE_ORDER = ["low", "medium", "high"];
+const PERFORMANCE_PROFILES = {
+  low: {
+    label: "Niedrig",
+    towerShotVisualModulo: 4,
+    hitParticleMultiplier: 0.5,
+    toxicFogIntervalMs: 260,
+    toxicFogPuffMultiplier: 0.6,
+  },
+  medium: {
+    label: "Mittel",
+    towerShotVisualModulo: 2,
+    hitParticleMultiplier: 0.75,
+    toxicFogIntervalMs: 180,
+    toxicFogPuffMultiplier: 1,
+  },
+  high: {
+    label: "Hoch",
+    towerShotVisualModulo: 1,
+    hitParticleMultiplier: 1,
+    toxicFogIntervalMs: 90,
+    toxicFogPuffMultiplier: 1.2,
+  },
+};
 const fxSettings = {
   screenShakeEnabled: true,
+  performanceProfile: "medium",
 };
+
+function getPerformanceProfile() {
+  return (
+    PERFORMANCE_PROFILES[fxSettings.performanceProfile] ||
+    PERFORMANCE_PROFILES.medium
+  );
+}
 
 function loadFxSettings() {
   try {
@@ -287,6 +320,12 @@ function loadFxSettings() {
     const parsed = JSON.parse(raw);
     if (typeof parsed?.screenShakeEnabled === "boolean") {
       fxSettings.screenShakeEnabled = parsed.screenShakeEnabled;
+    }
+    if (
+      typeof parsed?.performanceProfile === "string" &&
+      PERFORMANCE_PROFILES[parsed.performanceProfile]
+    ) {
+      fxSettings.performanceProfile = parsed.performanceProfile;
     }
   } catch (e) {
     // ignore
@@ -528,6 +567,11 @@ function syncFxControls() {
   } else {
     btn_fx_shake.classList.add("is-muted");
   }
+
+  if (btn_fx_perf) {
+    const profile = getPerformanceProfile();
+    btn_fx_perf.textContent = `Effekte: ${profile.label}`;
+  }
 }
 
 loadFxSettings();
@@ -536,6 +580,21 @@ syncFxControls();
 if (btn_fx_shake) {
   btn_fx_shake.addEventListener("click", () => {
     fxSettings.screenShakeEnabled = !fxSettings.screenShakeEnabled;
+    saveFxSettings();
+    syncFxControls();
+  });
+}
+
+if (btn_fx_perf) {
+  btn_fx_perf.addEventListener("click", () => {
+    const currentIndex = PERFORMANCE_PROFILE_ORDER.indexOf(
+      fxSettings.performanceProfile,
+    );
+    const nextIndex =
+      currentIndex < 0
+        ? 1
+        : (currentIndex + 1) % PERFORMANCE_PROFILE_ORDER.length;
+    fxSettings.performanceProfile = PERFORMANCE_PROFILE_ORDER[nextIndex];
     saveFxSettings();
     syncFxControls();
   });
@@ -728,7 +787,13 @@ function colorForLaser(laserColor) {
 
 function spawnHitParticles(x, y, laserColor) {
   const baseColor = colorForLaser(laserColor);
-  const count = laserColor === "missle" ? 14 : 8;
+  const profile = getPerformanceProfile();
+  const count = Math.max(
+    2,
+    Math.round(
+      (laserColor === "missle" ? 14 : 8) * profile.hitParticleMultiplier,
+    ),
+  );
   for (let i = 0; i < count; i++) {
     const a = Math.random() * Math.PI * 2;
     const sp = (laserColor === "missle" ? 90 : 70) + Math.random() * 60;
@@ -747,7 +812,11 @@ function spawnHitParticles(x, y, laserColor) {
 
   // small smoke puff for missiles
   if (laserColor === "missle") {
-    for (let i = 0; i < 8; i++) {
+    const smokeCount = Math.max(
+      2,
+      Math.round(8 * profile.hitParticleMultiplier),
+    );
+    for (let i = 0; i < smokeCount; i++) {
       const a = Math.random() * Math.PI * 2;
       const sp = 25 + Math.random() * 30;
       worldParticles.push(
@@ -768,13 +837,18 @@ function spawnHitParticles(x, y, laserColor) {
 
 function spawnToxicFogAround(enemy, dtMs) {
   if (!enemy?.is_toxicated) return;
+  const profile = getPerformanceProfile();
   enemy._toxicFogAccMs = (enemy._toxicFogAccMs ?? 0) + dtMs;
-  if (enemy._toxicFogAccMs < 90) return;
+  if (enemy._toxicFogAccMs < profile.toxicFogIntervalMs) return;
   enemy._toxicFogAccMs = 0;
 
   const cx = enemy.pos_x + (enemy.width * enemy.scale) / 2;
   const cy = enemy.pos_y + (enemy.height * enemy.scale) / 2;
-  const puffCount = 2 + Math.floor(Math.random() * 2);
+  const basePuffCount = 2 + Math.floor(Math.random() * 2);
+  const puffCount = Math.max(
+    1,
+    Math.round(basePuffCount * profile.toxicFogPuffMultiplier),
+  );
   for (let i = 0; i < puffCount; i++) {
     const a = Math.random() * Math.PI * 2;
     const r = 6 + Math.random() * 10;
@@ -791,6 +865,24 @@ function spawnToxicFogAround(enemy, dtMs) {
       }),
     );
   }
+}
+
+function shouldRenderTowerShotVisual(towerType, tower) {
+  if (!tower) return true;
+  if (
+    towerType !== "destroyer" &&
+    towerType !== "toxic" &&
+    towerType !== "slower"
+  ) {
+    return true;
+  }
+
+  const modulo = Math.max(1, getPerformanceProfile().towerShotVisualModulo);
+  if (modulo <= 1) return true;
+
+  const nextCounter = ((tower._visualShotCounter ?? -1) + 1) % modulo;
+  tower._visualShotCounter = nextCounter;
+  return nextCounter === 0;
 }
 
 function spawnLowEnergySparks(dtMs) {
@@ -2375,17 +2467,19 @@ function gameLoop() {
             if (!enemy.resistent.includes("slower")) {
               enemy.applySlowEffect(slow_val, slow_time);
               if (enemy.isBoss) triggerScreenShake(2.2, 120);
-              //* Erzeuge einen blauen Laser
-              lasers.push(
-                new Laser(
-                  tower.x + 15,
-                  tower.y,
-                  enemy.pos_x,
-                  enemy.pos_y,
-                  "blue",
-                  { targetRef: enemy, hitRadius: 10 },
-                ),
-              );
+              //* Erzeuge nur jeden zweiten Schuss visuell
+              if (shouldRenderTowerShotVisual("slower", tower)) {
+                lasers.push(
+                  new Laser(
+                    tower.x + 15,
+                    tower.y,
+                    enemy.pos_x,
+                    enemy.pos_y,
+                    "blue",
+                    { targetRef: enemy, hitRadius: 10 },
+                  ),
+                );
+              }
               audio.play("laser_blue");
             }
 
@@ -2410,17 +2504,19 @@ function gameLoop() {
 
                 if (enemy.isBoss) triggerScreenShake(2.4, 130);
 
-                //* Green Laser
-                lasers.push(
-                  new Laser(
-                    tower.x + 15,
-                    tower.y,
-                    enemy.pos_x,
-                    enemy.pos_y,
-                    "green",
-                    { targetRef: enemy, hitRadius: 10 },
-                  ),
-                );
+                //* Erzeuge nur jeden zweiten Schuss visuell
+                if (shouldRenderTowerShotVisual("toxic", tower)) {
+                  lasers.push(
+                    new Laser(
+                      tower.x + 15,
+                      tower.y,
+                      enemy.pos_x,
+                      enemy.pos_y,
+                      "green",
+                      { targetRef: enemy, hitRadius: 10 },
+                    ),
+                  );
+                }
                 audio.play("laser_green");
               }
               tower.cooldown = 20; //* Setze die Abklingzeit auf 20 Frames
@@ -2433,17 +2529,19 @@ function gameLoop() {
               enemy.health -= tower.tower_damage_lvl;
               // Boss hit impact
               if (enemy.isBoss) triggerScreenShake(2.6, 110);
-              // *Erzeuge einen roten Laser
-              lasers.push(
-                new Laser(
-                  tower.x + 15,
-                  tower.y,
-                  enemy.pos_x,
-                  enemy.pos_y,
-                  "red",
-                  { targetRef: enemy, hitRadius: 10 },
-                ),
-              );
+              // *Erzeuge nur jeden zweiten Schuss visuell
+              if (shouldRenderTowerShotVisual("destroyer", tower)) {
+                lasers.push(
+                  new Laser(
+                    tower.x + 15,
+                    tower.y,
+                    enemy.pos_x,
+                    enemy.pos_y,
+                    "red",
+                    { targetRef: enemy, hitRadius: 10 },
+                  ),
+                );
+              }
               audio.play("laser_red");
             }
             //* Cool Down
