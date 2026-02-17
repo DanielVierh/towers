@@ -45,6 +45,7 @@ const menu_modal = document.getElementById("menu_modal");
 const btn_start_game = document.getElementById("btn_start_game");
 const btn_goto_menu = document.getElementById("btn_goto_menu");
 const btn_pause = document.getElementById("btn_pause");
+const btn_open_settings = document.getElementById("btn_open_settings");
 const lbl_energy = document.getElementById("lbl_energy");
 const tower_img = document.getElementById("tower_img");
 const sel_difficulty = document.getElementById("sel_difficulty");
@@ -172,6 +173,10 @@ const btn_audio_mute = document.getElementById("btn_audio_mute");
 const audio_volume = document.getElementById("audio_volume");
 const btn_fx_shake = document.getElementById("btn_fx_shake");
 const btn_fx_perf = document.getElementById("btn_fx_perf");
+const mdl_settings = document.getElementById("mdl_settings");
+const btn_close_modal_settings = document.getElementById(
+  "btn_close_modal_settings",
+);
 
 // Daily loot modal
 const dailyLootModal = document.getElementById("dailyLootModal");
@@ -631,6 +636,56 @@ if (audio_volume) {
 }
 
 syncAudioControls();
+
+let settingsPausedByModal = false;
+
+function openSettingsModal() {
+  if (!mdl_settings) return;
+  if (game_is_running) {
+    play_pause();
+    settingsPausedByModal = true;
+  } else {
+    settingsPausedByModal = false;
+  }
+
+  syncAudioControls();
+  syncFxControls();
+  mdl_settings.classList.add("active");
+  mdl_settings.style.display = "flex";
+  mdl_settings.setAttribute("aria-hidden", "false");
+}
+
+function closeSettingsModal() {
+  if (!mdl_settings) return;
+  mdl_settings.classList.remove("active");
+  mdl_settings.style.display = "none";
+  mdl_settings.setAttribute("aria-hidden", "true");
+
+  if (settingsPausedByModal && !game_is_running) {
+    play_pause();
+  }
+  settingsPausedByModal = false;
+}
+
+if (btn_open_settings) {
+  btn_open_settings.addEventListener("click", () => {
+    openSettingsModal();
+  });
+}
+
+if (btn_close_modal_settings) {
+  btn_close_modal_settings.addEventListener("click", () => {
+    closeSettingsModal();
+  });
+}
+
+if (mdl_settings) {
+  mdl_settings.addEventListener("click", (event) => {
+    if (event.target === mdl_settings) {
+      closeSettingsModal();
+    }
+  });
+}
 
 // Generic UI click SFX (kept subtle + rate-limited)
 document.addEventListener(

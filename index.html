@@ -83,26 +83,38 @@
       <div class="labels" id="lbl_live"></div>
       <div class="labels" id="lbl_wave"></div>
       <div class="labels" id="lbl_wave_timer"></div>
-      <div class="labels audio-controls" id="audio_controls">
-        <button class="audio-btn" id="btn_audio_mute" type="button">
-          Sound: an
+      <div class="labels audio-controls">
+        <button class="audio-btn" id="btn_open_settings" type="button">
+          Settings
         </button>
-        <button class="audio-btn" id="btn_fx_shake" type="button">
-          Shake: an
-        </button>
-        <button class="audio-btn" id="btn_fx_perf" type="button">
-          Effekte: Mittel
-        </button>
-        <input
-          id="audio_volume"
-          class="audio-slider"
-          type="range"
-          min="0"
-          max="100"
-          value="35"
-          step="1"
-          aria-label="Sound Lautstärke"
-        />
+      </div>
+    </div>
+
+    <div class="modal modal-settings" id="mdl_settings" aria-hidden="true">
+      <div class="settings-content" role="dialog" aria-modal="true">
+        <div class="close-button" id="btn_close_modal_settings">x</div>
+        <h3>Einstellungen</h3>
+        <div class="audio-controls settings-controls" id="audio_controls">
+          <button class="audio-btn" id="btn_audio_mute" type="button">
+            Sound: an
+          </button>
+          <button class="audio-btn" id="btn_fx_shake" type="button">
+            Shake: an
+          </button>
+          <button class="audio-btn" id="btn_fx_perf" type="button">
+            Effekte: Mittel
+          </button>
+          <input
+            id="audio_volume"
+            class="audio-slider"
+            type="range"
+            min="0"
+            max="100"
+            value="35"
+            step="1"
+            aria-label="Sound Lautstärke"
+          />
+        </div>
       </div>
     </div>
 
