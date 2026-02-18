@@ -1930,25 +1930,27 @@ function getTowerColor(tower) {
 //*#########################################################
 
 function getRangeColor(tower) {
-  switch (tower.range) {
-    case 80:
-      return "rgba(255, 255, 255, 0.2)"; // Weiß für Stufe 1
-    case 100:
-      return "rgb(0, 255, 55)"; // Grün für Stufe 2
-    case 120:
-      return "rgb(255, 217, 0)"; // Rot für Stufe 3
-    case 140:
-      return "rgba(255, 0, 0, 0.6)"; // Rot für Stufe 4
-    case 180:
-      return "rgba(160, 140, 255, 0.85)";
-    case 200:
-      return "rgba(132, 102, 255, 0.9)";
-    case 220:
-      return "rgba(106, 58, 255, 0.95)";
-    case 240:
-      return "rgba(82, 30, 222, 1)";
+  const baseRange = getTowerBaseRange(tower?.tower_type);
+  const maxRange = getTowerMaxRange(tower?.tower_type);
+  const currentRange = parseMoneyValue(tower?.range) || baseRange;
+
+  const maxSteps = Math.max(0, Math.floor((maxRange - baseRange) / 20));
+  const step = Math.min(
+    maxSteps,
+    Math.max(0, Math.floor((currentRange - baseRange) / 20)),
+  );
+
+  switch (step) {
+    case 0:
+      return "rgba(255, 255, 255, 0.2)";
+    case 1:
+      return "rgb(0, 255, 55)";
+    case 2:
+      return "rgb(255, 217, 0)";
+    case 3:
+      return "rgba(255, 0, 0, 0.6)";
     default:
-      return "rgba(255, 255, 255, 0.2)"; // Schwarz für Stufe 0
+      return "rgba(255, 255, 255, 0.2)";
   }
 }
 
