@@ -66,14 +66,16 @@ body.red-flash {
   padding: 5px 10px;
   border-radius: 15px;
   box-shadow: inset 0 0 10px white;
+  display: flex;
+  align-items: center;
 }
 .labels-wrapper .audio-controls {
   display: flex;
   align-items: center;
   gap: 8px;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 .labels-wrapper .audio-controls .audio-btn {
   background: rgba(0, 0, 0, 0.4);
@@ -95,6 +97,39 @@ body.red-flash {
   accent-color: #7fffd4;
 }
 
+.settings-btn {
+  position: fixed;
+  left: 10px;
+  bottom: 20px;
+  z-index: 5600;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+.settings-btn:hover {
+  transform: translateY(-1px);
+}
+.settings-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.settings-btn:focus-visible {
+  outline: 2px solid #7fffd4;
+  outline-offset: 2px;
+}
+
 /* Wave Intro */
 .wave-intro {
   position: fixed;
@@ -109,18 +144,10 @@ body.red-flash {
   gap: 12px;
   padding: 10px 14px;
   border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    rgba(10, 11, 27, 0.92),
-    rgba(0, 0, 0, 0.78)
-  );
+  background: linear-gradient(135deg, rgba(10, 11, 27, 0.92), rgba(0, 0, 0, 0.78));
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 0 26px rgba(127, 255, 212, 0.14),
-    inset 0 0 16px rgba(255, 255, 255, 0.06);
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
+  box-shadow: 0 0 26px rgba(127, 255, 212, 0.14), inset 0 0 16px rgba(255, 255, 255, 0.06);
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 .wave-intro.active {
   opacity: 1;
@@ -140,7 +167,7 @@ body.red-flash {
   width: 46px;
   height: 46px;
   -o-object-fit: contain;
-  object-fit: contain;
+     object-fit: contain;
   image-rendering: pixelated;
   filter: drop-shadow(0 0 10px rgba(127, 255, 212, 0.22));
 }
@@ -179,13 +206,7 @@ body.red-flash {
 /* Daily Loot */
 .daily-loot-modal {
   z-index: 6000;
-  background:
-    radial-gradient(
-      circle at 50% 20%,
-      rgba(120, 255, 220, 0.18),
-      rgba(0, 0, 0, 0.75) 60%
-    ),
-    rgba(0, 0, 0, 0.55);
+  background: radial-gradient(circle at 50% 20%, rgba(120, 255, 220, 0.18), rgba(0, 0, 0, 0.75) 60%), rgba(0, 0, 0, 0.55);
 }
 .daily-loot-modal.active {
   display: flex;
@@ -197,15 +218,9 @@ body.red-flash {
   width: min(860px, 94vw);
   border-radius: 18px;
   padding: 18px;
-  background: linear-gradient(
-    135deg,
-    rgba(10, 11, 27, 0.92),
-    rgba(0, 0, 0, 0.85)
-  );
+  background: linear-gradient(135deg, rgba(10, 11, 27, 0.92), rgba(0, 0, 0, 0.85));
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 0 40px rgba(127, 255, 212, 0.12),
-    inset 0 0 25px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 40px rgba(127, 255, 212, 0.12), inset 0 0 25px rgba(255, 255, 255, 0.08);
 }
 
 .daily-loot-header {
@@ -265,23 +280,14 @@ body.red-flash {
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.95);
-  background: linear-gradient(
-    135deg,
-    rgba(24, 54, 50, 0.9),
-    rgba(24, 24, 65, 0.9)
-  );
-  box-shadow:
-    0 0 18px rgba(127, 255, 212, 0.12),
-    inset 0 0 18px rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(24, 54, 50, 0.9), rgba(24, 24, 65, 0.9));
+  box-shadow: 0 0 18px rgba(127, 255, 212, 0.12), inset 0 0 18px rgba(255, 255, 255, 0.08);
   cursor: pointer;
   position: relative;
   overflow: hidden;
   padding: 0;
   transform-style: preserve-3d;
-  transition:
-    transform 420ms ease,
-    box-shadow 420ms ease,
-    filter 420ms ease;
+  transition: transform 420ms ease, box-shadow 420ms ease, filter 420ms ease;
   animation: dlb-float 2.6s ease-in-out infinite;
   outline: none;
 }
@@ -290,20 +296,14 @@ body.red-flash {
   position: absolute;
   inset: -2px;
   border-radius: 18px;
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(127, 255, 212, 0.25),
-    transparent 60%
-  );
+  background: radial-gradient(circle at 50% 0%, rgba(127, 255, 212, 0.25), transparent 60%);
   opacity: 0.8;
   filter: blur(8px);
   z-index: 0;
 }
 .daily-loot-box:hover {
   transform: translateY(-6px) scale(1.03);
-  box-shadow:
-    0 0 28px rgba(127, 255, 212, 0.18),
-    inset 0 0 18px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 28px rgba(127, 255, 212, 0.18), inset 0 0 18px rgba(255, 255, 255, 0.1);
 }
 .daily-loot-box:disabled {
   cursor: default;
@@ -344,9 +344,7 @@ body.red-flash {
   transform: rotateY(0deg);
   font-size: 3.4rem;
   color: rgba(255, 255, 255, 0.92);
-  text-shadow:
-    0 0 18px rgba(255, 255, 255, 0.35),
-    0 0 28px rgba(127, 255, 212, 0.22);
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.35), 0 0 28px rgba(127, 255, 212, 0.22);
 }
 
 .dlb-back {
@@ -355,11 +353,7 @@ body.red-flash {
   text-align: center;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.95);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.25),
-    rgba(255, 255, 255, 0.06)
-  );
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.06));
 }
 
 .dlb-reward {
@@ -393,9 +387,7 @@ body.red-flash {
   color: white;
   font-weight: 800;
   cursor: pointer;
-  box-shadow:
-    inset 0 0 12px rgba(0, 0, 0, 0.8),
-    0 0 16px rgba(127, 255, 212, 0.14);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8), 0 0 16px rgba(127, 255, 212, 0.14);
 }
 .daily-loot-close:disabled {
   opacity: 0.45;
@@ -511,21 +503,21 @@ body.red-flash {
   font-size: 0.85rem;
   cursor: pointer;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
-.modal-towers #checkbox_field_tower input[type="checkbox"],
-.modal-towers #checkbox_field_trap input[type="checkbox"],
-.modal-towers #checkbox_field_trap_charges input[type="checkbox"],
-.modal-towers #checkbox_field_upgrade input[type="checkbox"],
-.modal-upgrade #checkbox_field_tower input[type="checkbox"],
-.modal-upgrade #checkbox_field_trap input[type="checkbox"],
-.modal-upgrade #checkbox_field_trap_charges input[type="checkbox"],
-.modal-upgrade #checkbox_field_upgrade input[type="checkbox"],
-.modal-skill #checkbox_field_tower input[type="checkbox"],
-.modal-skill #checkbox_field_trap input[type="checkbox"],
-.modal-skill #checkbox_field_trap_charges input[type="checkbox"],
-.modal-skill #checkbox_field_upgrade input[type="checkbox"] {
+.modal-towers #checkbox_field_tower input[type=checkbox],
+.modal-towers #checkbox_field_trap input[type=checkbox],
+.modal-towers #checkbox_field_trap_charges input[type=checkbox],
+.modal-towers #checkbox_field_upgrade input[type=checkbox],
+.modal-upgrade #checkbox_field_tower input[type=checkbox],
+.modal-upgrade #checkbox_field_trap input[type=checkbox],
+.modal-upgrade #checkbox_field_trap_charges input[type=checkbox],
+.modal-upgrade #checkbox_field_upgrade input[type=checkbox],
+.modal-skill #checkbox_field_tower input[type=checkbox],
+.modal-skill #checkbox_field_trap input[type=checkbox],
+.modal-skill #checkbox_field_trap_charges input[type=checkbox],
+.modal-skill #checkbox_field_upgrade input[type=checkbox] {
   width: 20px;
   height: 20px;
   cursor: pointer;
@@ -543,7 +535,6 @@ body.red-flash {
 .modal-upgrade .grid-wrapper .tile,
 .modal-skill .grid-wrapper .tile {
   background: linear-gradient(45deg, rgb(24, 54, 50), transparent);
-  -webkit-backdrop-filter: blur(13px);
   backdrop-filter: blur(13px);
   padding: 10px;
   display: flex;
@@ -603,15 +594,13 @@ body.red-flash {
   width: 60px;
   height: 50px;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
   -o-object-position: top;
-  object-position: top;
+     object-position: top;
   background-color: rgba(97, 97, 99, 0.4705882353);
   border-radius: 5px;
   padding: 5px;
-  box-shadow:
-    0 0 15px rgba(255, 255, 255, 0.284),
-    inset 0 0 15px white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.284), inset 0 0 15px white;
   border: 1px solid rgba(255, 255, 255, 0.446);
 }
 .modal-towers .grid-wrapper .tile .button-buy,
@@ -696,9 +685,7 @@ body.red-flash {
   justify-content: center;
   align-items: center;
   text-align: center;
-  box-shadow:
-    inset 0 0 15px black,
-    0 0 15px black;
+  box-shadow: inset 0 0 15px black, 0 0 15px black;
   text-transform: uppercase;
   text-shadow: 0 0 10px black;
   outline: 1px solid rgba(255, 255, 255, 0.595);
@@ -728,8 +715,8 @@ body.red-flash {
 
 select {
   -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   background-color: #333;
   color: white;
   padding: 10px;
@@ -770,7 +757,7 @@ select option {
   width: 70px;
   height: auto;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
   background: black;
 }
 
@@ -837,9 +824,7 @@ select option {
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
-  transition:
-    transform 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 .modal-sel-lvl .grid-wrapper .tile.overpriced {
   opacity: 0.2;
@@ -852,7 +837,7 @@ select option {
   width: 150px;
   height: 150px;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
   border-radius: 50%;
   margin-bottom: 10px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
@@ -1048,12 +1033,7 @@ select option {
 #gxu-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(
-    circle at 50% 20%,
-    rgba(22, 50, 75, 0.45),
-    rgba(0, 0, 0, 0.82) 58%
-  );
-  -webkit-backdrop-filter: blur(8px) brightness(1.05);
+  background: radial-gradient(circle at 50% 20%, rgba(22, 50, 75, 0.45), rgba(0, 0, 0, 0.82) 58%);
   backdrop-filter: blur(8px) brightness(1.05);
   display: flex;
   align-items: center;
@@ -1075,10 +1055,7 @@ select option {
   position: relative;
   background: linear-gradient(165deg, #071018, #10261f 52%, #0b1b25 100%);
   border: 2px solid rgba(121, 225, 255, 0.42);
-  box-shadow:
-    0 18px 55px rgba(0, 0, 0, 0.58),
-    0 0 36px rgba(83, 201, 255, 0.28),
-    inset 0 0 22px rgba(115, 222, 255, 0.13);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.58), 0 0 36px rgba(83, 201, 255, 0.28), inset 0 0 22px rgba(115, 222, 255, 0.13);
   animation: gxu-dropIn 0.45s cubic-bezier(0.18, 1.3, 0.45, 1);
 }
 
@@ -1118,7 +1095,6 @@ select option {
   align-items: center;
   border: 1px solid rgba(122, 221, 255, 0.24);
   box-shadow: inset 0 0 12px rgba(94, 212, 255, 0.09);
-  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   opacity: 0;
   transform: translateY(10px);
@@ -1202,11 +1178,7 @@ select option {
   transform: translateX(-50%);
   width: 260px;
   height: 260px;
-  background: radial-gradient(
-    circle,
-    rgba(0, 234, 255, 0.3333333333),
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(0, 234, 255, 0.3333333333), transparent 70%);
   filter: blur(22px);
   opacity: 0;
   transition: opacity 0.4s;
@@ -1230,11 +1202,7 @@ select option {
 }
 
 .gxu-gameover {
-  background: linear-gradient(
-    90deg,
-    rgba(247, 100, 64, 0.5803921569),
-    rgba(159, 14, 14, 0.2588235294)
-  ) !important;
+  background: linear-gradient(90deg, rgba(247, 100, 64, 0.5803921569), rgba(159, 14, 14, 0.2588235294)) !important;
   text-shadow: 0 0 1px rgb(247, 235, 235) !important;
   border-radius: 8px;
-} /*# sourceMappingURL=styles.css.map */
+}/*# sourceMappingURL=styles.css.map */
