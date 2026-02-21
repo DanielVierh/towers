@@ -252,6 +252,10 @@ body.red-flash {
   }
 }
 
+.run-loot-modal {
+  z-index: 7000;
+}
+
 .daily-loot-content {
   width: min(860px, 94vw);
   border-radius: 18px;
@@ -1195,6 +1199,18 @@ select {
 }
 .gxu-modal.gxu-ready .gxu-stat-box:nth-of-type(5) {
   animation-delay: 190ms;
+}
+
+.gxu-modal.gxu-ready .gxu-stat-box:nth-of-type(6) {
+  animation-delay: 240ms;
+}
+
+.gxu-modal.gxu-ready .gxu-stat-box:nth-of-type(7) {
+  animation-delay: 290ms;
+}
+
+#gxu-s-best-tower {
+  font-size: 1.02rem;
 }
 
 @keyframes gxu-stat-in {

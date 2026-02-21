@@ -172,6 +172,7 @@ const tile_upgrade_liveGenerator = document.getElementById(
 );
 const btn_livegen = document.getElementById("btn_livegen");
 const reset_game = document.getElementById("reset_game");
+const btn_replay_same_map = document.getElementById("btn_replay_same_map");
 const lbl_available_mines = document.getElementById("lbl_available_mines");
 const lbl_needed_energy = document.getElementById("lbl_needed_energy");
 
@@ -193,6 +194,10 @@ const dailyLootModal = document.getElementById("dailyLootModal");
 const dailyLootBoxesRoot = document.getElementById("dailyLootBoxes");
 const dailyLootClose = document.getElementById("dailyLootClose");
 const dailyLootHint = document.getElementById("dailyLootHint");
+const runLootModal = document.getElementById("runLootModal");
+const runLootBoxesRoot = document.getElementById("runLootBoxes");
+const runLootClose = document.getElementById("runLootClose");
+const runLootHint = document.getElementById("runLootHint");
 
 // Wave intro banner
 const waveIntroBanner = document.getElementById("waveIntroBanner");
@@ -572,6 +577,174 @@ function initDailyLoot() {
     dailyLootModal.classList.remove("active");
     dailyLootModal.setAttribute("aria-hidden", "true");
   });
+}
+
+function formatPostRunReward(reward) {
+  if (!reward) return "Geschenk";
+  if (reward.kind === "xp_coins") {
+    return `+${Number(reward.amount).toLocaleString("de-DE")} XP-Coins`;
+  }
+  if (reward.kind === "xp") {
+    return `+${Number(reward.amount).toLocaleString("de-DE")} XP`;
+  }
+  if (reward.kind === "item") {
+    const nameMap = {
+      trap_rabatt_50: "Fallen-Rabatt",
+      tower_rabatt_50: "Tower-Rabatt",
+      upgrade_rabatt_50: "Upgrade-Rabatt",
+      mine_charges_3_pack: "3er-Minen-Pack",
+    };
+    const label = nameMap[reward.name] ?? reward.name;
+    return `+${reward.amount}x ${label}`;
+  }
+  return "Überraschung";
+}
+
+function applyPostRunReward(reward) {
+  if (!reward) return;
+  if (reward.kind === "xp_coins") {
+    save_obj.XP_Coins += Number(reward.amount) || 0;
+  } else if (reward.kind === "xp") {
+    save_obj.XP += Number(reward.amount) || 0;
+  } else if (reward.kind === "item") {
+    addXpStoreAmount(reward.name, Number(reward.amount) || 0);
+  }
+
+  render_amount(save_obj);
+  render_XP_Coins(save_obj);
+  render_xp_on_homescreen();
+  save_Game_without_saveDate();
+}
+
+function generatePostRunRewards(resultStats, win) {
+  const kills = Number(resultStats?.kills) || 0;
+  const waves = Number(resultStats?.waves) || 0;
+  const dps = Number(resultStats?.dps) || 0;
+  const score = waves * 8 + kills * 0.8 + dps * 0.1 + (win ? 90 : 20);
+
+  const xpCoinMin = Math.max(150, Math.floor(score * 1.1));
+  const xpCoinMax = Math.max(xpCoinMin + 120, Math.floor(score * 2.2));
+  const xpMin = Math.max(20, Math.floor(score * 0.2));
+  const xpMax = Math.max(xpMin + 30, Math.floor(score * 0.5));
+
+  const pool = [
+    {
+      weight: 46,
+      value: {
+        kind: "xp_coins",
+        amount: getRandomMinMax(xpCoinMin, xpCoinMax),
+      },
+    },
+    {
+      weight: 18,
+      value: {
+        kind: "xp_coins",
+        amount: getRandomMinMax(
+          Math.floor(xpCoinMax * 0.9),
+          Math.floor(xpCoinMax * 1.5),
+        ),
+      },
+    },
+    {
+      weight: 12,
+      value: {
+        kind: "xp",
+        amount: getRandomMinMax(xpMin, xpMax),
+      },
+    },
+    { weight: 9, value: { kind: "item", name: "trap_rabatt_50", amount: 2 } },
+    {
+      weight: 8,
+      value: { kind: "item", name: "mine_charges_3_pack", amount: win ? 3 : 2 },
+    },
+    { weight: 6, value: { kind: "item", name: "tower_rabatt_50", amount: 2 } },
+    {
+      weight: 5,
+      value: { kind: "item", name: "upgrade_rabatt_50", amount: 2 },
+    },
+  ];
+
+  if (score >= 260) {
+    pool.push({
+      weight: 4,
+      value: {
+        kind: "xp_coins",
+        amount: getRandomMinMax(
+          Math.floor(xpCoinMax * 1.5),
+          Math.floor(xpCoinMax * 2.4),
+        ),
+      },
+    });
+  }
+
+  const rewards = [];
+  for (let i = 0; i < 3; i++) {
+    rewards.push(weightedPick(pool));
+  }
+  return rewards;
+}
+
+function showPostRunLoot(resultStats, win) {
+  if (!runLootModal || !runLootBoxesRoot || !runLootClose) return;
+
+  const rewards = generatePostRunRewards(resultStats, win);
+  const opened = [false, false, false];
+
+  runLootClose.disabled = true;
+  if (runLootHint) {
+    runLootHint.textContent = "Öffne alle 3 Boxen, um fortzufahren.";
+  }
+
+  runLootModal.classList.add("active");
+  runLootModal.setAttribute("aria-hidden", "false");
+
+  const boxButtons = runLootBoxesRoot.querySelectorAll(".daily-loot-box");
+  boxButtons.forEach((btn) => {
+    const index = Number(btn.getAttribute("data-box-index"));
+    const frontEl = btn.querySelector(".dlb-front");
+    const rewardEl = btn.querySelector(".dlb-reward");
+
+    btn.classList.remove("is-opening", "is-opened");
+    btn.disabled = false;
+    if (frontEl) frontEl.textContent = "?";
+    if (rewardEl) rewardEl.textContent = "";
+
+    btn.onclick = () => {
+      if (opened[index]) return;
+
+      btn.classList.add("is-opening");
+      btn.disabled = true;
+
+      const reward = rewards[index];
+      applyPostRunReward(reward);
+      opened[index] = true;
+
+      setTimeout(() => {
+        btn.classList.remove("is-opening");
+        btn.classList.add("is-opened");
+        const fEl = btn.querySelector(".dlb-front");
+        if (fEl) fEl.textContent = formatPostRunReward(reward);
+
+        const count = opened.filter(Boolean).length;
+        if (runLootHint) {
+          runLootHint.textContent =
+            count >= 3
+              ? "Run-Loot eingesammelt!"
+              : `Noch ${3 - count} Box(en) öffnen…`;
+        }
+        if (count >= 3) {
+          runLootClose.disabled = false;
+        }
+      }, 520);
+    };
+  });
+
+  runLootClose.onclick = () => {
+    const count = opened.filter(Boolean).length;
+    if (count < 3) return;
+    runLootModal.classList.remove("active");
+    runLootModal.setAttribute("aria-hidden", "true");
+  };
 }
 
 function syncFxControls() {
@@ -1008,6 +1181,14 @@ let freeBuildPadding = 12; // pixels padding around towers when blocking cells
 let max_mine_amount_per_wave = 3;
 let current_mine_amount_per_wave = 3;
 
+let selectedLevelIdForReplay = null;
+let selectedLevelDetailsForReplay = null;
+let selectedDifficultyForReplay = "easy";
+
+let runStartedAtMs = 0;
+let runTowerDamage = 0;
+let runTowerStatsByType = {};
+
 // Zeitstempel für die Delta-Time Berechnung in der Game-Loop
 let lastTime = performance.now();
 
@@ -1349,6 +1530,111 @@ function parseMoneyValue(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
   return Math.max(0, Math.floor(n));
+}
+
+function cloneLevelDetails(level) {
+  if (!level) return null;
+  return {
+    ...level,
+    waypoints: Array.isArray(level.waypoints)
+      ? level.waypoints.map((wp) => ({ ...wp }))
+      : [],
+    tower_places: Array.isArray(level.tower_places)
+      ? level.tower_places.map((tp) => ({ ...tp }))
+      : [],
+    spawn_start: level.spawn_start ? { ...level.spawn_start } : undefined,
+    spawn_end: level.spawn_end ? { ...level.spawn_end } : undefined,
+  };
+}
+
+function getTowerDisplayName(towerType) {
+  switch (towerType) {
+    case "destroyer":
+      return "Destroyer";
+    case "slower":
+      return "Slower";
+    case "toxic":
+      return "Toxic";
+    case "anti_air":
+      return "Anti-Air";
+    case "sniper":
+      return "Sniper";
+    case "energy":
+      return "Energy";
+    case "mine":
+      return "Mine";
+    case "air_mine":
+      return "Air Mine";
+    case "spikes":
+      return "Spikes";
+    default:
+      return "Tower";
+  }
+}
+
+function resetRunStats() {
+  runStartedAtMs = performance.now();
+  runTowerDamage = 0;
+  runTowerStatsByType = {};
+}
+
+function ensureRunTowerStat(towerType) {
+  const key = towerType || "unknown";
+  if (!runTowerStatsByType[key]) {
+    runTowerStatsByType[key] = {
+      damage: 0,
+      kills: 0,
+      invested: 0,
+    };
+  }
+  return runTowerStatsByType[key];
+}
+
+function recordTowerDamage(tower, amount) {
+  const dmg = Number(amount);
+  if (!tower || !Number.isFinite(dmg) || dmg <= 0) return;
+  const stat = ensureRunTowerStat(tower.tower_type);
+  stat.damage += dmg;
+  if (stat.invested <= 0) {
+    const invested =
+      parseMoneyValue(tower.purchase_price_paid) +
+      parseMoneyValue(tower.upgrade_spent);
+    stat.invested = Math.max(stat.invested, invested);
+  }
+  runTowerDamage += dmg;
+}
+
+function recordTowerKill(tower) {
+  if (!tower) return;
+  const stat = ensureRunTowerStat(tower.tower_type);
+  stat.kills += 1;
+}
+
+function buildEndscreenStats({ xp, coins, waves }) {
+  const durationMs = Math.max(1, performance.now() - runStartedAtMs);
+  const durationSec = durationMs / 1000;
+  const dps = Math.max(0, Math.floor(runTowerDamage / durationSec));
+
+  let bestTowerLabel = "-";
+  let bestScore = -1;
+  Object.entries(runTowerStatsByType).forEach(([towerType, stat]) => {
+    const invested = Math.max(1, Number(stat.invested) || 0);
+    const damage = Math.max(0, Number(stat.damage) || 0);
+    const score = damage / invested;
+    if (damage > 0 && score > bestScore) {
+      bestScore = score;
+      bestTowerLabel = `${getTowerDisplayName(towerType)} (${score.toFixed(2)} dmg/€)`;
+    }
+  });
+
+  return {
+    kills: Number(save_obj.total_kills) || 0,
+    xp: Number(xp) || 0,
+    coins: Number(coins) || 0,
+    dps,
+    bestTower: bestTowerLabel,
+    waves: Math.max(0, Number(waves) || 0),
+  };
 }
 
 function estimateUpgradeInvestment(tower) {
@@ -2192,12 +2478,13 @@ function showGameOverModal() {
       new_XP_Coins = 5;
     }
     const xpReward = Math.max(0, Math.floor(save_obj.current_XP / 2));
-    gxuShowEndscreen(false, {
-      kills: save_obj.total_kills.toLocaleString("de-DE"),
+    const endscreenStats = buildEndscreenStats({
       xp: xpReward,
-      coins: new_XP_Coins.toLocaleString("de-DE"),
+      coins: new_XP_Coins,
       waves: save_obj.wave - 1,
     });
+    gxuShowEndscreen(false, endscreenStats);
+    showPostRunLoot(endscreenStats, false);
     save_obj.assign_XP = true;
     // Entferne das Save-Datum, damit auf dem Startscreen kein Lade-Button mehr angezeigt wird
     if (save_obj.hasOwnProperty("save_date")) {
@@ -2456,7 +2743,9 @@ function gameLoop() {
           // Stachelfeld: konstanter Schaden im Umkreis
           if (tower.tower_type === "spikes") {
             const dps = 390;
-            enemy.health -= dps * (deltaTime / 1000);
+            const damage = dps * (deltaTime / 1000);
+            enemy.health -= damage;
+            recordTowerDamage(tower, damage);
           }
 
           if (enemy.health <= 0) {
@@ -2466,6 +2755,7 @@ function gameLoop() {
             } else {
               save_obj.total_kills += 1;
             }
+            recordTowerKill(tower);
             // Explosion starten
             deathEffects.push(
               new DeathEffect(
@@ -2603,6 +2893,7 @@ function gameLoop() {
             //* Harm Enemy
             if (!enemy.resistent.includes("destroyer")) {
               enemy.health -= tower.tower_damage_lvl;
+              recordTowerDamage(tower, tower.tower_damage_lvl);
               // Boss hit impact
               if (enemy.isBoss) triggerScreenShake(2.6, 110);
               // *Erzeuge nur jeden zweiten Schuss visuell
@@ -2627,6 +2918,8 @@ function gameLoop() {
             //* >>> Sniper Tower <<<
           } else if (tower.tower_type === "sniper") {
             if (!enemy.markedForDeletion) {
+              const sniperDamage = Math.max(0, Number(enemy.health) || 0);
+              recordTowerDamage(tower, sniperDamage);
               enemy.health = 0;
               if (enemy.isBoss) triggerScreenShake(4.4, 170);
 
@@ -2647,6 +2940,7 @@ function gameLoop() {
               } else {
                 save_obj.total_kills += 1;
               }
+              recordTowerKill(tower);
 
               deathEffects.push(
                 new DeathEffect(
@@ -2708,7 +3002,9 @@ function gameLoop() {
             }
             //* Harm Enemy
             if (!enemy.resistent.includes("anti_air")) {
-              enemy.health -= tower.tower_damage_lvl * 70;
+              const damage = tower.tower_damage_lvl * 70;
+              enemy.health -= damage;
+              recordTowerDamage(tower, damage);
               // Boss hit impact
               if (enemy.isBoss) triggerScreenShake(3.4, 140);
               // *Erzeuge Missle
@@ -2740,10 +3036,15 @@ function gameLoop() {
               //* Mine Kill Count
               if (!got_killed) {
                 save_obj.total_kills++;
+                recordTowerKill(tower);
                 got_killed = true;
               }
               setTimeout(() => {
                 setTimeout(() => {
+                  recordTowerDamage(
+                    tower,
+                    Math.max(0, Number(enemy.health) || 0),
+                  );
                   enemy.health = 0;
                   enemy.markedForDeletion = true;
                   got_killed = false;
@@ -2793,9 +3094,14 @@ function gameLoop() {
               //* Mine Kill Count
               if (!got_killed) {
                 save_obj.total_kills++;
+                recordTowerKill(tower);
                 got_killed = true;
               }
               setTimeout(() => {
+                recordTowerDamage(
+                  tower,
+                  Math.max(0, Number(enemy.health) || 0),
+                );
                 enemy.health = 0;
                 enemy.markedForDeletion = true;
                 got_killed = false;
@@ -3106,12 +3412,13 @@ function won_game() {
           "de-DE",
         )} XP) <br> ${new_XP_Coins} XP-Coins`;
       }
-      gxuShowEndscreen(true, {
-        kills: save_obj.total_kills.toLocaleString("de-DE"),
-        xp: `${save_obj.current_XP.toLocaleString("de-DE")}`,
-        coins: new_XP_Coins.toLocaleString("de-DE"),
+      const endscreenStats = buildEndscreenStats({
+        xp: save_obj.current_XP,
+        coins: new_XP_Coins,
         waves: save_obj.wave - 1,
       });
+      gxuShowEndscreen(true, endscreenStats);
+      showPostRunLoot(endscreenStats, true);
       save_obj.current_XP = 0;
       save_obj.assign_XP = true;
       save_obj.save_date = undefined;
@@ -3987,6 +4294,7 @@ btn_load_game.addEventListener("click", () => {
     }
   }
   game_is_running = true;
+  resetRunStats();
   // Start the game loop
   gameLoop();
 
@@ -4000,54 +4308,57 @@ btn_load_game.addEventListener("click", () => {
 
 level_0.addEventListener("click", () => {
   const level_details = set_level("0");
-  initialize_game(level_details);
+  initialize_game(level_details, "0");
 });
 
 level_1.addEventListener("click", () => {
   const level_details = set_level("1");
-  initialize_game(level_details);
+  initialize_game(level_details, "1");
 });
 
 level_2.addEventListener("click", () => {
   const level_details = set_level("2");
-  initialize_game(level_details);
+  initialize_game(level_details, "2");
 });
 
 level_3.addEventListener("click", () => {
   const level_details = set_level("3");
-  initialize_game(level_details);
+  initialize_game(level_details, "3");
 });
 
 level_4.addEventListener("click", () => {
   const level_details = set_level("4");
-  initialize_game(level_details);
+  initialize_game(level_details, "4");
 });
 
 level_5.addEventListener("click", () => {
   const level_details = set_level("5");
-  initialize_game(level_details);
+  initialize_game(level_details, "5");
 });
 
 level_6.addEventListener("click", () => {
   const level_details = set_level("6");
-  initialize_game(level_details);
+  initialize_game(level_details, "6");
 });
 
 level_random.addEventListener("click", () => {
   const level_details = set_level("level_rnd");
-  initialize_game(level_details);
+  initialize_game(level_details, "level_rnd");
 });
 
 btn_start_game.addEventListener("click", () => {
   modal_select_lvl.style.display = "flex";
 });
 
-function initialize_game(level_details) {
+function initialize_game(level_details, selectedLevelId = null) {
   lbl_available_mines.innerHTML = `${current_mine_amount_per_wave}/${max_mine_amount_per_wave} Minen verfügbar`;
   save_obj.assign_XP = false;
   save_obj.current_XP = 0;
   modal_select_lvl.style.display = "none";
   const level = level_details;
+  selectedLevelIdForReplay = selectedLevelId;
+  selectedLevelDetailsForReplay = cloneLevelDetails(level);
+  selectedDifficultyForReplay = sel_difficulty?.value || "easy";
   //* Set the max wave target for this round
   save_obj.active_game_target_wave = Math.floor(Math.random() * (50 - 20)) + 20;
   // save_obj.active_game_target_wave = 2; // * For testing debug
@@ -4108,6 +4419,7 @@ function start_game() {
   const game_difficulty = sel_difficulty.value;
 
   set_difficulty(game_difficulty);
+  resetRunStats();
 
   // FreeBuild: give extra starting money and per-wave bonus
   if (save_obj.free_build) {
@@ -4818,16 +5130,28 @@ function gxuShowEndscreen(win, stats) {
   const elKills = document.getElementById("gxu-s-kills");
   const elXp = document.getElementById("gxu-s-xp");
   const elCoins = document.getElementById("gxu-s-coins");
+  const elDps = document.getElementById("gxu-s-dps");
+  const elBestTower = document.getElementById("gxu-s-best-tower");
   const elWaves = document.getElementById("gxu-s-waves");
+
+  if (btn_replay_same_map) {
+    btn_replay_same_map.disabled = !selectedLevelDetailsForReplay;
+  }
 
   const kills = parseStatNumber(stats?.kills);
   const xp = parseStatNumber(stats?.xp);
   const coins = parseStatNumber(stats?.coins);
+  const dps = parseStatNumber(stats?.dps);
+  const bestTower = String(stats?.bestTower ?? "-");
   const waves = parseStatNumber(stats?.waves);
 
   animateCount(elKills, kills, 850);
   animateCount(elXp, xp, 1050);
   animateCount(elCoins, coins, 1200);
+  animateCount(elDps, dps, 980);
+  if (elBestTower) {
+    elBestTower.textContent = bestTower;
+  }
   animateCount(elWaves, waves, 900);
 
   box.classList.remove("gxu-ready");
@@ -4838,6 +5162,35 @@ function gxuShowEndscreen(win, stats) {
 }
 function gxuClose() {
   document.getElementById("gxu-overlay").classList.remove("gxu-active");
+}
+
+if (btn_replay_same_map) {
+  btn_replay_same_map.addEventListener("click", () => {
+    if (!selectedLevelDetailsForReplay) {
+      new GameMessage(
+        "Replay nicht verfügbar",
+        "Bitte starte zuerst ein neues Spiel über die Level-Auswahl.",
+        "error",
+        2600,
+      ).show_Message();
+      return;
+    }
+
+    if (sel_difficulty && selectedDifficultyForReplay) {
+      sel_difficulty.value = selectedDifficultyForReplay;
+    }
+
+    gxuClose();
+    if (runLootModal) {
+      runLootModal.classList.remove("active");
+      runLootModal.setAttribute("aria-hidden", "true");
+    }
+
+    initialize_game(
+      cloneLevelDetails(selectedLevelDetailsForReplay),
+      selectedLevelIdForReplay,
+    );
+  });
 }
 
 reset_game.addEventListener("click", () => {
