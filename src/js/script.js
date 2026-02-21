@@ -401,9 +401,9 @@ function weightedPick(items) {
 
 function generateDailyRewards() {
   const pool = [
-    { weight: 40, value: { kind: "xp_coins", amount: 250 } },
-    { weight: 25, value: { kind: "xp_coins", amount: 500 } },
-    { weight: 10, value: { kind: "xp_coins", amount: 1000 } },
+    { weight: 40, value: { kind: "xp_coins", amount: 500 } },
+    { weight: 25, value: { kind: "xp_coins", amount: 1000 } },
+    { weight: 10, value: { kind: "xp_coins", amount: 2000 } },
     { weight: 12, value: { kind: "item", name: "trap_rabatt_50", amount: 2 } },
     {
       weight: 10,
