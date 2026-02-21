@@ -3199,7 +3199,10 @@ function gameLoop() {
                 detonateMineAoE(tower, "mine");
 
                 // Charges reduzieren; nur bei 0 entfernen
-                const nextCharges = Math.max(0, (Number(tower.charges) || 1) - 1);
+                const nextCharges = Math.max(
+                  0,
+                  (Number(tower.charges) || 1) - 1,
+                );
                 tower.charges = nextCharges;
                 if (nextCharges <= 0) {
                   resetTowerPlaceState(tower);
@@ -3237,7 +3240,10 @@ function gameLoop() {
                 detonateMineAoE(tower, "air_mine");
 
                 // Charges reduzieren; nur bei 0 entfernen
-                const nextCharges = Math.max(0, (Number(tower.charges) || 1) - 1);
+                const nextCharges = Math.max(
+                  0,
+                  (Number(tower.charges) || 1) - 1,
+                );
                 tower.charges = nextCharges;
                 if (nextCharges <= 0) {
                   resetTowerPlaceState(tower);
