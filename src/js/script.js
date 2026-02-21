@@ -2504,6 +2504,77 @@ function calculateDistance(
   return Math.sqrt((centerX2 - centerX1) ** 2 + (centerY2 - centerY1) ** 2);
 }
 
+function detonateMineAoE(tower, resistanceKey) {
+  if (!tower) return;
+
+  const blastRadius = Math.max(18, Number(tower.range) || 40);
+
+  enemies.forEach((targetEnemy) => {
+    if (!targetEnemy || targetEnemy.markedForDeletion) return;
+
+    const distance = calculateDistance(
+      targetEnemy.pos_x,
+      targetEnemy.pos_y,
+      tower.x,
+      tower.y,
+      targetEnemy.width,
+      targetEnemy.height,
+      30,
+      30,
+    );
+
+    if (distance > blastRadius) return;
+
+    const damage = Math.max(0, Number(targetEnemy.health) || 0);
+    recordTowerDamage(tower, damage);
+    targetEnemy.health = 0;
+    targetEnemy.markedForDeletion = true;
+
+    if (save_obj.total_kills === undefined) {
+      save_obj.total_kills = 1;
+    } else {
+      save_obj.total_kills += 1;
+    }
+    recordTowerKill(tower);
+
+    deathEffects.push(
+      new DeathEffect(
+        targetEnemy.pos_x + targetEnemy.width / 2,
+        targetEnemy.pos_y + targetEnemy.height / 2,
+        1.3,
+      ),
+    );
+
+    let earnedMoney = 0;
+    if (save_obj.wave > 20) {
+      earnedMoney = 2;
+    } else if (save_obj.wave >= 4) {
+      earnedMoney = 4;
+    } else {
+      earnedMoney = 10;
+    }
+
+    earnedMoney += targetEnemy.extra_money;
+    save_obj.current_XP += xpGain(1);
+    save_obj.money += earnedMoney;
+
+    if (tower.live_gen === 1) {
+      tower.kill_counter += 1;
+      if (tower.kill_counter === 20) {
+        save_obj.live++;
+        tower.kill_counter = 0;
+      }
+    }
+
+    moneyPopups.push({
+      x: targetEnemy.pos_x,
+      y: targetEnemy.pos_y,
+      amount: `+${earnedMoney}`,
+      opacity: 1,
+    });
+  });
+}
+
 //*#########################################################
 //* ANCHOR -show Game Over Modal
 //*#########################################################
@@ -2806,7 +2877,7 @@ function gameLoop() {
 
           // Stachelfeld: konstanter Schaden im Umkreis
           if (tower.tower_type === "spikes") {
-            const dps = 390;
+            const dps = 1200;
             const damage = dps * (deltaTime / 1000);
             enemy.health -= damage;
             recordTowerDamage(tower, damage);
@@ -3123,53 +3194,33 @@ function gameLoop() {
               tower.lastTriggeredAt = nowEpoch;
               if (tower.charges === undefined) tower.charges = 1;
 
-              //* Mine Kill Count
-              if (!got_killed) {
-                save_obj.total_kills++;
-                recordTowerKill(tower);
-                got_killed = true;
-              }
               setTimeout(() => {
-                setTimeout(() => {
-                  recordTowerDamage(
-                    tower,
-                    Math.max(0, Number(enemy.health) || 0),
-                  );
-                  enemy.health = 0;
-                  enemy.markedForDeletion = true;
-                  got_killed = false;
-                }, 100);
-                setTimeout(() => {
-                  // Explosion-Animation anzeigen
-                  triggerExplosion(tower.x + 20, tower.y);
+                triggerExplosion(tower.x + 20, tower.y);
+                detonateMineAoE(tower, "mine");
 
-                  // Charges reduzieren; nur bei 0 entfernen
-                  const nextCharges = Math.max(
-                    0,
-                    (Number(tower.charges) || 1) - 1,
-                  );
-                  tower.charges = nextCharges;
-                  if (nextCharges <= 0) {
-                    resetTowerPlaceState(tower);
-                    if (save_obj.free_build && pathGrid) {
-                      buildObstaclesFromTowers(
-                        save_obj.tower_places,
-                        pathGrid,
-                        freeBuildPadding,
-                      );
-                      enemies.forEach((enemy) => {
-                        try {
-                          const newPath = findPath(
-                            { x: enemy.pos_x, y: enemy.pos_y },
-                            free_spawn_end,
-                            pathGrid,
-                          );
-                          if (newPath) enemy.setPath(newPath);
-                        } catch (e) {}
-                      });
-                    }
+                // Charges reduzieren; nur bei 0 entfernen
+                const nextCharges = Math.max(0, (Number(tower.charges) || 1) - 1);
+                tower.charges = nextCharges;
+                if (nextCharges <= 0) {
+                  resetTowerPlaceState(tower);
+                  if (save_obj.free_build && pathGrid) {
+                    buildObstaclesFromTowers(
+                      save_obj.tower_places,
+                      pathGrid,
+                      freeBuildPadding,
+                    );
+                    enemies.forEach((enemy) => {
+                      try {
+                        const newPath = findPath(
+                          { x: enemy.pos_x, y: enemy.pos_y },
+                          free_spawn_end,
+                          pathGrid,
+                        );
+                        if (newPath) enemy.setPath(newPath);
+                      } catch (e) {}
+                    });
                   }
-                }, 50);
+                }
               }, 10);
             }
           } else if (tower.tower_type === "air_mine") {
@@ -3181,51 +3232,33 @@ function gameLoop() {
               tower.lastTriggeredAt = nowEpoch;
               if (tower.charges === undefined) tower.charges = 1;
 
-              //* Mine Kill Count
-              if (!got_killed) {
-                save_obj.total_kills++;
-                recordTowerKill(tower);
-                got_killed = true;
-              }
               setTimeout(() => {
-                recordTowerDamage(
-                  tower,
-                  Math.max(0, Number(enemy.health) || 0),
-                );
-                enemy.health = 0;
-                enemy.markedForDeletion = true;
-                got_killed = false;
-                setTimeout(() => {
-                  // Explosion-Animation anzeigen
-                  triggerExplosion(tower.x + 20, tower.y);
+                triggerExplosion(tower.x + 20, tower.y);
+                detonateMineAoE(tower, "air_mine");
 
-                  // Charges reduzieren; nur bei 0 entfernen
-                  const nextCharges = Math.max(
-                    0,
-                    (Number(tower.charges) || 1) - 1,
-                  );
-                  tower.charges = nextCharges;
-                  if (nextCharges <= 0) {
-                    resetTowerPlaceState(tower);
-                    if (save_obj.free_build && pathGrid) {
-                      buildObstaclesFromTowers(
-                        save_obj.tower_places,
-                        pathGrid,
-                        freeBuildPadding,
-                      );
-                      enemies.forEach((enemy) => {
-                        try {
-                          const newPath = findPath(
-                            { x: enemy.pos_x, y: enemy.pos_y },
-                            free_spawn_end,
-                            pathGrid,
-                          );
-                          if (newPath) enemy.setPath(newPath);
-                        } catch (e) {}
-                      });
-                    }
+                // Charges reduzieren; nur bei 0 entfernen
+                const nextCharges = Math.max(0, (Number(tower.charges) || 1) - 1);
+                tower.charges = nextCharges;
+                if (nextCharges <= 0) {
+                  resetTowerPlaceState(tower);
+                  if (save_obj.free_build && pathGrid) {
+                    buildObstaclesFromTowers(
+                      save_obj.tower_places,
+                      pathGrid,
+                      freeBuildPadding,
+                    );
+                    enemies.forEach((enemy) => {
+                      try {
+                        const newPath = findPath(
+                          { x: enemy.pos_x, y: enemy.pos_y },
+                          free_spawn_end,
+                          pathGrid,
+                        );
+                        if (newPath) enemy.setPath(newPath);
+                      } catch (e) {}
+                    });
                   }
-                }, 50);
+                }
               }, 10);
             }
           }
@@ -4123,11 +4156,12 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       }
       tower.charges = charges;
       tower.lastTriggeredAt = 0;
+      tower.range = 40;
     }
 
     if (tower_type === "spikes") {
       tower.expiresAt = Date.now() + 8000;
-      tower.range = 55;
+      tower.range = 28;
     }
 
     if (tower_type === "emp_field") {
