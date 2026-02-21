@@ -35,6 +35,8 @@ export class Creep {
     this.original_velocity = velocity; // Speichern der ursprünglichen Geschwindigkeit
     this.isSlowed = false; // Neue Eigenschaft, um zu verfolgen, ob der Gegner verlangsamt wurde
     this.slowTimeout = null; // Timeout-ID für den Verlangsamungseffekt
+    this.empDisabledUntil = 0;
+    this.isEmpDisabled = false;
 
     this.imageIndex = 0; // Aktuelles Bild für die Animation
     this.imageFrames = []; // Array für die Bilder
@@ -68,7 +70,19 @@ export class Creep {
     }, slow_time); // Verwende den übergebenen slow_time-Wert
   }
 
+  applyEmpEffect(disableMs = 1800) {
+    const now = Date.now();
+    this.empDisabledUntil = Math.max(
+      this.empDisabledUntil || 0,
+      now + disableMs,
+    );
+    this.isEmpDisabled = true;
+  }
+
   update(save_obj, moneyPopups) {
+    const nowEpoch = Date.now();
+    this.isEmpDisabled = nowEpoch < (Number(this.empDisabledUntil) || 0);
+
     // Smooth HP bar easing
     if (typeof this.displayHealth !== "number")
       this.displayHealth = this.health;
@@ -88,13 +102,14 @@ export class Creep {
       const dy = target.y - offsetY - this.pos_y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < this.velocity) {
+      const moveVelocity = this.isEmpDisabled ? 0 : this.velocity;
+      if (distance < moveVelocity) {
         this.pos_x = target.x - offsetX; // Setze die korrigierte Zielposition
         this.pos_y = target.y - offsetY;
         this.currentWaypointIndex++;
-      } else {
-        this.pos_x += (dx / distance) * this.velocity;
-        this.pos_y += (dy / distance) * this.velocity;
+      } else if (moveVelocity > 0) {
+        this.pos_x += (dx / distance) * moveVelocity;
+        this.pos_y += (dy / distance) * moveVelocity;
         this.direction = dx < 0 ? -1 : 1; // Setze die Richtung basierend auf dx
       }
       // console.log(this);
@@ -190,6 +205,7 @@ export class Creep {
       // Status icons (slow / toxic / invisible-type)
       const icons = [];
       if (this.isSlowed) icons.push({ color: "rgba(90,180,255,0.95)" });
+      if (this.isEmpDisabled) icons.push({ color: "rgba(255,215,90,0.95)" });
       if (this.is_toxicated) icons.push({ color: "rgba(80,220,120,0.95)" });
       // show invisible icon only after reveal (type indicator)
       if (this.wasInvisible && !this.invisible) {

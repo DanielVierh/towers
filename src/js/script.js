@@ -84,6 +84,7 @@ const TRAP_SVGS = {
 
 const TRAP_IMAGE_SOURCES = {
   spikes: "src/assets/mine/trap.png",
+  emp_field: "src/assets/mine/emp_mine.svg",
 };
 
 const trapIconImages = new Map();
@@ -108,6 +109,7 @@ function getTrapIconImage(trapType) {
 const btn_show_instructions = document.getElementById("btn_show_instructions");
 const btn_mine = document.getElementById("btn_mine");
 const btn_spikes = document.getElementById("btn_spikes");
+const btn_emp_field = document.getElementById("btn_emp_field");
 const lbl_XP = document.getElementById("lbl_XP");
 const modal_select_lvl = document.getElementById("modal_select_lvl");
 const level_0 = document.getElementById("level_0");
@@ -136,6 +138,7 @@ const btn_sell_refund = document.getElementById("btn_sell_refund");
 const btn_unlock_sniper_tower = document.getElementById(
   "btn_unlock_sniper_tower",
 );
+const btn_unlock_emp_field = document.getElementById("btn_unlock_emp_field");
 const mdl_skill_purchase = document.getElementById("mdl_skill_purchase");
 const btn_close_skill_purchase = document.getElementById(
   "btn_close_skill_purchase",
@@ -1427,6 +1430,10 @@ let save_obj = {
       name: "unlock_sniper_tower",
       amount: 0,
     },
+    {
+      name: "unlock_emp_field",
+      amount: 0,
+    },
   ],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
   active_game_target_wave: 0,
@@ -1501,6 +1508,10 @@ function isSniperUnlocked() {
   return getPassiveLevel("unlock_sniper_tower") > 0;
 }
 
+function isEmpFieldUnlocked() {
+  return getPassiveLevel("unlock_emp_field") > 0;
+}
+
 function baseTowerCost(towerType) {
   switch (towerType) {
     case "energy":
@@ -1521,6 +1532,8 @@ function baseTowerCost(towerType) {
       return 70;
     case "spikes":
       return 90;
+    case "emp_field":
+      return 150;
     default:
       return 0;
   }
@@ -1855,6 +1868,7 @@ function include_new_SaveObj_Properties() {
   ensureXpStoreItem("passive_xp_multi", 0);
   ensureXpStoreItem("passive_sell_refund", 0);
   ensureXpStoreItem("unlock_sniper_tower", 0);
+  ensureXpStoreItem("unlock_emp_field", 0);
 
   // Ensure consumables exist in older saves
   ensureXpStoreItem("mine_charges_3_pack", 0);
@@ -1866,11 +1880,20 @@ function include_new_SaveObj_Properties() {
 
 function syncSniperUnlockUI() {
   const unlocked = isSniperUnlocked();
+  const empUnlocked = isEmpFieldUnlocked();
   if (btn_Sniper) {
     if (unlocked) {
       btn_Sniper.classList.remove("hidden");
     } else {
       btn_Sniper.classList.add("hidden");
+    }
+  }
+
+  if (btn_emp_field) {
+    if (empUnlocked) {
+      btn_emp_field.classList.remove("hidden");
+    } else {
+      btn_emp_field.classList.add("hidden");
     }
   }
 
@@ -1881,6 +1904,16 @@ function syncSniperUnlockUI() {
     } else {
       btn_unlock_sniper_tower.innerHTML = "Kaufen 15.000 <br />XP Coins";
       btn_unlock_sniper_tower.classList.remove("disabled");
+    }
+  }
+
+  if (btn_unlock_emp_field) {
+    if (empUnlocked) {
+      btn_unlock_emp_field.innerHTML = "Freigeschaltet";
+      btn_unlock_emp_field.classList.add("disabled");
+    } else {
+      btn_unlock_emp_field.innerHTML = "Kaufen 5.000 <br />XP Coins";
+      btn_unlock_emp_field.classList.remove("disabled");
     }
   }
 }
@@ -2259,7 +2292,8 @@ function drawTowerPlaces() {
       const isTrap =
         tower.tower_type === "mine" ||
         tower.tower_type === "air_mine" ||
-        tower.tower_type === "spikes";
+        tower.tower_type === "spikes" ||
+        tower.tower_type === "emp_field";
 
       // Default draw box (old sprites)
       let drawX = tower.x;
@@ -2281,6 +2315,28 @@ function drawTowerPlaces() {
           trapImg.naturalHeight > 0
         ) {
           ctx.drawImage(trapImg, drawX, drawY, drawW, drawH);
+        }
+      } else if (tower.tower_type === "emp_field") {
+        drawX = tower.x - 15;
+        drawY = tower.y - 15;
+        drawW = 60;
+        drawH = 60;
+        const trapImg = getTrapIconImage("emp_field");
+        if (
+          trapImg &&
+          trapImg.complete &&
+          trapImg.naturalWidth > 0 &&
+          trapImg.naturalHeight > 0
+        ) {
+          ctx.save();
+          ctx.globalAlpha = 0.9;
+          ctx.drawImage(trapImg, drawX, drawY, drawW, drawH);
+          ctx.strokeStyle = "rgba(120,220,255,0.9)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(tower.x + 15, tower.y + 15, 18, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
         }
       } else {
         // All normal towers + normal mines use their original sprite
@@ -2310,7 +2366,10 @@ function drawTowerPlaces() {
             : 1;
           tower.charges = charges;
           ctx.fillText(String(charges), badgeX, badgeY);
-        } else if (tower.tower_type === "spikes") {
+        } else if (
+          tower.tower_type === "spikes" ||
+          tower.tower_type === "emp_field"
+        ) {
           const remainingMs = (Number(tower.expiresAt) || 0) - Date.now();
           const remainingS = Math.max(0, Math.ceil(remainingMs / 1000));
           ctx.fillText(`${remainingS}s`, badgeX, badgeY);
@@ -2378,6 +2437,8 @@ function drawTowerPlaces() {
           ctx.strokeStyle = "black"; // Grau für Anti Air
         } else if (tower.tower_type === "spikes") {
           ctx.strokeStyle = "black";
+        } else if (tower.tower_type === "emp_field") {
+          ctx.strokeStyle = "rgba(120,220,255,0.95)";
         } else if (tower.tower_type === "sniper") {
           ctx.strokeStyle = "purple";
         } else {
@@ -2635,12 +2696,15 @@ function gameLoop() {
     }
   }
 
-  // Cleanup: abgelaufene Stachelfelder entfernen
+  // Cleanup: abgelaufene Fallen mit Dauer entfernen
   {
     const nowEpoch = Date.now();
     let removedAny = false;
     save_obj.tower_places.forEach((tower) => {
-      if (tower.tower_is_build && tower.tower_type === "spikes") {
+      if (
+        tower.tower_is_build &&
+        (tower.tower_type === "spikes" || tower.tower_type === "emp_field")
+      ) {
         const expiresAt = Number(tower.expiresAt) || 0;
         if (expiresAt && nowEpoch >= expiresAt) {
           resetTowerPlaceState(tower);
@@ -2815,6 +2879,32 @@ function gameLoop() {
           //* Slower Tower
           if (tower.tower_type === "spikes") {
             // handled above (damage over time)
+          } else if (tower.tower_type === "emp_field") {
+            if (typeof enemy.applyEmpEffect === "function") {
+              enemy.applyEmpEffect(1400);
+            } else {
+              enemy.applySlowEffect(0.05, 1400);
+            }
+
+            if (enemy.invisible) {
+              enemy.invisible = false;
+              enemy.wasInvisible = true;
+            }
+
+            if (shouldRenderTowerShotVisual("slower", tower)) {
+              lasers.push(
+                new Laser(
+                  tower.x + 15,
+                  tower.y,
+                  enemy.pos_x,
+                  enemy.pos_y,
+                  "blue",
+                  { targetRef: enemy, hitRadius: 10 },
+                ),
+              );
+            }
+            audio.play("laser_blue");
+            tower.cooldown = 110;
           } else if (tower.tower_type === "slower") {
             let slow_val = 0.5;
             let slow_time = 10000;
@@ -3630,8 +3720,11 @@ function show_trap_price() {
   const new_price_mine_air = oldPrice_mine_air / 2;
   const oldPrice_spikes = 90;
   const new_price_spikes = oldPrice_spikes / 2;
+  const oldPrice_emp = 150;
+  const new_price_emp = oldPrice_emp / 2;
   const btn_ground_mine = document.getElementById("btn_ground_mine");
   const btn_spikes_buy = document.getElementById("btn_spikes_buy");
+  const btn_emp_buy = document.getElementById("btn_emp_buy");
   const mine_rabatt = return_Item_Amount_and_existence(
     save_obj,
     "trap_rabatt_50",
@@ -3643,18 +3736,24 @@ function show_trap_price() {
     btn_air_mine.setAttribute("data-tower_price", new_price_mine_air);
     if (btn_spikes)
       btn_spikes.setAttribute("data-tower_price", new_price_spikes);
+    if (btn_emp_field)
+      btn_emp_field.setAttribute("data-tower_price", new_price_emp);
     btn_ground_mine.innerHTML = `Kaufen ${new_price_mine_ground}€`;
     trigger_btn_air_mine.innerHTML = `Kaufen ${new_price_mine_air}€`;
     if (btn_spikes_buy)
       btn_spikes_buy.innerHTML = `Kaufen ${new_price_spikes}€`;
+    if (btn_emp_buy) btn_emp_buy.innerHTML = `Kaufen ${new_price_emp}€`;
   } else {
     btn_mine.setAttribute("data-tower_price", oldPrice_mine_ground);
     btn_air_mine.setAttribute("data-tower_price", oldPrice_mine_air);
     if (btn_spikes)
       btn_spikes.setAttribute("data-tower_price", oldPrice_spikes);
+    if (btn_emp_field)
+      btn_emp_field.setAttribute("data-tower_price", oldPrice_emp);
     btn_ground_mine.innerHTML = `Kaufen ${oldPrice_mine_ground}€`;
     trigger_btn_air_mine.innerHTML = `Kaufen ${oldPrice_mine_air}€`;
     if (btn_spikes_buy) btn_spikes_buy.innerHTML = `Kaufen ${oldPrice_spikes}€`;
+    if (btn_emp_buy) btn_emp_buy.innerHTML = `Kaufen ${oldPrice_emp}€`;
   }
 }
 
@@ -3851,6 +3950,34 @@ if (btn_spikes) {
 }
 
 //*#########################################################
+//* ANCHOR -Set EMP Field
+//*#########################################################
+if (btn_emp_field) {
+  btn_emp_field.addEventListener("click", () => {
+    if (!isEmpFieldUnlocked()) {
+      new GameMessage(
+        "EMP-Feld gesperrt",
+        "Schalte das EMP-Feld zuerst im Skill Store frei.",
+        "error",
+        2500,
+      ).show_Message();
+      return;
+    }
+
+    set_Tower(btn_emp_field, "emp_field", 0, mdl_traps);
+    const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
+    if (item.available && item.amount > 0) {
+      const is_trap_discount = check_trap_discount.checked;
+      if (is_trap_discount) {
+        save_obj.XP_Store_Items[item.index].amount -= 1;
+        render_amount(save_obj);
+        save_Game_without_saveDate();
+      }
+    }
+  });
+}
+
+//*#########################################################
 //* ANCHOR -Set Tower Destroyer
 //*#########################################################
 
@@ -3952,7 +4079,8 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     if (
       tower_type === "mine" ||
       tower_type === "air_mine" ||
-      tower_type === "spikes"
+      tower_type === "spikes" ||
+      tower_type === "emp_field"
     ) {
       if (current_mine_amount_per_wave === 0) {
         new GameMessage(
@@ -4000,6 +4128,12 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     if (tower_type === "spikes") {
       tower.expiresAt = Date.now() + 8000;
       tower.range = 55;
+    }
+
+    if (tower_type === "emp_field") {
+      tower.expiresAt = Date.now() + 7000;
+      tower.range = 75;
+      tower.cooldown = 0;
     }
 
     if (tower_type === "sniper") {
@@ -4974,6 +5108,39 @@ if (btn_unlock_sniper_tower) {
         } else {
           save_obj.XP_Store_Items.push({
             name: "unlock_sniper_tower",
+            amount: 1,
+          });
+        }
+        return true;
+      },
+    });
+  });
+}
+
+if (btn_unlock_emp_field) {
+  btn_unlock_emp_field.addEventListener("click", () => {
+    const alreadyUnlocked = isEmpFieldUnlocked();
+    const price = Number(btn_unlock_emp_field.getAttribute("data-skill_price"));
+    const maxQty = alreadyUnlocked ? 0 : Math.min(1, maxQtyByCoins(price));
+
+    openSkillPurchaseModal({
+      displayName: "EMP-Feld",
+      price,
+      maxQty,
+      blockedMessage: alreadyUnlocked
+        ? "Das EMP-Feld ist bereits freigeschaltet."
+        : "Zu wenig XP-Coins.",
+      applyPurchase: () => {
+        if (isEmpFieldUnlocked()) return false;
+        const unlockItem = return_Item_Amount_and_existence(
+          save_obj,
+          "unlock_emp_field",
+        );
+        if (unlockItem.available) {
+          save_obj.XP_Store_Items[unlockItem.index].amount = 1;
+        } else {
+          save_obj.XP_Store_Items.push({
+            name: "unlock_emp_field",
             amount: 1,
           });
         }
