@@ -5246,7 +5246,7 @@ if (btn_xp_multiplier) {
       key: "passive_xp_multi",
       displayName: "XP Multiplikator",
       price,
-      maxLevel: 8,
+      maxLevel: 15,
     });
   });
 }
