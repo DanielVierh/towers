@@ -134,6 +134,9 @@ const btn_start_money = document.getElementById("btn_start_money");
 const btn_start_energy = document.getElementById("btn_start_energy");
 const btn_mine_plus = document.getElementById("btn_mine_plus");
 const btn_xp_multiplier = document.getElementById("btn_xp_multiplier");
+const btn_wave_income_multiplier = document.getElementById(
+  "btn_wave_income_multiplier",
+);
 const btn_sell_refund = document.getElementById("btn_sell_refund");
 const btn_unlock_sniper_tower = document.getElementById(
   "btn_unlock_sniper_tower",
@@ -1423,6 +1426,10 @@ let save_obj = {
       amount: 0,
     },
     {
+      name: "passive_wave_income_multi",
+      amount: 0,
+    },
+    {
       name: "passive_sell_refund",
       amount: 0,
     },
@@ -1472,6 +1479,11 @@ function xpGain(baseXp) {
 
 function mineBonusPerWave() {
   return getPassiveLevel("passive_mine_plus");
+}
+
+function waveIncomeMultiplier() {
+  const lvl = Math.min(3, getPassiveLevel("passive_wave_income_multi"));
+  return 2 + lvl;
 }
 
 function startMoneyBonus() {
@@ -1866,6 +1878,7 @@ function include_new_SaveObj_Properties() {
   ensureXpStoreItem("passive_start_energy", 0);
   ensureXpStoreItem("passive_mine_plus", 0);
   ensureXpStoreItem("passive_xp_multi", 0);
+  ensureXpStoreItem("passive_wave_income_multi", 0);
   ensureXpStoreItem("passive_sell_refund", 0);
   ensureXpStoreItem("unlock_sniper_tower", 0);
   ensureXpStoreItem("unlock_emp_field", 0);
@@ -3494,7 +3507,7 @@ function updateWaveTimer() {
       save_obj.enemy_max_health += 20;
     }
     // base income per wave
-    let baseIncome = Math.floor(save_obj.wave * 2);
+    let baseIncome = Math.floor(save_obj.wave * waveIncomeMultiplier());
     if (save_obj.free_build && save_obj.free_build_per_wave_bonus) {
       baseIncome += Math.floor(
         save_obj.wave * save_obj.free_build_per_wave_bonus,
@@ -5234,6 +5247,20 @@ if (btn_xp_multiplier) {
       displayName: "XP Multiplikator",
       price,
       maxLevel: 8,
+    });
+  });
+}
+
+if (btn_wave_income_multiplier) {
+  btn_wave_income_multiplier.addEventListener("click", () => {
+    const price = Number(
+      btn_wave_income_multiplier.getAttribute("data-skill_price"),
+    );
+    openPassiveSkillPurchase({
+      key: "passive_wave_income_multi",
+      displayName: "Wellen-Geld Multiplikator",
+      price,
+      maxLevel: 5,
     });
   });
 }

@@ -49,6 +49,9 @@ export function render_amount(save_obj) {
   const lbl_xp_multiplier_amount = document.getElementById(
     "lbl_xp_multiplier_amount",
   );
+  const lbl_wave_income_multiplier_amount = document.getElementById(
+    "lbl_wave_income_multiplier_amount",
+  );
   const lbl_sell_refund_amount = document.getElementById(
     "lbl_sell_refund_amount",
   );
@@ -183,6 +186,14 @@ export function render_amount(save_obj) {
   );
   if (lbl_xp_multiplier_amount && xpMulti.available) {
     lbl_xp_multiplier_amount.innerHTML = `Lv ${xpMulti.amount}`;
+  }
+
+  const waveIncomeMulti = return_Item_Amount_and_existence(
+    save_obj,
+    "passive_wave_income_multi",
+  );
+  if (lbl_wave_income_multiplier_amount && waveIncomeMulti.available) {
+    lbl_wave_income_multiplier_amount.innerHTML = `Lv ${waveIncomeMulti.amount}`;
   }
 
   const sellRefund = return_Item_Amount_and_existence(
