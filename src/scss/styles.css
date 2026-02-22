@@ -1083,6 +1083,7 @@ select option {
   right: 5px;
   font-size: 0.8rem;
   font-weight: bold;
+  pointer-events: none;
 }
 
 #gxu-overlay {
