@@ -1360,6 +1360,8 @@ let save_obj = {
   ctf_game_over: false,
   ctf_top_pos: null,
   ctf_bottom_pos: null,
+  tower_place_fill: null,
+  tower_place_stroke: null,
   tower_places: [
     {
       x: 70,
@@ -2625,8 +2627,13 @@ function drawTowerPlaces() {
         ctx.closePath();
       }
     } else {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      const fill = save_obj.tower_place_fill || "rgba(0, 0, 0, 0.2)";
+      const stroke = save_obj.tower_place_stroke || "rgba(255, 255, 255, 0.22)";
+      ctx.fillStyle = fill;
       ctx.fillRect(tower.x, tower.y, 30, 30);
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(tower.x, tower.y, 30, 30);
     }
 
     //* Energy Building Animation
@@ -5530,7 +5537,7 @@ canvas.addEventListener("mousemove", function (event) {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
-  // console.log(`x: ${x - 20}, y: ${y - 20}`);
+  console.log(`x: ${x - 20}, y: ${y - 20}`);
 });
 
 function gxuShowEndscreen(win, stats) {
