@@ -17,7 +17,6 @@ export function drawWaypoints(ctx, waypoints, waypoint_color) {
   });
   ctx.stroke();
 }
-
 const levels = [
   {
     //* ANCHOR - Level: Grassland
@@ -1142,6 +1141,7 @@ const levels = [
   {
     //* ANCHOR - Lavaland:
     name: "Lavaland",
+    game_mode: "ctf",
     background_img_path: "src/assets/bg/bg_vulcano.png",
     waypoint_color: "rgba(10, 10, 10, 0.12)",
     waypoints: [
@@ -1151,12 +1151,6 @@ const levels = [
       { x: 123, y: 190 },
       { x: 230, y: 270 },
       { x: 124, y: 348 },
-
-      { x: 230, y: 270 },
-      { x: 123, y: 190 },
-      { x: 240, y: 120 },
-      { x: 170, y: 30 },
-      { x: 255, y: -60 },
     ],
     tower_places: [
       {

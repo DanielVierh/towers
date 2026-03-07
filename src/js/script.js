@@ -106,6 +106,151 @@ function getTrapIconImage(trapType) {
   trapIconImages.set(trapType, img);
   return img;
 }
+
+// Capture-the-Flag (Lavaland)
+const CTF_FLAG_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="10" y="6" width="5" height="52" rx="2" fill="#6b6b6b"/>
+  <path d="M15 10 C 28 4, 34 14, 46 10 C 52 8, 56 10, 56 10 L56 30 C 44 34, 38 24, 26 28 C 20 30, 15 28, 15 28 Z"
+        fill="#e53935" stroke="#b71c1c" stroke-width="2"/>
+  <circle cx="12.5" cy="6" r="4" fill="#9e9e9e"/>
+</svg>`;
+
+let ctfFlagImage = null;
+function getCtfFlagImage() {
+  if (ctfFlagImage) return ctfFlagImage;
+  const img = new Image();
+  img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+    CTF_FLAG_SVG,
+  )}`;
+  ctfFlagImage = img;
+  return img;
+}
+
+function isCtfMode() {
+  return save_obj?.game_mode === "ctf";
+}
+
+function getCtfTotalFlagsByDifficulty(difficulty) {
+  switch (difficulty) {
+    case "very_easy":
+      return 10;
+    case "easy":
+      return 7;
+    case "standard":
+      return 5;
+    case "hard":
+      return 3;
+    default:
+      return 7;
+  }
+}
+
+function clampToCanvas(p) {
+  const x = Math.max(8, Math.min(canvas.width - 28, Number(p?.x) || 0));
+  const y = Math.max(8, Math.min(canvas.height - 28, Number(p?.y) || 0));
+  return { x, y };
+}
+
+function initCtfState(level) {
+  const diff = sel_difficulty?.value || "easy";
+  const total = getCtfTotalFlagsByDifficulty(diff);
+  save_obj.ctf_flags_total = total;
+  save_obj.ctf_flags_remaining_base = total;
+  save_obj.ctf_flags_stolen = 0;
+  save_obj.ctf_game_over = false;
+
+  const wps = Array.isArray(level?.waypoints) ? level.waypoints : [];
+  const top = wps[0] || { x: 20, y: 20 };
+  const bottom = wps[wps.length - 1] || {
+    x: canvas.width - 20,
+    y: canvas.height - 20,
+  };
+  save_obj.ctf_top_pos = clampToCanvas(top);
+  save_obj.ctf_bottom_pos = clampToCanvas(bottom);
+}
+
+function drawCtfBaseFlags(ctx) {
+  if (!isCtfMode()) return;
+  const remaining = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
+  if (remaining <= 0) return;
+
+  const img = getCtfFlagImage();
+  const base = save_obj.ctf_bottom_pos || { x: 20, y: canvas.height - 20 };
+  const size = 18;
+  const gap = 6;
+
+  // Draw remaining flags at the bottom base.
+  for (let i = 0; i < remaining; i++) {
+    const x = base.x - i * (size + gap);
+    const y = base.y - size;
+    if (x < 0) break;
+    ctx.drawImage(img, x, y, size, size);
+  }
+}
+
+function drawCtfFlagOnEnemy(ctx, enemy) {
+  if (!isCtfMode()) return;
+  if (!enemy?.ctfHasFlag) return;
+  const img = getCtfFlagImage();
+  const size = 16;
+  const x = enemy.pos_x + 10;
+  const y = enemy.pos_y - 18;
+  ctx.drawImage(img, x, y, size, size);
+}
+
+function ctfHandleEnemyReachedPathEnd(enemy) {
+  if (!isCtfMode()) return;
+  if (!enemy?.waypoints) return;
+  if (enemy.currentWaypointIndex < enemy.waypoints.length) return;
+
+  // Reached bottom base (first pass): steal a flag and return.
+  if (!enemy.ctfHasFlag) {
+    const remaining = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
+    if (remaining <= 0) {
+      enemy.markedForDeletion = true;
+      return;
+    }
+
+    enemy.markedForDeletion = false;
+    enemy.ctfHasFlag = true;
+    enemy.ctfReturning = true;
+    enemy.disableBoundaryDeletion = true;
+    save_obj.ctf_flags_remaining_base = remaining - 1;
+
+    enemy.waypoints = [...enemy.waypoints].reverse();
+    enemy.currentWaypointIndex = 0;
+    return;
+  }
+
+  // Reached top base while carrying a flag: flag stolen.
+  if (enemy.ctfReturning) {
+    save_obj.ctf_flags_stolen = (Number(save_obj.ctf_flags_stolen) || 0) + 1;
+    enemy.markedForDeletion = true;
+    if (
+      (Number(save_obj.ctf_flags_stolen) || 0) >=
+      (Number(save_obj.ctf_flags_total) || 0)
+    ) {
+      save_obj.ctf_game_over = true;
+    }
+  }
+}
+
+function ctfReturnFlagToBase(enemy) {
+  if (!isCtfMode()) return;
+  if (!enemy?.ctfHasFlag) return;
+
+  const total = Math.max(0, Number(save_obj.ctf_flags_total) || 0);
+  const stolen = Math.max(0, Number(save_obj.ctf_flags_stolen) || 0);
+  const maxBase = Math.max(0, total - stolen);
+  const currentBase = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
+  save_obj.ctf_flags_remaining_base = Math.min(maxBase, currentBase + 1);
+
+  // Prevent double returns.
+  enemy.ctfHasFlag = false;
+  enemy.ctfReturning = false;
+}
+
 const btn_show_instructions = document.getElementById("btn_show_instructions");
 const btn_mine = document.getElementById("btn_mine");
 const btn_spikes = document.getElementById("btn_spikes");
@@ -1208,6 +1353,13 @@ let save_obj = {
   enemy_max_velocity: 1.5,
   energy_level: 0,
   energy_start_level: 0,
+  game_mode: "standard",
+  ctf_flags_total: 0,
+  ctf_flags_remaining_base: 0,
+  ctf_flags_stolen: 0,
+  ctf_game_over: false,
+  ctf_top_pos: null,
+  ctf_bottom_pos: null,
   tower_places: [
     {
       x: 70,
@@ -2153,6 +2305,11 @@ function add_special_creep(
         invisible,
       );
       creep.isBoss = Boolean(isBoss);
+      if (isCtfMode()) {
+        creep.disableBoundaryDeletion = true;
+        creep.ctfHasFlag = false;
+        creep.ctfReturning = false;
+      }
       if (
         save_obj.free_build &&
         pathGrid &&
@@ -2244,6 +2401,12 @@ function spawnEnemy() {
     );
     newCreep.isBoss = /boss/i.test(creep_properties[creep_index]?.name ?? "");
     if (usedPath) newCreep.setPath(usedPath);
+
+    if (isCtfMode()) {
+      newCreep.disableBoundaryDeletion = true;
+      newCreep.ctfHasFlag = false;
+      newCreep.ctfReturning = false;
+    }
     enemies.push(newCreep);
     enemyCount++;
   }, 500);
@@ -2543,6 +2706,9 @@ function detonateMineAoE(tower, resistanceKey) {
     targetEnemy.health = 0;
     targetEnemy.markedForDeletion = true;
 
+    // CTF: return carried flag to the base when the carrier dies.
+    ctfReturnFlagToBase(targetEnemy);
+
     if (save_obj.total_kills === undefined) {
       save_obj.total_kills = 1;
     } else {
@@ -2592,8 +2758,10 @@ function detonateMineAoE(tower, resistanceKey) {
 //* ANCHOR -show Game Over Modal
 //*#########################################################
 
-function showGameOverModal() {
-  lbl_Live.innerHTML = "0 Leben";
+function showGameOverModal(reason = "lives") {
+  if (reason === "lives") {
+    lbl_Live.innerHTML = "0 Leben";
+  }
   //* Assign new XP and XP-Coins
   if (!save_obj.assign_XP) {
     audio.play("game_over", { force: true });
@@ -2610,6 +2778,9 @@ function showGameOverModal() {
     } else if (game_difficulty === "hard") {
       base_XP_Coins = 3000;
       lostLive = 15 - save_obj.live;
+    }
+    if (reason === "ctf") {
+      lostLive = 0;
     }
     const live_Loss_Antibonus = lostLive * 20;
     let new_XP_Coins = Math.floor(
@@ -2834,37 +3005,49 @@ function gameLoop() {
   updateLabels();
 
   //* Dann die Creeps darüber zeichnen
+  drawCtfBaseFlags(ctx);
   enemies.forEach((enemy, index) => {
     enemy.update(save_obj, moneyPopups);
 
     // Toxic fog particles
     spawnToxicFogAround(enemy, deltaTime);
 
-    // If enemy has reached the end of its waypoint path, mark for deletion and deduct life
-    if (
-      !enemy.markedForDeletion &&
-      enemy.waypoints &&
-      enemy.currentWaypointIndex >= enemy.waypoints.length
-    ) {
-      enemy.markedForDeletion = true;
-      save_obj.live--;
-      audio.play("life_lost");
-      document.body.classList.add("red-flash");
-      setTimeout(() => {
-        document.body.classList.remove("red-flash");
-      }, 300);
+    // If the creep died outside of the tower-kill path (e.g. poison/DoT),
+    // return a carried flag back to the base.
+    if (isCtfMode() && enemy.markedForDeletion) {
+      ctfReturnFlagToBase(enemy);
     }
 
-    //* Markiere den Creeps zur Löschung, wenn er die Grenze überschreitet
-    if (enemy.pos_x > 400) {
-      enemy.markedForDeletion = true;
-      save_obj.live--;
-      audio.play("life_lost");
+    if (isCtfMode()) {
+      // In CTF, reaching the end means: steal a flag and return.
+      ctfHandleEnemyReachedPathEnd(enemy);
+    } else {
+      // If enemy has reached the end of its waypoint path, mark for deletion and deduct life
+      if (
+        !enemy.markedForDeletion &&
+        enemy.waypoints &&
+        enemy.currentWaypointIndex >= enemy.waypoints.length
+      ) {
+        enemy.markedForDeletion = true;
+        save_obj.live--;
+        audio.play("life_lost");
+        document.body.classList.add("red-flash");
+        setTimeout(() => {
+          document.body.classList.remove("red-flash");
+        }, 300);
+      }
 
-      document.body.classList.add("red-flash");
-      setTimeout(() => {
-        document.body.classList.remove("red-flash");
-      }, 300);
+      //* Markiere den Creeps zur Löschung, wenn er die Grenze überschreitet
+      if (enemy.pos_x > 400) {
+        enemy.markedForDeletion = true;
+        save_obj.live--;
+        audio.play("life_lost");
+
+        document.body.classList.add("red-flash");
+        setTimeout(() => {
+          document.body.classList.remove("red-flash");
+        }, 300);
+      }
     }
 
     //* Überprüfen, ob der Creeps in der Nähe eines Turms ist
@@ -2920,6 +3103,9 @@ function gameLoop() {
             );
 
             audio.play("creep_death");
+
+            // CTF: if the carrier dies, the flag returns to the base.
+            ctfReturnFlagToBase(enemy);
 
             // Gegner markieren, damit er verschwindet
             enemy.markedForDeletion = true;
@@ -3294,6 +3480,7 @@ function gameLoop() {
       enemies.splice(index, 1);
     } else {
       enemy.draw(ctx);
+      drawCtfFlagOnEnemy(ctx, enemy);
     }
   });
 
@@ -3314,6 +3501,15 @@ function gameLoop() {
       lasers.splice(index, 1);
     }
   });
+
+  if (isCtfMode() && save_obj.ctf_game_over) {
+    showGameOverModal("ctf");
+    btn_goto_menu.classList.remove("hidden");
+    btn_pause.classList.add("hidden");
+    btn_save_game.classList.add("hidden");
+    ctx.restore();
+    return; // Stop the game loop
+  }
 
   if (save_obj.live <= 0) {
     showGameOverModal();
@@ -4563,6 +4759,19 @@ function initialize_game(level_details, selectedLevelId = null) {
   save_obj.tower_places = level.tower_places;
   //* Set the waypoint color for the level
   save_obj.waypoint_color = level.waypoint_color;
+
+  // Capture-the-Flag mode (Lavaland)
+  save_obj.game_mode = level.game_mode || "standard";
+  if (save_obj.game_mode === "ctf") {
+    initCtfState(level);
+  } else {
+    save_obj.ctf_flags_total = 0;
+    save_obj.ctf_flags_remaining_base = 0;
+    save_obj.ctf_flags_stolen = 0;
+    save_obj.ctf_game_over = false;
+    save_obj.ctf_top_pos = null;
+    save_obj.ctf_bottom_pos = null;
+  }
   //* Free build mode handling
   if (level.free_build) {
     save_obj.free_build = true;
@@ -5321,7 +5530,7 @@ canvas.addEventListener("mousemove", function (event) {
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
-  console.log(`x: ${x - 20}, y: ${y - 20}`);
+  // console.log(`x: ${x - 20}, y: ${y - 20}`);
 });
 
 function gxuShowEndscreen(win, stats) {

@@ -116,7 +116,7 @@ export class Creep {
     }
 
     // Markiere den Creep zur Löschung, wenn er die Grenze überschreitet
-    if (this.pos_x > 400) {
+    if (!this.disableBoundaryDeletion && this.pos_x > 400) {
       this.markedForDeletion = true;
     }
 
