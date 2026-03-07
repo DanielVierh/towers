@@ -1,4 +1,5 @@
-const CACHE_NAME = "tower-app-v2";
+// Bump this on deploy so old cached JS/CSS can't pin outdated game logic.
+const CACHE_NAME = "tower-app-v3";
 const APP_SHELL = [
   "./",
   "index.html",
@@ -8,6 +9,22 @@ const APP_SHELL = [
   "android-chrome-192x192.png",
   "android-chrome-512x512.png",
 ];
+
+async function putInCache(request, response) {
+  if (!response || response.status !== 200) return;
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(request, response);
+}
+
+async function networkFirst(request) {
+  try {
+    const networkResponse = await fetch(request);
+    await putInCache(request, networkResponse.clone());
+    return networkResponse;
+  } catch {
+    return caches.match(request);
+  }
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -35,10 +52,21 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
   const isHtmlRequest =
     event.request.mode === "navigate" ||
     requestUrl.pathname.endsWith(".html") ||
     requestUrl.pathname === "/";
+
+  // Ensure updated app code is fetched when online (prevents stale cached script.js).
+  const isAppCodeRequest =
+    isSameOrigin &&
+    (requestUrl.pathname.endsWith(".js") || requestUrl.pathname.endsWith(".css"));
+
+  if (isAppCodeRequest) {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
 
   if (isHtmlRequest) {
     event.respondWith(
@@ -72,7 +100,7 @@ self.addEventListener("fetch", (event) => {
           }
 
           if (
-            requestUrl.origin === self.location.origin &&
+            isSameOrigin &&
             (requestUrl.pathname.startsWith("/src/assets/") ||
               requestUrl.pathname.endsWith(".css") ||
               requestUrl.pathname.endsWith(".js") ||
