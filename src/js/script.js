@@ -1958,6 +1958,8 @@ function loadGameFromLocalStorage() {
     save_obj = JSON.parse(savedGame);
     console.log("saveGame", save_obj);
 
+    save_obj.XP_Coins = Math.max(0, Math.floor(Number(save_obj.XP_Coins) || 0));
+
     lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
       "de-DE",
     )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
@@ -2010,6 +2012,8 @@ function include_new_SaveObj_Properties() {
       save_obj.XP_Coins = save_obj.XP;
     }
     saveGameToLocalStorage();
+  } else {
+    save_obj.XP_Coins = Math.max(0, Math.floor(Number(save_obj.XP_Coins) || 0));
   }
 
   //* Add XP_Store_Items
@@ -5153,7 +5157,7 @@ function openSkillPurchaseModal({
 }) {
   if (!mdl_skill_purchase) return;
 
-  const normalizedPrice = Math.max(1, Number(price) || 0);
+  const normalizedPrice = Math.max(1, Math.floor(Number(price) || 0));
   const normalizedMaxQty = Math.max(0, Math.floor(Number(maxQty) || 0));
 
   if (normalizedMaxQty <= 0) {
@@ -5184,7 +5188,7 @@ function finalizeSkillPurchase() {
   if (!skillPurchaseState) return;
 
   const { qty, price, displayName, applyPurchase } = skillPurchaseState;
-  const totalCost = qty * price;
+  const totalCost = Math.max(0, Math.floor(Number(qty * price) || 0));
   const ok = check_XPCoins(totalCost, displayName);
   if (!ok) return;
 
@@ -5192,7 +5196,10 @@ function finalizeSkillPurchase() {
     typeof applyPurchase === "function" ? applyPurchase(qty) : false;
   if (!applied) return;
 
-  save_obj.XP_Coins -= totalCost;
+  save_obj.XP_Coins = Math.max(
+    0,
+    Math.floor(Number(save_obj.XP_Coins - totalCost) || 0),
+  );
   render_XP_Coins(save_obj);
   render_amount(save_obj);
   render_xp_on_homescreen();
@@ -5498,14 +5505,17 @@ if (btn_sell_refund) {
 }
 
 function render_xp_on_homescreen() {
+  const normalizedCoins = Math.max(0, Math.floor(Number(save_obj.XP_Coins) || 0));
+  save_obj.XP_Coins = normalizedCoins;
   lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
     "de-DE",
-  )} XP <br> ${save_obj.XP_Coins.toLocaleString("de-DE")} XP Coins`;
+  )} XP <br> ${normalizedCoins.toLocaleString("de-DE")} XP Coins`;
 }
 
 //*ANCHOR -  Function to check, if enough coins are available  - Respond with a message
 function check_XPCoins(price, xp_objectname) {
-  const current_XPCoins = save_obj.XP_Coins;
+  const current_XPCoins = Math.max(0, Math.floor(Number(save_obj.XP_Coins) || 0));
+  save_obj.XP_Coins = current_XPCoins;
   // const current_XPCoins = 9000; //* zum testen
   if (current_XPCoins >= price) {
     audio.play("purchase_ok");

@@ -207,7 +207,9 @@ export function render_amount(save_obj) {
 
 export function render_XP_Coins(save_obj) {
   const lbl_xp_store_coins = document.getElementById("lbl_xp_store_coins");
-  lbl_xp_store_coins.innerHTML = `${save_obj.XP_Coins.toLocaleString(
+  const normalizedCoins = Math.max(0, Math.floor(Number(save_obj.XP_Coins) || 0));
+  save_obj.XP_Coins = normalizedCoins;
+  lbl_xp_store_coins.innerHTML = `${normalizedCoins.toLocaleString(
     "de-DE",
   )} XP-Coins`;
 }
