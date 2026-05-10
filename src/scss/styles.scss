@@ -53,6 +53,19 @@ body.red-flash {
   animation: red-flash 0.3s ease-in-out;
 }
 
+@keyframes green-flash {
+  0% {
+    background: rgba(0, 255, 4, 0.5);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+body.green-flash {
+  animation: green-flash 0.3s ease-in-out;
+}
+
 .labels-wrapper {
   display: flex;
   flex-wrap: wrap;

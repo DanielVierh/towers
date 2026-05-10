@@ -2759,6 +2759,10 @@ function detonateMineAoE(tower, resistanceKey) {
       tower.kill_counter += 1;
       if (tower.kill_counter === 20) {
         save_obj.live++;
+        document.body.classList.add("green-flash");
+        setTimeout(() => {
+          document.body.classList.remove("green-flash");
+        }, 300);
         tower.kill_counter = 0;
       }
     }
@@ -3149,6 +3153,10 @@ function gameLoop() {
 
               if (tower.kill_counter === 20) {
                 save_obj.live++;
+                document.body.classList.add("green-flash");
+                setTimeout(() => {
+                  document.body.classList.remove("green-flash");
+                }, 300);
                 tower.kill_counter = 0;
                 console.log("LIVE ++");
               }
@@ -3354,6 +3362,10 @@ function gameLoop() {
 
                 if (tower.kill_counter === 20) {
                   save_obj.live++;
+                  document.body.classList.add("green-flash");
+                  setTimeout(() => {
+                    document.body.classList.remove("green-flash");
+                  }, 300);
                   tower.kill_counter = 0;
                 }
               }
