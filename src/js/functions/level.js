@@ -848,8 +848,8 @@ const levels = [
         cooldown: 0,
       },
       {
-        x: 290,
-        y: 60,
+        x: 275,
+        y: 37,
         tower_is_build: false,
         tower_damage_lvl: 1,
         tower_type: "",
