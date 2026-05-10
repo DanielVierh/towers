@@ -2318,6 +2318,15 @@ function add_special_creep(
         invisible,
       );
       creep.isBoss = Boolean(isBoss);
+
+      // Schild-Mechanik im Schwer-Modus alle 5 Runden
+      if (sel_difficulty.value === "hard" && (save_obj.wave + 1) % 5 === 0) {
+        const shieldAmount = Math.round(health * 0.5);
+        creep.shieldHealth = shieldAmount;
+        creep.maxShieldHealth = shieldAmount;
+        creep.displayShieldHealth = shieldAmount;
+      }
+
       if (isCtfMode()) {
         creep.disableBoundaryDeletion = true;
         creep.ctfHasFlag = false;
@@ -2414,6 +2423,14 @@ function spawnEnemy() {
     );
     newCreep.isBoss = /boss/i.test(creep_properties[creep_index]?.name ?? "");
     if (usedPath) newCreep.setPath(usedPath);
+
+    // Schild-Mechanik im Schwer-Modus alle 5 Runden
+    if (sel_difficulty.value === "hard" && (save_obj.wave + 1) % 5 === 0) {
+      const shieldAmount = Math.round(health * 0.5);
+      newCreep.shieldHealth = shieldAmount;
+      newCreep.maxShieldHealth = shieldAmount;
+      newCreep.displayShieldHealth = shieldAmount;
+    }
 
     if (isCtfMode()) {
       newCreep.disableBoundaryDeletion = true;
@@ -2721,6 +2738,7 @@ function detonateMineAoE(tower, resistanceKey) {
 
     const damage = Math.max(0, Number(targetEnemy.health) || 0);
     recordTowerDamage(tower, damage);
+    targetEnemy.shieldHealth = 0;
     targetEnemy.health = 0;
     targetEnemy.markedForDeletion = true;
 
@@ -3097,7 +3115,7 @@ function gameLoop() {
           if (tower.tower_type === "spikes") {
             const dps = 1200;
             const damage = dps * (deltaTime / 1000);
-            enemy.health -= damage;
+            enemy.applyDamage(damage);
             recordTowerDamage(tower, damage);
           }
 
@@ -3278,7 +3296,7 @@ function gameLoop() {
           } else if (tower.tower_type === "destroyer") {
             //* Harm Enemy
             if (!enemy.resistent.includes("destroyer")) {
-              enemy.health -= tower.tower_damage_lvl;
+              enemy.applyDamage(tower.tower_damage_lvl);
               recordTowerDamage(tower, tower.tower_damage_lvl);
               // Boss hit impact
               if (enemy.isBoss) triggerScreenShake(2.6, 110);
@@ -3306,6 +3324,7 @@ function gameLoop() {
             if (!enemy.markedForDeletion) {
               const sniperDamage = Math.max(0, Number(enemy.health) || 0);
               recordTowerDamage(tower, sniperDamage);
+              enemy.shieldHealth = 0;
               enemy.health = 0;
               if (enemy.isBoss) triggerScreenShake(4.4, 170);
 
@@ -3393,7 +3412,7 @@ function gameLoop() {
             //* Harm Enemy
             if (!enemy.resistent.includes("anti_air")) {
               const damage = tower.tower_damage_lvl * 70;
-              enemy.health -= damage;
+              enemy.applyDamage(damage);
               recordTowerDamage(tower, damage);
               // Boss hit impact
               if (enemy.isBoss) triggerScreenShake(3.4, 140);

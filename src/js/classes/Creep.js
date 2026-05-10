@@ -50,6 +50,11 @@ export class Creep {
     // Smooth HP bar (rendered health lags behind actual health)
     this.displayHealth = health;
 
+    // Shield
+    this.shieldHealth = 0;
+    this.maxShieldHealth = 0;
+    this.displayShieldHealth = 0;
+
     // Lade alle Bilder aus dem Ordner
     for (let i = 1; i <= 17; i++) {
       const img = new Image();
@@ -90,6 +95,15 @@ export class Creep {
     this.displayHealth += (this.health - this.displayHealth) * 0.12;
     if (Math.abs(this.displayHealth - this.health) < 0.05) {
       this.displayHealth = this.health;
+    }
+
+    // Smooth Shield bar easing
+    if (typeof this.displayShieldHealth !== "number")
+      this.displayShieldHealth = this.shieldHealth;
+    this.displayShieldHealth +=
+      (this.shieldHealth - this.displayShieldHealth) * 0.12;
+    if (Math.abs(this.displayShieldHealth - this.shieldHealth) < 0.05) {
+      this.displayShieldHealth = this.shieldHealth;
     }
 
     if (this.currentWaypointIndex < this.waypoints.length) {
@@ -133,12 +147,12 @@ export class Creep {
       if (!this.lastToxicEffect || now - this.lastToxicEffect >= 1000) {
         // Alle 1 Sekunde
         this.lastToxicEffect = now;
-        this.health -= this.toxicated_lvl * 50;
+        this.applyDamage(this.toxicated_lvl * 50);
 
         if (this.health <= 0) {
           // Generiere Geld, bevor der Creep gelöscht wird
           if (!this.markedForDeletion) {
-            save_obj.money += 30; // Beispiel: 10 Geld für jeden toten Creep
+            save_obj.money += 30;
             moneyPopups.push({
               x: this.pos_x,
               y: this.pos_y,
@@ -181,6 +195,25 @@ export class Creep {
       }
       ctx.restore();
 
+      // Shield-Aura (blauer pulsierender Ring, solange Schild aktiv)
+      if (this.shieldHealth > 0) {
+        const centerX = this.pos_x + scaledWidth / 2;
+        const centerY = this.pos_y + scaledHeight / 2;
+        const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
+        const auraRadius =
+          Math.max(scaledWidth, scaledHeight) / 2 + 4 + pulse * 3;
+
+        ctx.save();
+        ctx.shadowBlur = 10 + pulse * 6;
+        ctx.shadowColor = "rgba(80, 160, 255, 0.9)";
+        ctx.strokeStyle = `rgba(100, 180, 255, ${0.55 + pulse * 0.35})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       // Zeichne die Lebensanzeige
       const healthBarWidth = 40;
       const healthBarHeight = 5;
@@ -202,6 +235,29 @@ export class Creep {
         healthBarHeight,
       );
 
+      // Schild-Bar (schwarzer Hintergrund, blaue Füllung)
+      const shieldBarGap = 3;
+      const shieldBarY = healthBarY + healthBarHeight + shieldBarGap;
+      if (this.maxShieldHealth > 0) {
+        ctx.fillStyle = "#111";
+        ctx.fillRect(healthBarX, shieldBarY, healthBarWidth, healthBarHeight);
+
+        const clampedDisplayShield = Math.max(
+          0,
+          Math.min(
+            this.maxShieldHealth,
+            this.displayShieldHealth ?? this.shieldHealth,
+          ),
+        );
+        ctx.fillStyle = "rgba(60, 140, 255, 0.9)";
+        ctx.fillRect(
+          healthBarX,
+          shieldBarY,
+          (clampedDisplayShield / this.maxShieldHealth) * healthBarWidth,
+          healthBarHeight,
+        );
+      }
+
       // Status icons (slow / toxic / invisible-type)
       const icons = [];
       if (this.isSlowed) icons.push({ color: "rgba(90,180,255,0.95)" });
@@ -217,7 +273,11 @@ export class Creep {
         const iconGap = 6;
         const rowWidth = (icons.length - 1) * iconGap;
         const baseX = healthBarX + healthBarWidth / 2 - rowWidth / 2;
-        const baseY = healthBarY + healthBarHeight + 7;
+        // shift icons below shield bar when present
+        const baseY =
+          this.maxShieldHealth > 0
+            ? shieldBarY + healthBarHeight + 4
+            : healthBarY + healthBarHeight + 7;
 
         icons.forEach((icon, idx) => {
           const x = baseX + idx * iconGap;
@@ -239,6 +299,15 @@ export class Creep {
       //     scaledHeight
       // );
     }
+  }
+
+  applyDamage(amount) {
+    if (this.shieldHealth > 0) {
+      const absorbed = Math.min(this.shieldHealth, amount);
+      this.shieldHealth -= absorbed;
+      amount -= absorbed;
+    }
+    this.health -= amount;
   }
 
   setPath(path) {
