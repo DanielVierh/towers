@@ -1934,11 +1934,10 @@ function saveGameToLocalStorage() {
   )
     .toString()
     .padStart(2, "0")}.${now.getFullYear()} - ${now
-    .getHours()
-    .toString()
-    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${
-    save_obj.wave
-  }/${save_obj.active_game_target_wave})`;
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${save_obj.wave
+    }/${save_obj.active_game_target_wave})`;
   save_obj.save_date = formattedDate;
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
@@ -2115,7 +2114,7 @@ window.onload = () => {
     render_amount(save_obj);
     render_XP_Coins(save_obj);
     syncSniperUnlockUI();
-  } catch (e) {}
+  } catch (e) { }
   initDailyLoot();
   // const greeting = new GameMessage(
   //   "Willkommen zurück",
@@ -2388,7 +2387,7 @@ function spawnEnemy() {
     const health =
       Math.floor(
         Math.random() *
-          (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1),
+        (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1),
       ) +
       save_obj.enemy_max_health / 2 +
       creep_properties[creep_index].extra_health;
@@ -2684,13 +2683,13 @@ function drawTowerPlaces() {
 function checkCollision(colliding_object_A, colliding_object_B) {
   return (
     colliding_object_A.pos_x <
-      colliding_object_B.pos_x + colliding_object_B.width &&
+    colliding_object_B.pos_x + colliding_object_B.width &&
     colliding_object_A.pos_x + colliding_object_A.width >
-      colliding_object_B.pos_x &&
+    colliding_object_B.pos_x &&
     colliding_object_A.pos_y <
-      colliding_object_B.pos_y + colliding_object_B.height &&
+    colliding_object_B.pos_y + colliding_object_B.height &&
     colliding_object_A.pos_y + colliding_object_A.height >
-      colliding_object_B.pos_y
+    colliding_object_B.pos_y
   );
 }
 
@@ -3468,7 +3467,7 @@ function gameLoop() {
                           pathGrid,
                         );
                         if (newPath) enemy.setPath(newPath);
-                      } catch (e) {}
+                      } catch (e) { }
                     });
                   }
                 }
@@ -3509,7 +3508,7 @@ function gameLoop() {
                           pathGrid,
                         );
                         if (newPath) enemy.setPath(newPath);
-                      } catch (e) {}
+                      } catch (e) { }
                     });
                   }
                 }
@@ -3680,9 +3679,8 @@ function updateWaveTimer() {
   }
 
   waveTimer--;
-  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${
-    creep_properties[next_round_creep_index].name
-  }`;
+  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${creep_properties[next_round_creep_index].name
+    }`;
   if (save_obj.wave === save_obj.active_game_target_wave) {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
@@ -4616,7 +4614,7 @@ btn_SellTower.addEventListener("click", () => {
               pathGrid,
             );
             if (newPath) enemy.setPath(newPath);
-          } catch (e) {}
+          } catch (e) { }
         });
       }
     } else {
@@ -5584,16 +5582,16 @@ function check_XPCoins(price, xp_objectname) {
 }
 
 //* Mouse Position for Debugging
-canvas.addEventListener("mousemove", function (event) {
-  // Canvas-Position im Dokument ermitteln
-  const rect = canvas.getBoundingClientRect();
+// canvas.addEventListener("mousemove", function (event) {
+//   // Canvas-Position im Dokument ermitteln
+//   const rect = canvas.getBoundingClientRect();
 
-  // Mausposition relativ zum Canvas
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+//   // Mausposition relativ zum Canvas
+//   const x = event.clientX - rect.left;
+//   const y = event.clientY - rect.top;
 
-  console.log(`x: ${x - 20}, y: ${y - 20}`);
-});
+//   console.log(`x: ${x - 20}, y: ${y - 20}`);
+// });
 
 function gxuShowEndscreen(win, stats) {
   const title = document.getElementById("gxu-title");
