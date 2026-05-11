@@ -212,6 +212,15 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
     );
     if (remaining <= 0) {
       enemy.markedForDeletion = true;
+      const hasActiveCarrier = enemies.some(
+        (otherEnemy) =>
+          otherEnemy !== enemy &&
+          !otherEnemy.markedForDeletion &&
+          otherEnemy.ctfHasFlag,
+      );
+      if (!hasActiveCarrier) {
+        save_obj.ctf_game_over = true;
+      }
       return;
     }
 
@@ -219,7 +228,7 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
     enemy.ctfHasFlag = true;
     enemy.ctfReturning = true;
     enemy.disableBoundaryDeletion = true;
-    save_obj.ctf_flags_remaining_base = remaining - 1;
+    save_obj.ctf_flags_remaining_base = Math.max(0, remaining - 1);
 
     enemy.waypoints = [...enemy.waypoints].reverse();
     enemy.currentWaypointIndex = 0;
@@ -228,14 +237,11 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
 
   // Reached top base while carrying a flag: flag stolen.
   if (enemy.ctfReturning) {
-    save_obj.ctf_flags_stolen = (Number(save_obj.ctf_flags_stolen) || 0) + 1;
+    // Finalize stolen flags when the creep is actually removed from the game.
+    enemy.ctfDeliveredFlag = true;
+    enemy.ctfHasFlag = false;
+    enemy.ctfReturning = false;
     enemy.markedForDeletion = true;
-    if (
-      (Number(save_obj.ctf_flags_stolen) || 0) >=
-      (Number(save_obj.ctf_flags_total) || 0)
-    ) {
-      save_obj.ctf_game_over = true;
-    }
   }
 }
 
@@ -3053,7 +3059,8 @@ function gameLoop() {
 
   //* Dann die Creeps darüber zeichnen
   drawCtfBaseFlags(ctx);
-  enemies.forEach((enemy, index) => {
+  for (let index = enemies.length - 1; index >= 0; index--) {
+    const enemy = enemies[index];
     enemy.update(save_obj, moneyPopups);
 
     // Toxic fog particles
@@ -3533,12 +3540,22 @@ function gameLoop() {
     });
 
     if (enemy.markedForDeletion) {
+      if (isCtfMode() && enemy.ctfDeliveredFlag) {
+        save_obj.ctf_flags_stolen = (Number(save_obj.ctf_flags_stolen) || 0) + 1;
+        enemy.ctfDeliveredFlag = false;
+        if (
+          (Number(save_obj.ctf_flags_stolen) || 0) >=
+          (Number(save_obj.ctf_flags_total) || 0)
+        ) {
+          save_obj.ctf_game_over = true;
+        }
+      }
       enemies.splice(index, 1);
     } else {
       enemy.draw(ctx);
       drawCtfFlagOnEnemy(ctx, enemy);
     }
-  });
+  }
 
   // Zeichne die Popups
   drawMoneyPopups();
