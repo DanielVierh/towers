@@ -131,6 +131,11 @@ function isCtfMode() {
   return save_obj?.game_mode === "ctf";
 }
 
+function syncCtfLivesWithFlags() {
+  if (!isCtfMode()) return;
+  save_obj.live = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
+}
+
 function getCtfTotalFlagsByDifficulty(difficulty) {
   switch (difficulty) {
     case "very_easy":
@@ -168,6 +173,7 @@ function initCtfState(level) {
   };
   save_obj.ctf_top_pos = clampToCanvas(top);
   save_obj.ctf_bottom_pos = clampToCanvas(bottom);
+  syncCtfLivesWithFlags();
 }
 
 function drawCtfBaseFlags(ctx) {
@@ -221,6 +227,7 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
       if (!hasActiveCarrier) {
         save_obj.ctf_game_over = true;
       }
+      syncCtfLivesWithFlags();
       return;
     }
 
@@ -229,6 +236,7 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
     enemy.ctfReturning = true;
     enemy.disableBoundaryDeletion = true;
     save_obj.ctf_flags_remaining_base = Math.max(0, remaining - 1);
+    syncCtfLivesWithFlags();
 
     enemy.waypoints = [...enemy.waypoints].reverse();
     enemy.currentWaypointIndex = 0;
@@ -257,6 +265,7 @@ function ctfReturnFlagToBase(enemy) {
     Number(save_obj.ctf_flags_remaining_base) || 0,
   );
   save_obj.ctf_flags_remaining_base = Math.min(maxBase, currentBase + 1);
+  syncCtfLivesWithFlags();
 
   // Prevent double returns.
   enemy.ctfHasFlag = false;
@@ -1970,6 +1979,10 @@ function loadGameFromLocalStorage() {
     save_obj = JSON.parse(savedGame);
     console.log("saveGame", save_obj);
 
+    if (isCtfMode()) {
+      syncCtfLivesWithFlags();
+    }
+
     const validDifficulties = ["very_easy", "easy", "standard", "hard"];
     if (!validDifficulties.includes(save_obj.game_difficulty)) {
       save_obj.game_difficulty = "easy";
@@ -3584,7 +3597,7 @@ function gameLoop() {
     return; // Stop the game loop
   }
 
-  if (save_obj.live <= 0) {
+  if (!isCtfMode() && save_obj.live <= 0) {
     showGameOverModal();
     btn_goto_menu.classList.remove("hidden");
     btn_pause.classList.add("hidden");
@@ -4893,6 +4906,9 @@ function start_game() {
   save_obj.game_difficulty = game_difficulty;
 
   set_difficulty(game_difficulty);
+  if (isCtfMode()) {
+    syncCtfLivesWithFlags();
+  }
   resetRunStats();
 
   // FreeBuild: give extra starting money and per-wave bonus
