@@ -136,6 +136,22 @@ function syncCtfLivesWithFlags() {
   save_obj.live = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
 }
 
+function grantLifeReward(amount = 1) {
+  const reward = Math.max(0, Math.floor(Number(amount) || 0));
+  if (reward <= 0) return;
+
+  if (isCtfMode()) {
+    save_obj.ctf_flags_total =
+      Math.max(0, Number(save_obj.ctf_flags_total) || 0) + reward;
+    save_obj.ctf_flags_remaining_base =
+      Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0) + reward;
+    syncCtfLivesWithFlags();
+    return;
+  }
+
+  save_obj.live += reward;
+}
+
 function getCtfTotalFlagsByDifficulty(difficulty) {
   switch (difficulty) {
     case "very_easy":
@@ -2802,7 +2818,7 @@ function detonateMineAoE(tower, resistanceKey) {
     if (tower.live_gen === 1) {
       tower.kill_counter += 1;
       if (tower.kill_counter === 20) {
-        save_obj.live++;
+        grantLifeReward(1);
         document.body.classList.add("green-flash");
         setTimeout(() => {
           document.body.classList.remove("green-flash");
@@ -3197,7 +3213,7 @@ function gameLoop() {
               (console.log("Tower Upgrade kill"), tower.kill_counter);
 
               if (tower.kill_counter === 20) {
-                save_obj.live++;
+                grantLifeReward(1);
                 document.body.classList.add("green-flash");
                 setTimeout(() => {
                   document.body.classList.remove("green-flash");
@@ -3407,7 +3423,7 @@ function gameLoop() {
                 tower.kill_counter += 1;
 
                 if (tower.kill_counter === 20) {
-                  save_obj.live++;
+                  grantLifeReward(1);
                   document.body.classList.add("green-flash");
                   setTimeout(() => {
                     document.body.classList.remove("green-flash");
