@@ -1964,6 +1964,14 @@ function loadGameFromLocalStorage() {
     save_obj = JSON.parse(savedGame);
     console.log("saveGame", save_obj);
 
+    const validDifficulties = ["very_easy", "easy", "standard", "hard"];
+    if (!validDifficulties.includes(save_obj.game_difficulty)) {
+      save_obj.game_difficulty = "easy";
+    }
+    if (sel_difficulty) {
+      sel_difficulty.value = save_obj.game_difficulty;
+    }
+
     save_obj.XP_Coins = Math.max(0, Math.floor(Number(save_obj.XP_Coins) || 0));
 
     lbl_xp.innerHTML = `${save_obj.XP.toLocaleString(
@@ -2319,7 +2327,7 @@ function add_special_creep(
       creep.isBoss = Boolean(isBoss);
 
       // Schild-Mechanik im Schwer-Modus alle 5 Runden
-      if (sel_difficulty.value === "hard" && (save_obj.wave + 1) % 5 === 0) {
+      if (save_obj.game_difficulty === "hard" && save_obj.wave % 5 === 0) {
         const shieldAmount = Math.round(health * 0.5);
         creep.shieldHealth = shieldAmount;
         creep.maxShieldHealth = shieldAmount;
@@ -2424,7 +2432,7 @@ function spawnEnemy() {
     if (usedPath) newCreep.setPath(usedPath);
 
     // Schild-Mechanik im Schwer-Modus alle 5 Runden
-    if (sel_difficulty.value === "hard" && (save_obj.wave + 1) % 5 === 0) {
+    if (save_obj.game_difficulty === "hard" && save_obj.wave % 5 === 0) {
       const shieldAmount = Math.round(health * 0.5);
       newCreep.shieldHealth = shieldAmount;
       newCreep.maxShieldHealth = shieldAmount;
@@ -2805,7 +2813,7 @@ function showGameOverModal(reason = "lives") {
   if (!save_obj.assign_XP) {
     audio.play("game_over", { force: true });
     save_obj.XP += Math.floor(save_obj.current_XP / 2);
-    const game_difficulty = sel_difficulty.value;
+    const game_difficulty = save_obj.game_difficulty || "easy";
     let base_XP_Coins = 500;
     let lostLive = 30 - save_obj.live;
     if (game_difficulty === "easy") {
@@ -3771,7 +3779,7 @@ function won_game() {
       );
       save_obj.XP += save_obj.current_XP;
 
-      const game_difficulty = sel_difficulty.value;
+      const game_difficulty = save_obj.game_difficulty || "easy";
       let base_XP_Coins = 500;
       let lostLive = 30 - save_obj.live;
       if (game_difficulty === "easy") {
@@ -4865,6 +4873,7 @@ function start_game() {
   menu_modal.classList.remove("active");
   audio.play("start");
   const game_difficulty = sel_difficulty.value;
+  save_obj.game_difficulty = game_difficulty;
 
   set_difficulty(game_difficulty);
   resetRunStats();
@@ -4904,25 +4913,34 @@ function start_game() {
 //* ANCHOR -set Game difficulty
 //*#########################################################
 function set_difficulty(game_difficulty) {
+  const validDifficulties = ["very_easy", "easy", "standard", "hard"];
+  if (!validDifficulties.includes(game_difficulty)) {
+    game_difficulty = "easy";
+  }
+
   if (game_difficulty === "very_easy") {
+    save_obj.game_difficulty = 'very_easy';
     save_obj.live = 30;
     save_obj.money = 1000;
     save_obj.enemy_max_health = 150;
     save_obj.energy_start_level = 100;
   }
   if (game_difficulty === "easy") {
+    save_obj.game_difficulty = 'easy';
     save_obj.live = 25;
     save_obj.money = 350;
     save_obj.enemy_max_health = 170;
     save_obj.energy_start_level = 50;
   }
   if (game_difficulty === "standard") {
+    save_obj.game_difficulty = 'standard';
     save_obj.live = 20;
     save_obj.money = 200;
     save_obj.enemy_max_health = 200;
     save_obj.energy_start_level = 0;
   }
   if (game_difficulty === "hard") {
+    save_obj.game_difficulty = 'hard';
     save_obj.live = 15;
     save_obj.money = 200;
     save_obj.enemy_max_health = 250;
