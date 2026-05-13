@@ -223,22 +223,43 @@ function drawCtfFlagOnEnemy(ctx, enemy) {
 
 function ctfHandleEnemyReachedPathEnd(enemy) {
   if (!isCtfMode()) return;
-  if (!enemy?.waypoints) return;
+
+  // Safety: ignore if no valid waypoints or an empty waypoint list (prevents false positives)
+  if (!enemy?.waypoints || !Array.isArray(enemy.waypoints) || enemy.waypoints.length === 0) return;
+
+  // If the current waypoint index hasn't reached the end, nothing to do
   if (enemy.currentWaypointIndex < enemy.waypoints.length) return;
+
+  // Additional guard: ensure the creep is actually near the final waypoint to avoid
+  // marking it as having reached the base prematurely (fixes reported bug).
+  try {
+    const lastWp = enemy.waypoints[enemy.waypoints.length - 1];
+    if (lastWp && typeof lastWp.x === "number" && typeof lastWp.y === "number") {
+      const dist = calculateDistance(
+        enemy.pos_x,
+        enemy.pos_y,
+        lastWp.x,
+        lastWp.y,
+        enemy.width,
+        enemy.height,
+        0,
+        0,
+      );
+      const DIST_THRESHOLD = 40; // px, tweakable
+      if (dist > DIST_THRESHOLD) return;
+    }
+  } catch (e) {
+    // If anything goes wrong with the distance check, fall back to original behavior
+  }
 
   // Reached bottom base (first pass): steal a flag and return.
   if (!enemy.ctfHasFlag) {
-    const remaining = Math.max(
-      0,
-      Number(save_obj.ctf_flags_remaining_base) || 0,
-    );
+    const remaining = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
     if (remaining <= 0) {
       enemy.markedForDeletion = true;
       const hasActiveCarrier = enemies.some(
         (otherEnemy) =>
-          otherEnemy !== enemy &&
-          !otherEnemy.markedForDeletion &&
-          otherEnemy.ctfHasFlag,
+          otherEnemy !== enemy && !otherEnemy.markedForDeletion && otherEnemy.ctfHasFlag,
       );
       if (!hasActiveCarrier) {
         save_obj.ctf_game_over = true;
@@ -3121,7 +3142,9 @@ function gameLoop() {
       }
 
       //* Markiere den Creeps zur Löschung, wenn er die Grenze überschreitet
-      if (enemy.pos_x > 400) {
+      // Respect disableBoundaryDeletion (used by CTF carriers) to avoid
+      // prematurely removing a carrier and deducting a life.
+      if (!enemy.disableBoundaryDeletion && enemy.pos_x > 400) {
         enemy.markedForDeletion = true;
         save_obj.live--;
         audio.play("life_lost");
