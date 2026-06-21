@@ -199,18 +199,63 @@ export class Creep {
       if (this.shieldHealth > 0) {
         const centerX = this.pos_x + scaledWidth / 2;
         const centerY = this.pos_y + scaledHeight / 2;
+
         const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
-        const auraRadius =
-          Math.max(scaledWidth, scaledHeight) / 2 + 4 + pulse * 3;
+
+        const radius = Math.max(scaledWidth, scaledHeight) / 2 + 8;
+        const glowRadius = radius + pulse * 4;
 
         ctx.save();
-        ctx.shadowBlur = 10 + pulse * 6;
-        ctx.shadowColor = "rgba(80, 160, 255, 0.9)";
-        ctx.strokeStyle = `rgba(100, 180, 255, ${0.55 + pulse * 0.35})`;
-        ctx.lineWidth = 2.5;
+
+        // leichte Ellipse = wirkt räumlicher
+        ctx.translate(centerX, centerY);
+        ctx.scale(1, 0.88);
+
+        // Outer Glow
+        ctx.shadowBlur = 25 + pulse * 10;
+        ctx.shadowColor = "rgba(80,160,255,0.9)";
+
+        // Energiefeld
+        const gradient = ctx.createRadialGradient(
+          0,
+          0,
+          radius * 0.4,
+          0,
+          0,
+          glowRadius,
+        );
+
+        gradient.addColorStop(0, "rgba(120,200,255,0.02)");
+        gradient.addColorStop(0.65, "rgba(120,200,255,0.08)");
+        gradient.addColorStop(0.9, "rgba(120,200,255,0.22)");
+        gradient.addColorStop(1, "rgba(180,230,255,0.6)");
+
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, auraRadius, 0, Math.PI * 2);
+        ctx.arc(0, 0, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Haupt-Ring
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = `rgba(180,220,255,${0.7 + pulse * 0.3})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
         ctx.stroke();
+
+        // Innerer Ring
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "rgba(255,255,255,0.4)";
+        ctx.beginPath();
+        ctx.arc(0, 0, radius - 4, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Lichtreflex oben links
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(255,255,255,0.8)";
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, -Math.PI * 0.85, -Math.PI * 0.35);
+        ctx.stroke();
+
         ctx.restore();
       }
 
