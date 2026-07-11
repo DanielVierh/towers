@@ -2195,7 +2195,6 @@ window.onload = () => {
     syncSniperUnlockUI();
   } catch (e) {}
   initDailyLoot();
-  toggle_discount_checkbox();
 };
 
 function toggle_discount_checkbox() {
