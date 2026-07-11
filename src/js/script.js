@@ -396,7 +396,6 @@ const tile_upgrade_liveGenerator = document.getElementById(
 );
 const btn_livegen = document.getElementById("btn_livegen");
 const reset_game = document.getElementById("reset_game");
-const btn_replay_same_map = document.getElementById("btn_replay_same_map");
 const lbl_available_mines = document.getElementById("lbl_available_mines");
 const lbl_needed_energy = document.getElementById("lbl_needed_energy");
 
@@ -5758,10 +5757,6 @@ function gxuShowEndscreen(win, stats) {
   const elBestTower = document.getElementById("gxu-s-best-tower");
   const elWaves = document.getElementById("gxu-s-waves");
 
-  if (btn_replay_same_map) {
-    btn_replay_same_map.disabled = !selectedLevelDetailsForReplay;
-  }
-
   const kills = parseStatNumber(stats?.kills);
   const xp = parseStatNumber(stats?.xp);
   const coins = parseStatNumber(stats?.coins);
@@ -5786,35 +5781,6 @@ function gxuShowEndscreen(win, stats) {
 }
 function gxuClose() {
   document.getElementById("gxu-overlay").classList.remove("gxu-active");
-}
-
-if (btn_replay_same_map) {
-  btn_replay_same_map.addEventListener("click", () => {
-    if (!selectedLevelDetailsForReplay) {
-      new GameMessage(
-        "Replay nicht verfügbar",
-        "Bitte starte zuerst ein neues Spiel über die Level-Auswahl.",
-        "error",
-        2600,
-      ).show_Message();
-      return;
-    }
-
-    if (sel_difficulty && selectedDifficultyForReplay) {
-      sel_difficulty.value = selectedDifficultyForReplay;
-    }
-
-    gxuClose();
-    if (runLootModal) {
-      runLootModal.classList.remove("active");
-      runLootModal.setAttribute("aria-hidden", "true");
-    }
-
-    initialize_game(
-      cloneLevelDetails(selectedLevelDetailsForReplay),
-      selectedLevelIdForReplay,
-    );
-  });
 }
 
 reset_game.addEventListener("click", () => {
