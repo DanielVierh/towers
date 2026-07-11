@@ -225,7 +225,12 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
   if (!isCtfMode()) return;
 
   // Safety: ignore if no valid waypoints or an empty waypoint list (prevents false positives)
-  if (!enemy?.waypoints || !Array.isArray(enemy.waypoints) || enemy.waypoints.length === 0) return;
+  if (
+    !enemy?.waypoints ||
+    !Array.isArray(enemy.waypoints) ||
+    enemy.waypoints.length === 0
+  )
+    return;
 
   // If the current waypoint index hasn't reached the end, nothing to do
   if (enemy.currentWaypointIndex < enemy.waypoints.length) return;
@@ -234,7 +239,11 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
   // marking it as having reached the base prematurely (fixes reported bug).
   try {
     const lastWp = enemy.waypoints[enemy.waypoints.length - 1];
-    if (lastWp && typeof lastWp.x === "number" && typeof lastWp.y === "number") {
+    if (
+      lastWp &&
+      typeof lastWp.x === "number" &&
+      typeof lastWp.y === "number"
+    ) {
       const dist = calculateDistance(
         enemy.pos_x,
         enemy.pos_y,
@@ -254,12 +263,17 @@ function ctfHandleEnemyReachedPathEnd(enemy) {
 
   // Reached bottom base (first pass): steal a flag and return.
   if (!enemy.ctfHasFlag) {
-    const remaining = Math.max(0, Number(save_obj.ctf_flags_remaining_base) || 0);
+    const remaining = Math.max(
+      0,
+      Number(save_obj.ctf_flags_remaining_base) || 0,
+    );
     if (remaining <= 0) {
       enemy.markedForDeletion = true;
       const hasActiveCarrier = enemies.some(
         (otherEnemy) =>
-          otherEnemy !== enemy && !otherEnemy.markedForDeletion && otherEnemy.ctfHasFlag,
+          otherEnemy !== enemy &&
+          !otherEnemy.markedForDeletion &&
+          otherEnemy.ctfHasFlag,
       );
       if (!hasActiveCarrier) {
         save_obj.ctf_game_over = true;
@@ -1986,10 +2000,11 @@ function saveGameToLocalStorage() {
   )
     .toString()
     .padStart(2, "0")}.${now.getFullYear()} - ${now
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${save_obj.wave
-    }/${save_obj.active_game_target_wave})`;
+    .getHours()
+    .toString()
+    .padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} (${
+    save_obj.wave
+  }/${save_obj.active_game_target_wave})`;
   save_obj.save_date = formattedDate;
   localStorage.setItem("towers_savegame", JSON.stringify(save_obj));
 }
@@ -2178,15 +2193,25 @@ window.onload = () => {
     render_amount(save_obj);
     render_XP_Coins(save_obj);
     syncSniperUnlockUI();
-  } catch (e) { }
+  } catch (e) {}
   initDailyLoot();
-  // const greeting = new GameMessage(
-  //   "Willkommen zurück",
-  //   "Du erhälst heute 500 XP-Coins",
-  //   "success",
-  //   7000
-  // ).show_Message();
+  toggle_discount_checkbox();
 };
+
+function toggle_discount_checkbox() {
+  //* Hide Tower Discount if no discount available
+  const tower_discount = return_Item_Amount_and_existence(
+    save_obj,
+    "tower_rabatt_50",
+  );
+  const checkbox_field_tower = document.getElementById("checkbox_field_tower");
+
+  if (tower_discount.amount === 0) {
+    checkbox_field_tower.classList.add("hidden");
+  } else {
+    checkbox_field_tower.classList.remove("hidden");
+  }
+}
 
 //*#########################################################
 //* ANCHOR -spawnEnemy
@@ -2451,7 +2476,7 @@ function spawnEnemy() {
     const health =
       Math.floor(
         Math.random() *
-        (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1),
+          (save_obj.enemy_max_health - save_obj.enemy_max_health / 2 + 1),
       ) +
       save_obj.enemy_max_health / 2 +
       creep_properties[creep_index].extra_health;
@@ -2747,13 +2772,13 @@ function drawTowerPlaces() {
 function checkCollision(colliding_object_A, colliding_object_B) {
   return (
     colliding_object_A.pos_x <
-    colliding_object_B.pos_x + colliding_object_B.width &&
+      colliding_object_B.pos_x + colliding_object_B.width &&
     colliding_object_A.pos_x + colliding_object_A.width >
-    colliding_object_B.pos_x &&
+      colliding_object_B.pos_x &&
     colliding_object_A.pos_y <
-    colliding_object_B.pos_y + colliding_object_B.height &&
+      colliding_object_B.pos_y + colliding_object_B.height &&
     colliding_object_A.pos_y + colliding_object_A.height >
-    colliding_object_B.pos_y
+      colliding_object_B.pos_y
   );
 }
 
@@ -3534,7 +3559,7 @@ function gameLoop() {
                           pathGrid,
                         );
                         if (newPath) enemy.setPath(newPath);
-                      } catch (e) { }
+                      } catch (e) {}
                     });
                   }
                 }
@@ -3575,7 +3600,7 @@ function gameLoop() {
                           pathGrid,
                         );
                         if (newPath) enemy.setPath(newPath);
-                      } catch (e) { }
+                      } catch (e) {}
                     });
                   }
                 }
@@ -3593,7 +3618,8 @@ function gameLoop() {
 
     if (enemy.markedForDeletion) {
       if (isCtfMode() && enemy.ctfDeliveredFlag) {
-        save_obj.ctf_flags_stolen = (Number(save_obj.ctf_flags_stolen) || 0) + 1;
+        save_obj.ctf_flags_stolen =
+          (Number(save_obj.ctf_flags_stolen) || 0) + 1;
         enemy.ctfDeliveredFlag = false;
         if (
           (Number(save_obj.ctf_flags_stolen) || 0) >=
@@ -3756,8 +3782,9 @@ function updateWaveTimer() {
   }
 
   waveTimer--;
-  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${creep_properties[next_round_creep_index].name
-    }`;
+  lbl_WaveTimer.innerHTML = `${save_obj.wave + 1}. Welle in ${waveTimer}s - ${
+    creep_properties[next_round_creep_index].name
+  }`;
   if (save_obj.wave === save_obj.active_game_target_wave) {
     lbl_WaveTimer.innerHTML = `Ende in ${waveTimer}s`;
   }
@@ -3929,6 +3956,7 @@ canvas.addEventListener("click", (event) => {
       }
       if (!place.tower_is_build) {
         //*Open Modal for Baumenu and show current Money and Energy
+        toggle_discount_checkbox();
         mdl_towers.style.display = "flex";
         syncSniperUnlockUI();
         const lbl_current_money = document.getElementById("lbl_current_money");
@@ -4691,7 +4719,7 @@ btn_SellTower.addEventListener("click", () => {
               pathGrid,
             );
             if (newPath) enemy.setPath(newPath);
-          } catch (e) { }
+          } catch (e) {}
         });
       }
     } else {
@@ -4991,28 +5019,28 @@ function set_difficulty(game_difficulty) {
   }
 
   if (game_difficulty === "very_easy") {
-    save_obj.game_difficulty = 'very_easy';
+    save_obj.game_difficulty = "very_easy";
     save_obj.live = 30;
     save_obj.money = 1000;
     save_obj.enemy_max_health = 150;
     save_obj.energy_start_level = 100;
   }
   if (game_difficulty === "easy") {
-    save_obj.game_difficulty = 'easy';
+    save_obj.game_difficulty = "easy";
     save_obj.live = 25;
     save_obj.money = 350;
     save_obj.enemy_max_health = 170;
     save_obj.energy_start_level = 50;
   }
   if (game_difficulty === "standard") {
-    save_obj.game_difficulty = 'standard';
+    save_obj.game_difficulty = "standard";
     save_obj.live = 20;
     save_obj.money = 200;
     save_obj.enemy_max_health = 200;
     save_obj.energy_start_level = 0;
   }
   if (game_difficulty === "hard") {
-    save_obj.game_difficulty = 'hard';
+    save_obj.game_difficulty = "hard";
     save_obj.live = 15;
     save_obj.money = 200;
     save_obj.enemy_max_health = 250;
