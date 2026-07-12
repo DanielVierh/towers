@@ -443,6 +443,7 @@ const waveIntroSpriteSpecial2 = document.getElementById(
 );
 const waveIntroText = document.getElementById("waveIntroText");
 let waveIntroLastWaveKey = null;
+const waveIntroImagePreloadCache = new Map();
 
 function creepPreviewFrame1Src(creepIndex) {
   const idx = Number(creepIndex);
@@ -458,6 +459,41 @@ function specialPreviewFrame1Src(specialIndex) {
   const base = special_creeps?.[idx]?.src;
   if (!base || typeof base !== "string") return null;
   return `${base}/frame_1.png`;
+}
+
+function preloadWaveIntroImage(src) {
+  if (!src || waveIntroImagePreloadCache.has(src)) return;
+  const img = new Image();
+  img.src = src;
+  waveIntroImagePreloadCache.set(src, img);
+}
+
+function getWaveIntroSpecialPreviewSrcs(waveNumber) {
+  const specialSrcs = [];
+  const upcomingWave = Number(waveNumber);
+  if (
+    Number.isFinite(upcomingWave) &&
+    upcomingWave !== 0 &&
+    upcomingWave % 6 === 0
+  ) {
+    specialSrcs.push(specialPreviewFrame1Src(0));
+  }
+  if (
+    Number.isFinite(upcomingWave) &&
+    upcomingWave !== 0 &&
+    upcomingWave % 10 === 0
+  ) {
+    specialSrcs.push(specialPreviewFrame1Src(1));
+  }
+  return specialSrcs.filter(Boolean);
+}
+
+function preloadUpcomingWaveIntroSprites(waveNumber, creepIndex) {
+  const mainSrc = creepPreviewFrame1Src(creepIndex);
+  preloadWaveIntroImage(mainSrc);
+  getWaveIntroSpecialPreviewSrcs(waveNumber).forEach((src) => {
+    preloadWaveIntroImage(src);
+  });
 }
 
 function setWaveIntroVisible(visible) {
@@ -495,23 +531,8 @@ function showWaveIntroCountdown({ waveNumber, creepIndex, secondsLeft }) {
   if (!waveIntroBanner || !waveIntroText) return;
 
   const mainSrc = creepPreviewFrame1Src(creepIndex);
-  const specialSrcs = [];
-  const upcomingWave = Number(waveNumber);
-  if (
-    Number.isFinite(upcomingWave) &&
-    upcomingWave !== 0 &&
-    upcomingWave % 6 === 0
-  ) {
-    specialSrcs.push(specialPreviewFrame1Src(0));
-  }
-  if (
-    Number.isFinite(upcomingWave) &&
-    upcomingWave !== 0 &&
-    upcomingWave % 10 === 0
-  ) {
-    specialSrcs.push(specialPreviewFrame1Src(1));
-  }
-  setWaveIntroSprites(mainSrc, specialSrcs.filter(Boolean));
+  const specialSrcs = getWaveIntroSpecialPreviewSrcs(waveNumber);
+  setWaveIntroSprites(mainSrc, specialSrcs);
 
   waveIntroText.textContent = `Welle ${waveNumber} in ${secondsLeft}s`;
   setWaveIntroVisible(true);
@@ -3803,6 +3824,8 @@ function updateWaveTimer() {
   const upcomingWaveNumber = save_obj.wave + 1;
   const isEndPhase = save_obj.wave === save_obj.active_game_target_wave;
   if (!isEndPhase && upcomingWaveNumber <= save_obj.active_game_target_wave) {
+    preloadUpcomingWaveIntroSprites(upcomingWaveNumber, next_round_creep_index);
+
     if (waveTimer > 0 && waveTimer <= 3) {
       showWaveIntroCountdown({
         waveNumber: upcomingWaveNumber,
