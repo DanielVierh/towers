@@ -2748,28 +2748,36 @@ function drawTowerPlaces() {
       if (show_tower_range) {
         ctx.beginPath();
         ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
+        let rangeColor = "transparent";
         if (tower.tower_type === "toxic") {
-          ctx.strokeStyle = "green"; // Grüner Kreis für toxic tower
+          rangeColor = "green"; // Grüner Kreis für toxic tower
         } else if (tower.tower_type === "destroyer") {
-          ctx.strokeStyle = "red"; // Roter Kreis für destroyer tower
+          rangeColor = "red"; // Roter Kreis für destroyer tower
         } else if (tower.tower_type === "slower") {
-          ctx.strokeStyle = "blue"; // Blauer Kreis für slower tower
+          rangeColor = "blue"; // Blauer Kreis für slower tower
         } else if (tower.tower_type === "anti_air") {
-          ctx.strokeStyle = "grey"; // Grau für Anti Air
+          rangeColor = "grey"; // Grau für Anti Air
         } else if (tower.tower_type === "mine") {
-          ctx.strokeStyle = "black"; // Grau für Anti Air
+          rangeColor = "black"; // Grau für Anti Air
         } else if (tower.tower_type === "air_mine") {
-          ctx.strokeStyle = "black"; // Grau für Anti Air
+          rangeColor = "black"; // Grau für Anti Air
         } else if (tower.tower_type === "spikes") {
-          ctx.strokeStyle = "black";
+          rangeColor = "black";
         } else if (tower.tower_type === "emp_field") {
-          ctx.strokeStyle = "rgba(120,220,255,0.95)";
+          rangeColor = "rgba(120,220,255,0.95)";
         } else if (tower.tower_type === "sniper") {
-          ctx.strokeStyle = "purple";
+          rangeColor = "purple";
         } else {
-          ctx.strokeStyle = "transparent"; // Standardfarbe
+          rangeColor = "transparent"; // Standardfarbe
         }
+
+        ctx.strokeStyle = rangeColor;
+        ctx.fillStyle = rangeColor;
         ctx.lineWidth = 3;
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.fill();
+        ctx.restore();
         ctx.stroke();
         ctx.closePath();
       }
