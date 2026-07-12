@@ -390,6 +390,16 @@ const check_tower_discount = document.getElementById("check_tower_discount");
 const check_upgrade_discount = document.getElementById(
   "check_upgrade_discount",
 );
+const btn_tower_discount_once = document.getElementById(
+  "btn_tower_discount_once",
+);
+const btn_trap_discount_once = document.getElementById(
+  "btn_trap_discount_once",
+);
+const btn_upgrade_discount_once = document.getElementById(
+  "btn_upgrade_discount_once",
+);
+const btn_mine_charges_once = document.getElementById("btn_mine_charges_once");
 const btn_life_upgrade = document.getElementById("btn_life_upgrade");
 const tile_upgrade_liveGenerator = document.getElementById(
   "tile_upgrade_liveGenerator",
@@ -2058,6 +2068,7 @@ function loadGameFromLocalStorage() {
       render_amount(save_obj);
       render_XP_Coins(save_obj);
       syncSniperUnlockUI();
+      refreshSingleUseDiscountButtons();
     } catch (error) {
       console.log(error);
     }
@@ -2192,6 +2203,7 @@ window.onload = () => {
     render_amount(save_obj);
     render_XP_Coins(save_obj);
     syncSniperUnlockUI();
+    refreshSingleUseDiscountButtons();
   } catch (e) {}
   initDailyLoot();
 };
@@ -4106,10 +4118,132 @@ window.addEventListener("keydown", (e) => {
 });
 
 //* Toggle trap discount
+function isSingleUseArmed(checkbox) {
+  return Boolean(checkbox && checkbox.dataset.singleUseArmed === "true");
+}
+
+function setSingleUseArmed(checkbox, value) {
+  if (!checkbox) return;
+  checkbox.dataset.singleUseArmed = value ? "true" : "false";
+}
+
+function clearSingleUseDiscount(checkbox) {
+  setSingleUseArmed(checkbox, false);
+}
+
+function refreshSingleUseButton(
+  button,
+  checkbox,
+  itemName,
+  labels = {
+    ready: "1x Rabatt",
+    armed: "1x aktiv",
+    empty: "0x Rabatt",
+  },
+) {
+  if (!button || !checkbox) return;
+  const item = return_Item_Amount_and_existence(save_obj, itemName);
+  const hasStock = item.available && Number(item.amount) > 0;
+  const armed = hasStock && checkbox.checked && isSingleUseArmed(checkbox);
+
+  button.disabled = !hasStock;
+  button.classList.toggle("is-armed", armed);
+  if (!hasStock) {
+    button.innerHTML = labels.empty;
+  } else {
+    button.innerHTML = armed ? labels.armed : labels.ready;
+  }
+}
+
+function refreshSingleUseDiscountButtons() {
+  refreshSingleUseButton(
+    btn_tower_discount_once,
+    check_tower_discount,
+    "tower_rabatt_50",
+  );
+  refreshSingleUseButton(
+    btn_trap_discount_once,
+    check_trap_discount,
+    "trap_rabatt_50",
+  );
+  refreshSingleUseButton(
+    btn_upgrade_discount_once,
+    check_upgrade_discount,
+    "upgrade_rabatt_50",
+  );
+  refreshSingleUseButton(
+    btn_mine_charges_once,
+    check_mine_charges,
+    "mine_charges_3_pack",
+    {
+      ready: "1x Pack",
+      armed: "1x aktiv",
+      empty: "0x Pack",
+    },
+  );
+}
+
+function armSingleUseDiscount(checkbox, itemName, refreshFn) {
+  if (!checkbox) return;
+  const item = return_Item_Amount_and_existence(save_obj, itemName);
+  if (!item.available || Number(item.amount) <= 0) {
+    new GameMessage(
+      "Kein Rabatt verfügbar",
+      "Du hast keinen verfügbaren Rabatt mehr.",
+      "error",
+      2000,
+    ).show_Message();
+    refreshSingleUseDiscountButtons();
+    return;
+  }
+
+  checkbox.checked = true;
+  setSingleUseArmed(checkbox, true);
+  if (typeof refreshFn === "function") refreshFn();
+  refreshSingleUseDiscountButtons();
+}
+
+function consumeDiscountIfActive(itemName, checkbox, refreshFn) {
+  const item = return_Item_Amount_and_existence(save_obj, itemName);
+  if (!item.available || Number(item.amount) <= 0) return false;
+  if (!checkbox || !checkbox.checked) return false;
+
+  save_obj.XP_Store_Items[item.index].amount -= 1;
+  if (save_obj.XP_Store_Items[item.index].amount < 0) {
+    save_obj.XP_Store_Items[item.index].amount = 0;
+  }
+
+  const remaining = Number(save_obj.XP_Store_Items[item.index].amount) || 0;
+  const wasSingleUse = isSingleUseArmed(checkbox);
+  if (wasSingleUse || remaining <= 0) {
+    checkbox.checked = false;
+  }
+  clearSingleUseDiscount(checkbox);
+
+  render_amount(save_obj);
+  save_Game_without_saveDate();
+  if (typeof refreshFn === "function") refreshFn();
+  refreshSingleUseDiscountButtons();
+  return true;
+}
+
 check_trap_discount.addEventListener("click", () => {
+  if (!check_trap_discount.checked) {
+    clearSingleUseDiscount(check_trap_discount);
+  }
   show_trap_price();
   set_class_for_overpriced_towers();
+  refreshSingleUseDiscountButtons();
 });
+
+if (check_mine_charges) {
+  check_mine_charges.addEventListener("click", () => {
+    if (!check_mine_charges.checked) {
+      clearSingleUseDiscount(check_mine_charges);
+    }
+    refreshSingleUseDiscountButtons();
+  });
+}
 
 function show_trap_price() {
   const oldPrice_mine_ground = 70;
@@ -4153,13 +4287,19 @@ function show_trap_price() {
     if (btn_spikes_buy) btn_spikes_buy.innerHTML = `Kaufen ${oldPrice_spikes}€`;
     if (btn_emp_buy) btn_emp_buy.innerHTML = `Kaufen ${oldPrice_emp}€`;
   }
+
+  refreshSingleUseDiscountButtons();
 }
 
 //* Toggle Tower Discount
 check_tower_discount.addEventListener("click", () => {
+  if (!check_tower_discount.checked) {
+    clearSingleUseDiscount(check_tower_discount);
+  }
   show_recuded_price_on_discount();
   calc_energy_overdose();
   set_class_for_overpriced_towers();
+  refreshSingleUseDiscountButtons();
 });
 
 const buy_btn_powerplant = document.getElementById("buy_btn_powerplant");
@@ -4174,7 +4314,6 @@ function show_recuded_price_on_discount() {
     save_obj,
     "tower_rabatt_50",
   );
-  const tower_discount_selected = check_tower_discount.checked;
   if (towerDiscount) {
     const original_powerplant_price = 70;
     const original_destroyer_price = 50;
@@ -4193,7 +4332,7 @@ function show_recuded_price_on_discount() {
     if (
       towerDiscount.available &&
       towerDiscount.amount > 0 &&
-      check_tower_discount.checked & tower_discount_selected
+      check_tower_discount.checked
     ) {
       buy_btn_powerplant.innerHTML = `Kaufen ${new_powerplant_price}€`;
       btn_energy.setAttribute("data-tower_price", new_powerplant_price);
@@ -4226,6 +4365,8 @@ function show_recuded_price_on_discount() {
       }
     }
   }
+
+  refreshSingleUseDiscountButtons();
 }
 
 function getUpgradeDiscountedPrice(basePrice) {
@@ -4240,6 +4381,7 @@ function getUpgradeDiscountedPrice(basePrice) {
 
 function applyUpgradeDiscountToModalPrices() {
   render_amount(save_obj);
+  refreshSingleUseDiscountButtons();
 
   if (!tower || !tower.tower_is_build) return;
 
@@ -4279,9 +4421,48 @@ function applyUpgradeDiscountToModalPrices() {
 
 if (check_upgrade_discount) {
   check_upgrade_discount.addEventListener("click", () => {
+    if (!check_upgrade_discount.checked) {
+      clearSingleUseDiscount(check_upgrade_discount);
+    }
     applyUpgradeDiscountToModalPrices();
     calc_energy_overdose();
     set_class_for_overpriced_towers();
+    refreshSingleUseDiscountButtons();
+  });
+}
+
+if (btn_tower_discount_once) {
+  btn_tower_discount_once.addEventListener("click", () => {
+    armSingleUseDiscount(check_tower_discount, "tower_rabatt_50", () => {
+      show_recuded_price_on_discount();
+      calc_energy_overdose();
+      set_class_for_overpriced_towers();
+    });
+  });
+}
+
+if (btn_trap_discount_once) {
+  btn_trap_discount_once.addEventListener("click", () => {
+    armSingleUseDiscount(check_trap_discount, "trap_rabatt_50", () => {
+      show_trap_price();
+      set_class_for_overpriced_towers();
+    });
+  });
+}
+
+if (btn_upgrade_discount_once) {
+  btn_upgrade_discount_once.addEventListener("click", () => {
+    armSingleUseDiscount(check_upgrade_discount, "upgrade_rabatt_50", () => {
+      applyUpgradeDiscountToModalPrices();
+      calc_energy_overdose();
+      set_class_for_overpriced_towers();
+    });
+  });
+}
+
+if (btn_mine_charges_once) {
+  btn_mine_charges_once.addEventListener("click", () => {
+    armSingleUseDiscount(check_mine_charges, "mine_charges_3_pack");
   });
 }
 
@@ -4290,7 +4471,8 @@ if (check_upgrade_discount) {
 //*#########################################################
 
 btn_Slower.addEventListener("click", () => {
-  set_Tower(btn_Slower, "slower", 1, mdl_towers);
+  const towerBuilt = set_Tower(btn_Slower, "slower", 1, mdl_towers);
+  if (towerBuilt) substract_tower_discount();
 });
 
 //*#########################################################
@@ -4298,15 +4480,12 @@ btn_Slower.addEventListener("click", () => {
 //*#########################################################
 
 btn_mine.addEventListener("click", () => {
-  set_Tower(btn_mine, "mine", 0, mdl_traps);
-  const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
-  if (item.available && item.amount > 0) {
-    const is_trap_discount = check_trap_discount.checked;
-    if (is_trap_discount) {
-      save_obj.XP_Store_Items[item.index].amount -= 1;
-      render_amount(save_obj);
-      save_Game_without_saveDate();
-    }
+  const towerBuilt = set_Tower(btn_mine, "mine", 0, mdl_traps);
+  if (towerBuilt) {
+    consumeDiscountIfActive("trap_rabatt_50", check_trap_discount, () => {
+      show_trap_price();
+      set_class_for_overpriced_towers();
+    });
   }
 });
 
@@ -4316,15 +4495,12 @@ btn_mine.addEventListener("click", () => {
 const btn_air_mine = document.getElementById("btn_air_mine");
 
 btn_air_mine.addEventListener("click", () => {
-  set_Tower(btn_air_mine, "air_mine", 0, mdl_traps);
-  const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
-  if (item.available && item.amount > 0) {
-    const is_trap_discount = check_trap_discount.checked;
-    if (is_trap_discount) {
-      save_obj.XP_Store_Items[item.index].amount -= 1;
-      render_amount(save_obj);
-      save_Game_without_saveDate();
-    }
+  const towerBuilt = set_Tower(btn_air_mine, "air_mine", 0, mdl_traps);
+  if (towerBuilt) {
+    consumeDiscountIfActive("trap_rabatt_50", check_trap_discount, () => {
+      show_trap_price();
+      set_class_for_overpriced_towers();
+    });
   }
 });
 
@@ -4334,15 +4510,12 @@ btn_air_mine.addEventListener("click", () => {
 
 if (btn_spikes) {
   btn_spikes.addEventListener("click", () => {
-    set_Tower(btn_spikes, "spikes", 0, mdl_traps);
-    const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
-    if (item.available && item.amount > 0) {
-      const is_trap_discount = check_trap_discount.checked;
-      if (is_trap_discount) {
-        save_obj.XP_Store_Items[item.index].amount -= 1;
-        render_amount(save_obj);
-        save_Game_without_saveDate();
-      }
+    const towerBuilt = set_Tower(btn_spikes, "spikes", 0, mdl_traps);
+    if (towerBuilt) {
+      consumeDiscountIfActive("trap_rabatt_50", check_trap_discount, () => {
+        show_trap_price();
+        set_class_for_overpriced_towers();
+      });
     }
   });
 }
@@ -4362,15 +4535,12 @@ if (btn_emp_field) {
       return;
     }
 
-    set_Tower(btn_emp_field, "emp_field", 0, mdl_traps);
-    const item = return_Item_Amount_and_existence(save_obj, "trap_rabatt_50");
-    if (item.available && item.amount > 0) {
-      const is_trap_discount = check_trap_discount.checked;
-      if (is_trap_discount) {
-        save_obj.XP_Store_Items[item.index].amount -= 1;
-        render_amount(save_obj);
-        save_Game_without_saveDate();
-      }
+    const towerBuilt = set_Tower(btn_emp_field, "emp_field", 0, mdl_traps);
+    if (towerBuilt) {
+      consumeDiscountIfActive("trap_rabatt_50", check_trap_discount, () => {
+        show_trap_price();
+        set_class_for_overpriced_towers();
+      });
     }
   });
 }
@@ -4380,8 +4550,8 @@ if (btn_emp_field) {
 //*#########################################################
 
 btn_Destroyer.addEventListener("click", () => {
-  set_Tower(btn_Destroyer, "destroyer", 1, mdl_towers);
-  substract_tower_discount();
+  const towerBuilt = set_Tower(btn_Destroyer, "destroyer", 1, mdl_towers);
+  if (towerBuilt) substract_tower_discount();
 });
 
 //*#########################################################
@@ -4389,8 +4559,8 @@ btn_Destroyer.addEventListener("click", () => {
 //*#########################################################
 
 btn_Toxic.addEventListener("click", () => {
-  set_Tower(btn_Toxic, "toxic", 1, mdl_towers);
-  substract_tower_discount();
+  const towerBuilt = set_Tower(btn_Toxic, "toxic", 1, mdl_towers);
+  if (towerBuilt) substract_tower_discount();
 });
 
 //*#########################################################
@@ -4400,8 +4570,8 @@ btn_Toxic.addEventListener("click", () => {
 const btn_Anti_Air = document.getElementById("btn_Anti_Air");
 
 btn_Anti_Air.addEventListener("click", () => {
-  set_Tower(btn_Anti_Air, "anti_air", 1, mdl_towers);
-  substract_tower_discount();
+  const towerBuilt = set_Tower(btn_Anti_Air, "anti_air", 1, mdl_towers);
+  if (towerBuilt) substract_tower_discount();
 });
 
 //*#########################################################
@@ -4418,8 +4588,8 @@ if (btn_Sniper) {
       ).show_Message();
       return;
     }
-    set_Tower(btn_Sniper, "sniper", 1, mdl_towers);
-    substract_tower_discount();
+    const towerBuilt = set_Tower(btn_Sniper, "sniper", 1, mdl_towers);
+    if (towerBuilt) substract_tower_discount();
   });
 }
 
@@ -4428,36 +4598,27 @@ if (btn_Sniper) {
 //*#########################################################
 
 btn_energy.addEventListener("click", () => {
-  set_Tower(btn_energy, "energy", 1, mdl_towers);
-  substract_tower_discount();
+  const towerBuilt = set_Tower(btn_energy, "energy", 1, mdl_towers);
+  if (towerBuilt) substract_tower_discount();
 });
 
 //*#########################################################
 //* ANCHOR -Substract Tower Discount on use
 //*#########################################################
 function substract_tower_discount() {
-  const item = return_Item_Amount_and_existence(save_obj, "tower_rabatt_50");
-  if (item.available && item.amount > 0) {
-    const is_tower_discount = check_tower_discount.checked;
-    if (is_tower_discount) {
-      save_obj.XP_Store_Items[item.index].amount -= 1;
-      render_amount(save_obj);
-      save_Game_without_saveDate();
-    }
-  }
+  consumeDiscountIfActive("tower_rabatt_50", check_tower_discount, () => {
+    show_recuded_price_on_discount();
+    calc_energy_overdose();
+    set_class_for_overpriced_towers();
+  });
 }
 
 function substract_upgrade_discount() {
-  const item = return_Item_Amount_and_existence(save_obj, "upgrade_rabatt_50");
-  if (!item.available || item.amount <= 0) return;
-  if (!check_upgrade_discount || !check_upgrade_discount.checked) return;
-
-  save_obj.XP_Store_Items[item.index].amount -= 1;
-  if (save_obj.XP_Store_Items[item.index].amount < 0) {
-    save_obj.XP_Store_Items[item.index].amount = 0;
-  }
-  render_amount(save_obj);
-  save_Game_without_saveDate();
+  consumeDiscountIfActive("upgrade_rabatt_50", check_upgrade_discount, () => {
+    applyUpgradeDiscountToModalPrices();
+    calc_energy_overdose();
+    set_class_for_overpriced_towers();
+  });
 }
 
 //*#########################################################
@@ -4487,7 +4648,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
           "error",
           3000,
         ).show_Message();
-        return;
+        return false;
       } else {
         current_mine_amount_per_wave--;
         current_mine_amount_per_wave === 0
@@ -4506,18 +4667,14 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
 
     if (tower_type === "mine" || tower_type === "air_mine") {
       let charges = 1;
-      const packs = return_Item_Amount_and_existence(
-        save_obj,
-        "mine_charges_3_pack",
-      );
       const usePacks = Boolean(
         check_mine_charges && check_mine_charges.checked,
       );
-      if (usePacks && packs.available && packs.amount > 0) {
+      if (
+        usePacks &&
+        consumeDiscountIfActive("mine_charges_3_pack", check_mine_charges)
+      ) {
         charges = 3;
-        save_obj.XP_Store_Items[packs.index].amount -= 1;
-        render_amount(save_obj);
-        save_Game_without_saveDate();
       }
       tower.charges = charges;
       tower.lastTriggeredAt = 0;
@@ -4569,6 +4726,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
         }
       });
     }
+    return true;
   } else {
     const show_not_enough_money = new GameMessage(
       "Kauf aktuell nicht möglich",
@@ -4576,6 +4734,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
       "error",
       2000,
     ).show_Message();
+    return false;
   }
 }
 
