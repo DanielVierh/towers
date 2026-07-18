@@ -337,6 +337,7 @@ const level_4 = document.getElementById("level_4");
 const level_5 = document.getElementById("level_5");
 const level_6 = document.getElementById("level_6");
 const level_7 = document.getElementById("level_7");
+const level_8 = document.getElementById("level_8");
 const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
@@ -5069,6 +5070,11 @@ level_7.addEventListener("click", () => {
   initialize_game(level_details, "7");
 });
 
+level_8.addEventListener("click", () => {
+  const level_details = set_level("8");
+  initialize_game(level_details, "8");
+});
+
 level_random.addEventListener("click", () => {
   const level_details = set_level("level_rnd");
   initialize_game(level_details, "level_rnd");
@@ -5888,16 +5894,16 @@ function check_XPCoins(price, xp_objectname) {
 }
 
 //* Mouse Position for Debugging
-// canvas.addEventListener("mousemove", function (event) {
-//   // Canvas-Position im Dokument ermitteln
-//   const rect = canvas.getBoundingClientRect();
+canvas.addEventListener("mousemove", function (event) {
+  // Canvas-Position im Dokument ermitteln
+  const rect = canvas.getBoundingClientRect();
 
-//   // Mausposition relativ zum Canvas
-//   const x = event.clientX - rect.left;
-//   const y = event.clientY - rect.top;
+  // Mausposition relativ zum Canvas
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
-//   console.log(`x: ${x - 20}, y: ${y - 20}`);
-// });
+  console.log(`x: ${x - 20}, y: ${y - 20}`);
+});
 
 function gxuShowEndscreen(win, stats) {
   const title = document.getElementById("gxu-title");
