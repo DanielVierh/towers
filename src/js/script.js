@@ -338,6 +338,7 @@ const level_5 = document.getElementById("level_5");
 const level_6 = document.getElementById("level_6");
 const level_7 = document.getElementById("level_7");
 const level_8 = document.getElementById("level_8");
+const level_9 = document.getElementById("level_9");
 const level_random = document.getElementById("level_random");
 const btn_close_modal_lvl = document.getElementById("btn_close_modal_lvl");
 const lbl_xp = document.getElementById("lbl_xp");
@@ -5073,6 +5074,11 @@ level_7.addEventListener("click", () => {
 level_8.addEventListener("click", () => {
   const level_details = set_level("8");
   initialize_game(level_details, "8");
+});
+
+level_9.addEventListener("click", () => {
+  const level_details = set_level("9");
+  initialize_game(level_details, "9");
 });
 
 level_random.addEventListener("click", () => {
