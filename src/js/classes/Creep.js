@@ -40,7 +40,7 @@ export class Creep {
 
     this.imageIndex = 0; // Aktuelles Bild für die Animation
     this.imageFrames = []; // Array für die Bilder
-    this.frameSpeed = 5; // Geschwindigkeit der Animation
+    this.frameSpeed = 1; // Geschwindigkeit der Animation 5 = eher langsam, 3 = schneller, 1 = schnell
     this.frameTick = 0;
     this.counter = 0;
     this.invisible = invisible;
