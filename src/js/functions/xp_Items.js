@@ -105,6 +105,9 @@ export function render_amount(save_obj) {
   if (tower_item.available) {
     lbl_tower_discount_amount.innerHTML = `${tower_item.amount}X`;
     lbl_buymenu_tower_discount_amount.innerHTML = `${tower_item.amount} X 50% Rabatt`;
+    if (tower_item.amount === 0) {
+      lbl_buymenu_tower_discount_amount.innerHTML = "";
+    }
   }
 
   //* Show Amount of Upgrade Discount
