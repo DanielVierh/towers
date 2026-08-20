@@ -2922,7 +2922,14 @@ function detonateMineAoE(tower, resistanceKey) {
       ),
     );
 
-    let earnedMoney = 300;
+    let earnedMoney = 0;
+    if (save_obj.wave > 20) {
+      earnedMoney = 2;
+    } else if (save_obj.wave >= 4) {
+      earnedMoney = 4;
+    } else {
+      earnedMoney = 10;
+    }
     earnedMoney += targetEnemy.extra_money;
     save_obj.current_XP += xpGain(1);
     save_obj.money += earnedMoney;
@@ -2939,7 +2946,7 @@ function detonateMineAoE(tower, resistanceKey) {
       }
     }
 
-    // Geld Generator: activation and rewards (+50€ per 20 kills)
+    // Geld Generator: activation and rewards (+300€ per 20 kills)
     try {
       if (tower.money_generator) {
         if (tower.money_generator.pendingUntil && Date.now() >= tower.money_generator.pendingUntil) {
@@ -2951,7 +2958,7 @@ function detonateMineAoE(tower, resistanceKey) {
           tower.money_generator.killCounter = (tower.money_generator.killCounter || 0) + 1;
           if (tower.money_generator.killCounter >= 20) {
             tower.money_generator.killCounter = 0;
-            save_obj.money += 50;
+            save_obj.money += 300;
             document.body.classList.add("yellow-flash");
             setTimeout(() => {
               document.body.classList.remove("yellow-flash");
@@ -2959,7 +2966,7 @@ function detonateMineAoE(tower, resistanceKey) {
             moneyPopups.push({
               x: targetEnemy.pos_x,
               y: targetEnemy.pos_y,
-              amount: `+50`,
+              amount: `+300`,
               opacity: 1,
             });
           }
@@ -3336,7 +3343,14 @@ function gameLoop() {
             enemy.markedForDeletion = true;
 
             // Geld + XP
-            let earnedMoney = 300;
+            let earnedMoney = 0;
+            if (save_obj.wave > 20) {
+              earnedMoney = 2;
+            } else if (save_obj.wave >= 4) {
+              earnedMoney = 4;
+            } else {
+              earnedMoney = 10;
+            }
             earnedMoney += enemy.extra_money;
             save_obj.current_XP += xpGain(1);
             save_obj.money += earnedMoney;
@@ -3368,7 +3382,7 @@ function gameLoop() {
                   tower.money_generator.killCounter = (tower.money_generator.killCounter || 0) + 1;
                   if (tower.money_generator.killCounter >= 20) {
                     tower.money_generator.killCounter = 0;
-                    save_obj.money += 50;
+                    save_obj.money += 300;
                     document.body.classList.add("yellow-flash");
                     setTimeout(() => {
                       document.body.classList.remove("yellow-flash");
@@ -3376,7 +3390,7 @@ function gameLoop() {
                     moneyPopups.push({
                       x: enemy.pos_x,
                       y: enemy.pos_y,
-                      amount: `+50`,
+                      amount: `+300`,
                       opacity: 1,
                     });
                   }
@@ -3567,7 +3581,14 @@ function gameLoop() {
 
               enemy.markedForDeletion = true;
 
-              let earnedMoney = 300;
+              let earnedMoney = 0;
+              if (save_obj.wave > 20) {
+                earnedMoney = 2;
+              } else if (save_obj.wave >= 4) {
+                earnedMoney = 4;
+              } else {
+                earnedMoney = 10;
+              }
               earnedMoney += enemy.extra_money;
               save_obj.current_XP += xpGain(1);
               save_obj.money += earnedMoney;
@@ -3596,7 +3617,7 @@ function gameLoop() {
                     tower.money_generator.killCounter = (tower.money_generator.killCounter || 0) + 1;
                     if (tower.money_generator.killCounter >= 20) {
                       tower.money_generator.killCounter = 0;
-                      save_obj.money += 50;
+                      save_obj.money += 300;
                       document.body.classList.add("yellow-flash");
                       setTimeout(() => {
                         document.body.classList.remove("yellow-flash");
@@ -3604,7 +3625,7 @@ function gameLoop() {
                       moneyPopups.push({
                         x: enemy.pos_x,
                         y: enemy.pos_y,
-                        amount: `+50`,
+                        amount: `+300`,
                         opacity: 1,
                       });
                     }

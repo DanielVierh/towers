@@ -152,13 +152,34 @@ export class Creep {
         if (this.health <= 0) {
           // Generiere Geld, bevor der Creep gelöscht wird
           if (!this.markedForDeletion) {
-            save_obj.money += 300;
-            moneyPopups.push({
-              x: this.pos_x,
-              y: this.pos_y,
-              amount: `+300`,
-              opacity: 1, // Start-Deckkraft
-            });
+            // Berechne Basis-Geld wie in script.js (Wave-basiert) und addiere extra_money
+            try {
+              let earnedMoney = 0;
+              if (save_obj.wave > 20) {
+                earnedMoney = 2;
+              } else if (save_obj.wave >= 4) {
+                earnedMoney = 4;
+              } else {
+                earnedMoney = 10;
+              }
+              earnedMoney += this.extra_money || 0;
+              save_obj.money += earnedMoney;
+              moneyPopups.push({
+                x: this.pos_x,
+                y: this.pos_y,
+                amount: `+${earnedMoney}`,
+                opacity: 1,
+              });
+            } catch (e) {
+              // Fallback: kleines Geld, falls etwas schiefgeht
+              save_obj.money += 10;
+              moneyPopups.push({
+                x: this.pos_x,
+                y: this.pos_y,
+                amount: `+10`,
+                opacity: 1,
+              });
+            }
           }
           this.markedForDeletion = true;
         }
