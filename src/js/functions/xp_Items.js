@@ -37,7 +37,9 @@ export function render_amount(save_obj) {
   );
   const check_mine_charges = document.getElementById("check_mine_charges");
   const tile_live_upgr = document.getElementById("tile_live_upgr");
+  const btn_life_upgrade = document.getElementById("btn_life_upgrade");
   const tile_unlock_sniper = document.getElementById("tile_unlock_sniper");
+  const tile_unlock_emp = document.getElementById("tile_unlock_emp_field");
 
   const lbl_start_money_amount = document.getElementById(
     "lbl_start_money_amount",
@@ -141,10 +143,24 @@ export function render_amount(save_obj) {
     "live_generator",
   );
   if (live_upgr.available) {
-    tile_live_upgr.classList.add("is-active");
+    if (tile_live_upgr) tile_live_upgr.classList.add("is-active");
   } else if (tile_live_upgr) {
     tile_live_upgr.classList.remove("is-active");
   }
+  // Button-Text für Leben Generierer anpassen
+  try {
+    if (btn_life_upgrade) {
+      if (Number(live_upgr.amount) > 0) {
+        btn_life_upgrade.innerHTML = "Freigeschaltet";
+        btn_life_upgrade.classList.add("disabled");
+      } else {
+        const price =
+          Number(btn_life_upgrade.getAttribute("data-skill_price")) || 0;
+        btn_life_upgrade.innerHTML = `Kaufen ${price.toLocaleString("de-DE")} <br />XP Coins`;
+        btn_life_upgrade.classList.remove("disabled");
+      }
+    }
+  } catch (e) {}
 
   //* Show if sniper unlock is available
   const sniper_unlock = return_Item_Amount_and_existence(
@@ -159,6 +175,21 @@ export function render_amount(save_obj) {
     tile_unlock_sniper.classList.add("is-active");
   } else if (tile_unlock_sniper) {
     tile_unlock_sniper.classList.remove("is-active");
+  }
+
+  //* Show if EMP field unlock is available
+  const emp_unlock = return_Item_Amount_and_existence(
+    save_obj,
+    "unlock_emp_field",
+  );
+  if (
+    tile_unlock_emp &&
+    emp_unlock.available &&
+    Number(emp_unlock.amount) > 0
+  ) {
+    tile_unlock_emp.classList.add("is-active");
+  } else if (tile_unlock_emp) {
+    tile_unlock_emp.classList.remove("is-active");
   }
 
   // Passive skills (levels)
@@ -279,13 +310,29 @@ export function render_amount(save_obj) {
 
   const geldGen = return_Item_Amount_and_existence(save_obj, "geld_generator");
   if (lbl_geld_generator_amount && geldGen.available) {
-    lbl_geld_generator_amount.innerHTML = `${geldGen.amount}x`;
+    lbl_geld_generator_amount.style.display = `none`;
     try {
       const tile = document.getElementById("tile_geld_generator");
+      const btn = document.getElementById("btn_geld_generator");
       if (tile) {
         const p = tile.querySelector("p");
         if (p) {
-          p.innerHTML = `Kostet 20.000 XP-Coins. Im Destroyer aktivierbar: 25 Energie (kein Geld). Nach Aktivierung dauert es 2 Minuten, dann alle 20 Kills +50€.`;
+          p.innerHTML = `Kostet 20.000 XP-Coins. Im Destroyer aktivierbar: 25 Energie (kein Geld). Nach Aktivierung dauert es 2 Minuten, dann alle 20 Kills +300€.`;
+        }
+        // Wenn das Item mindestens einmal gekauft wurde, Tile grün markieren
+        if (Number(geldGen.amount) > 0) {
+          tile.classList.add("is-active");
+        } else {
+          tile.classList.remove("is-active");
+        }
+      }
+      // Button-Text anpassen (gekauft / kaufen)
+      if (btn) {
+        if (Number(geldGen.amount) > 0) {
+          btn.innerHTML = "Freigeschaltet";
+        } else {
+          const price = Number(btn.getAttribute("data-skill_price")) || 0;
+          btn.innerHTML = `Kaufen ${price.toLocaleString("de-DE")} <br />\n            XP Coins`;
         }
       }
     } catch (e) {}
