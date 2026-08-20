@@ -476,6 +476,16 @@
           </div>
         </div>
 
+        <div class="tile" id="tile_geld_generator">
+          <div id="lbl_geld_generator_amount" class="label-amount">0x</div>
+          <h3>Geld Generierer</h3>
+          <p>feffe 20.000 XP-Coins. Im Destroyer aktivierbar: 25 Energie. Nach Aktivierung dauert es 2 Minuten, dann alle 20 Kills +300€.</p>
+          <div class="button-buy" id="btn_geld_generator" data-skill_price="20000">
+            Kaufen 20.000 <br />
+            XP Coins
+          </div>
+        </div>
+
         <div class="tile" id="tile_passive_wave_income">
           <div id="lbl_wave_income_multiplier_amount" class="label-amount">
             Lv 0
@@ -982,6 +992,22 @@
           <p id="tile_upgrade_live_descr">Generiert alle 20 Kills 1 Leben</p>
           <div class="button-buy" data-tower_price="700" id="btn_livegen">
             Kaufen 700€
+          </div>
+        </div>
+        <div class="tile hidden" id="tile_upgrade_moneyGenerator">
+          <h4 id="tile_upgrade_money_title">Geld Generierer</h4>
+          <p id="tile_upgrade_money_descr">Aktiviere den Geld-Generator im Destroyer: kostet 25 Energie, Deployment 2 Minuten, belohnt alle 20 Kills +300€.</p>
+          <div class="moneygen-status" id="moneygen_modal_status" style="display:flex;flex-direction:column;gap:6px;">
+            <div id="moneygen_progress" style="width:100%;background:rgba(255,255,255,0.06);height:8px;border-radius:4px;overflow:hidden;">
+              <div id="moneygen_progress_bar" style="width:0%;height:100%;background:orange"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div id="moneygen_secs" style="font-size:0.9rem;color:#fff">Bereit zum Aktivieren</div>
+              <div id="moneygen_status_label" style="font-size:0.85rem;color:#ddd"></div>
+            </div>
+          </div>
+          <div class="button-buy" data-tower_price="0" id="btn_moneygen">
+            Aktivieren 25 Energie
           </div>
         </div>
         <div class="tile">

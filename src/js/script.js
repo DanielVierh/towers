@@ -361,6 +361,7 @@ const btn_sell_refund = document.getElementById("btn_sell_refund");
 const btn_unlock_sniper_tower = document.getElementById(
   "btn_unlock_sniper_tower",
 );
+const btn_geld_generator = document.getElementById("btn_geld_generator");
 const btn_unlock_emp_field = document.getElementById("btn_unlock_emp_field");
 const mdl_skill_purchase = document.getElementById("mdl_skill_purchase");
 const btn_close_skill_purchase = document.getElementById(
@@ -407,6 +408,10 @@ const tile_upgrade_liveGenerator = document.getElementById(
   "tile_upgrade_liveGenerator",
 );
 const btn_livegen = document.getElementById("btn_livegen");
+const tile_upgrade_moneyGenerator = document.getElementById(
+  "tile_upgrade_moneyGenerator",
+);
+const btn_moneygen = document.getElementById("btn_moneygen");
 const reset_game = document.getElementById("reset_game");
 const lbl_available_mines = document.getElementById("lbl_available_mines");
 const lbl_needed_energy = document.getElementById("lbl_needed_energy");
@@ -1077,6 +1082,7 @@ if (audio_volume) {
 syncAudioControls();
 
 let settingsPausedByModal = false;
+let moneygenModalInterval = null;
 
 function openSettingsModal() {
   if (!mdl_settings) return;
@@ -2005,6 +2011,7 @@ function resetTowerPlaceState(tower) {
   delete tower.expiresAt;
   delete tower.charges;
   delete tower.lastTriggeredAt;
+  delete tower.money_generator;
 }
 
 //*#########################################################
@@ -2158,6 +2165,7 @@ function include_new_SaveObj_Properties() {
   ensureXpStoreItem("passive_sell_refund", 0);
   ensureXpStoreItem("unlock_sniper_tower", 0);
   ensureXpStoreItem("unlock_emp_field", 0);
+  ensureXpStoreItem("geld_generator", 0);
 
   // Ensure consumables exist in older saves
   ensureXpStoreItem("mine_charges_3_pack", 0);
@@ -2719,6 +2727,31 @@ function drawTowerPlaces() {
         ctx.fillText(tower.kill_counter, tower.x + 15, tower.y + 30);
       }
 
+      // Zeichne Indikator für Geld Generator (Deployment/Active) - simplified canvas indicator
+      if (tower.money_generator) {
+        try {
+          if (tower.money_generator.pendingUntil) {
+            // pending state: small orange badge on the tower (modal shows detailed countdown)
+            const badgeX = drawX + drawW - 6;
+            const badgeY = drawY + 6;
+            ctx.save();
+            ctx.fillStyle = "orange";
+            ctx.beginPath();
+            ctx.arc(badgeX, badgeY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          } else if (tower.money_generator.active) {
+            // active: gold marker + kill counter (drawn slightly above live-gen counter)
+            ctx.strokeStyle = "gold";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(tower.x + 28, tower.y + 5, 1, 1);
+            ctx.font = "10px Arial";
+            ctx.fillStyle = `rgba(255, 255, 255, 1)`;
+            ctx.fillText(String(tower.money_generator.killCounter || 0), tower.x + 15, tower.y + 18);
+          }
+        } catch (e) {}
+      }
+
       if (save_obj.energy_level < 0) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(tower.x + 5, tower.y, 30, 30);
@@ -2889,15 +2922,7 @@ function detonateMineAoE(tower, resistanceKey) {
       ),
     );
 
-    let earnedMoney = 0;
-    if (save_obj.wave > 20) {
-      earnedMoney = 2;
-    } else if (save_obj.wave >= 4) {
-      earnedMoney = 4;
-    } else {
-      earnedMoney = 10;
-    }
-
+    let earnedMoney = 300;
     earnedMoney += targetEnemy.extra_money;
     save_obj.current_XP += xpGain(1);
     save_obj.money += earnedMoney;
@@ -2913,6 +2938,34 @@ function detonateMineAoE(tower, resistanceKey) {
         tower.kill_counter = 0;
       }
     }
+
+    // Geld Generator: activation and rewards (+50€ per 20 kills)
+    try {
+      if (tower.money_generator) {
+        if (tower.money_generator.pendingUntil && Date.now() >= tower.money_generator.pendingUntil) {
+          tower.money_generator.pendingUntil = null;
+          tower.money_generator.active = true;
+          new GameMessage("Geld Generator bereit", "Der Geld Generator ist jetzt aktiviert.", "info", 2000).show_Message();
+        }
+        if (tower.money_generator.active) {
+          tower.money_generator.killCounter = (tower.money_generator.killCounter || 0) + 1;
+          if (tower.money_generator.killCounter >= 20) {
+            tower.money_generator.killCounter = 0;
+            save_obj.money += 50;
+            document.body.classList.add("yellow-flash");
+            setTimeout(() => {
+              document.body.classList.remove("yellow-flash");
+            }, 300);
+            moneyPopups.push({
+              x: targetEnemy.pos_x,
+              y: targetEnemy.pos_y,
+              amount: `+50`,
+              opacity: 1,
+            });
+          }
+        }
+      }
+    } catch (e) {}
 
     moneyPopups.push({
       x: targetEnemy.pos_x,
@@ -3283,15 +3336,7 @@ function gameLoop() {
             enemy.markedForDeletion = true;
 
             // Geld + XP
-            let earnedMoney = 0;
-            if (save_obj.wave > 20) {
-              earnedMoney = 2;
-            } else if (save_obj.wave >= 4) {
-              earnedMoney = 4;
-            } else {
-              earnedMoney = 10;
-            }
-
+            let earnedMoney = 300;
             earnedMoney += enemy.extra_money;
             save_obj.current_XP += xpGain(1);
             save_obj.money += earnedMoney;
@@ -3311,6 +3356,33 @@ function gameLoop() {
                 console.log("LIVE ++");
               }
             }
+
+            try {
+              if (tower.money_generator) {
+                if (tower.money_generator.pendingUntil && Date.now() >= tower.money_generator.pendingUntil) {
+                  tower.money_generator.pendingUntil = null;
+                  tower.money_generator.active = true;
+                  new GameMessage("Geld Generator bereit", "Der Geld Generator ist jetzt aktiviert.", "info", 2000).show_Message();
+                }
+                if (tower.money_generator.active) {
+                  tower.money_generator.killCounter = (tower.money_generator.killCounter || 0) + 1;
+                  if (tower.money_generator.killCounter >= 20) {
+                    tower.money_generator.killCounter = 0;
+                    save_obj.money += 50;
+                    document.body.classList.add("yellow-flash");
+                    setTimeout(() => {
+                      document.body.classList.remove("yellow-flash");
+                    }, 300);
+                    moneyPopups.push({
+                      x: enemy.pos_x,
+                      y: enemy.pos_y,
+                      amount: `+50`,
+                      opacity: 1,
+                    });
+                  }
+                }
+              }
+            } catch (e) {}
 
             // Geld-Popup
             moneyPopups.push({
@@ -3495,15 +3567,7 @@ function gameLoop() {
 
               enemy.markedForDeletion = true;
 
-              let earnedMoney = 0;
-              if (save_obj.wave > 20) {
-                earnedMoney = 2;
-              } else if (save_obj.wave >= 4) {
-                earnedMoney = 4;
-              } else {
-                earnedMoney = 10;
-              }
-
+              let earnedMoney = 300;
               earnedMoney += enemy.extra_money;
               save_obj.current_XP += xpGain(1);
               save_obj.money += earnedMoney;
@@ -3520,6 +3584,33 @@ function gameLoop() {
                   tower.kill_counter = 0;
                 }
               }
+
+              try {
+                if (tower.money_generator) {
+                  if (tower.money_generator.pendingUntil && Date.now() >= tower.money_generator.pendingUntil) {
+                    tower.money_generator.pendingUntil = null;
+                    tower.money_generator.active = true;
+                    new GameMessage("Geld Generator bereit", "Der Geld Generator ist jetzt aktiviert.", "info", 2000).show_Message();
+                  }
+                  if (tower.money_generator.active) {
+                    tower.money_generator.killCounter = (tower.money_generator.killCounter || 0) + 1;
+                    if (tower.money_generator.killCounter >= 20) {
+                      tower.money_generator.killCounter = 0;
+                      save_obj.money += 50;
+                      document.body.classList.add("yellow-flash");
+                      setTimeout(() => {
+                        document.body.classList.remove("yellow-flash");
+                      }, 300);
+                      moneyPopups.push({
+                        x: enemy.pos_x,
+                        y: enemy.pos_y,
+                        amount: `+50`,
+                        opacity: 1,
+                      });
+                    }
+                  }
+                }
+              } catch (e) {}
 
               moneyPopups.push({
                 x: enemy.pos_x,
@@ -4035,6 +4126,20 @@ canvas.addEventListener("click", (event) => {
         } else {
           tile_upgrade_liveGenerator.classList.add("hidden");
         }
+        // Geld Generierer - only show if player bought the XP item and tower is Destroyer
+        const geldItem = return_Item_Amount_and_existence(save_obj, "geld_generator");
+        if (geldItem.available && Number(geldItem.amount) > 0 && tower.tower_type === "destroyer") {
+          tile_upgrade_moneyGenerator.classList.remove("hidden");
+          if (tower.money_generator && tower.money_generator.active) {
+            document.getElementById("btn_moneygen").innerHTML = "Aktiv";
+          } else if (tower.money_generator && tower.money_generator.pendingUntil) {
+            document.getElementById("btn_moneygen").innerHTML = "Bereitstellung...";
+          } else {
+            document.getElementById("btn_moneygen").innerHTML = "Aktivieren 25 Energie";
+          }
+        } else {
+          tile_upgrade_moneyGenerator.classList.add("hidden");
+        }
         lbl_upgr_current_money.innerHTML = `${save_obj.money} €`;
         lbl_upgr_current_energy.innerHTML = `${save_obj.energy_level}`;
         tower_img.src = tower.tower_img;
@@ -4056,6 +4161,56 @@ canvas.addEventListener("click", (event) => {
           calc_energy_overdose();
         }
         mdl_upgrade.style.display = "flex";
+        // Start money-generator modal updater (if visible)
+        try {
+          if (moneygenModalInterval) {
+            clearInterval(moneygenModalInterval);
+            moneygenModalInterval = null;
+          }
+          const progressEl = document.getElementById("moneygen_progress_bar");
+          const secsEl = document.getElementById("moneygen_secs");
+          const statusEl = document.getElementById("moneygen_status_label");
+          if (tile_upgrade_moneyGenerator && !tile_upgrade_moneyGenerator.classList.contains("hidden") && (progressEl || secsEl)) {
+            const updateFn = () => {
+              if (!tower) return;
+              // If pendingUntil elapsed, flip to active state immediately
+              try {
+                if (tower.money_generator && tower.money_generator.pendingUntil && Date.now() >= Number(tower.money_generator.pendingUntil)) {
+                  tower.money_generator.pendingUntil = null;
+                  tower.money_generator.active = true;
+                  save_Game_without_saveDate();
+                  new GameMessage("Geld Generator bereit", "Der Geld Generator ist jetzt aktiviert.", "info", 2000).show_Message();
+                }
+              } catch (e) {}
+
+              if (!tower.money_generator) {
+                if (progressEl) progressEl.style.width = "0%";
+                if (secsEl) secsEl.textContent = "Nicht aktiviert";
+                if (statusEl) statusEl.textContent = "";
+                return;
+              }
+
+              if (tower.money_generator.pendingUntil) {
+                const remainingMs = Math.max(0, Number(tower.money_generator.pendingUntil) - Date.now());
+                const totalMs = Math.max(1, Number(tower.money_generator.pendingUntil) - (Number(tower.money_generator.startedAt) || (Number(tower.money_generator.pendingUntil) - 120000)));
+                const pct = Math.max(0, Math.min(1, 1 - remainingMs / totalMs));
+                if (progressEl) progressEl.style.width = `${Math.round(pct * 100)}%`;
+                if (secsEl) secsEl.textContent = `${Math.ceil(remainingMs / 1000)}s`;
+                if (statusEl) statusEl.textContent = "Bereitstellung";
+              } else if (tower.money_generator.active) {
+                if (progressEl) progressEl.style.width = `100%`;
+                if (secsEl) secsEl.textContent = `Aktiv`;
+                if (statusEl) statusEl.textContent = `${Number(tower.money_generator.killCounter||0)} / 20`;
+              } else {
+                if (progressEl) progressEl.style.width = `0%`;
+                if (secsEl) secsEl.textContent = `Bereit zum Aktivieren`;
+                if (statusEl) statusEl.textContent = ``;
+              }
+            };
+            updateFn();
+            moneygenModalInterval = setInterval(updateFn, 800);
+          }
+        } catch (e) {}
         if (tower.tower_damage_lvl === 2) {
           btn_Stronger.innerHTML = "Kaufen 500€";
           btn_Stronger.setAttribute("data-tower_price", "500");
@@ -4883,6 +5038,40 @@ btn_livegen.addEventListener("click", () => {
   }
 });
 
+// Activate Money Generator on selected Destroyer tower
+if (btn_moneygen) {
+  btn_moneygen.addEventListener("click", () => {
+    // Activation costs 25 energy (no money)
+    const energyCost = 25;
+    if (!tower || !tower.tower_is_build) return;
+    if (tower.tower_type !== "destroyer") {
+      new GameMessage("Nur für Destroyer", "Der Geld Generator kann nur auf Destroyer aktiviert werden.", "error", 2000).show_Message();
+      return;
+    }
+    if (tower.money_generator && tower.money_generator.active) {
+      new GameMessage("Bereits aktiv", "Der Geld Generator ist bereits aktiv.", "error", 2000).show_Message();
+      return;
+    }
+    if (save_obj.energy_level < energyCost) {
+      new GameMessage("Zu wenig Energie", "Du benötigst 25 Energie, um den Geld Generator zu aktivieren.", "error", 2000).show_Message();
+      return;
+    }
+
+    // start deployment (2 minutes)
+    // Persist activation cost on the tower so energy accounting can subtract it
+    tower.money_generator = {
+      pendingUntil: Date.now() + 120000,
+      startedAt: Date.now(),
+      active: false,
+      killCounter: 0,
+      activationCost: energyCost,
+    };
+    save_Game_without_saveDate();
+    mdl_upgrade.style.display = "none";
+    play_pause();
+  });
+}
+
 //*#########################################################
 //* ANCHOR -Sell Tower
 //*#########################################################
@@ -4958,6 +5147,12 @@ btn_close_modal_traps.addEventListener("click", () => {
 //*#########################################################
 btn_close_modal_upgrade.addEventListener("click", () => {
   mdl_upgrade.style.display = "none";
+  try {
+    if (moneygenModalInterval) {
+      clearInterval(moneygenModalInterval);
+      moneygenModalInterval = null;
+    }
+  } catch (e) {}
   play_pause();
 });
 
@@ -5382,6 +5577,18 @@ function count_energy_level() {
     slower_energy_amount -
     anti_air_energy_amount -
     sniper_energy_amount;
+
+  // Subtract activation energy for any pending/active Geld Generators (persisted per-tower)
+  try {
+    let moneyGenEnergyConsumed = 0;
+    save_obj.tower_places.forEach((tower) => {
+      if (!tower) return;
+      if (tower.money_generator && (tower.money_generator.pendingUntil || tower.money_generator.active)) {
+        moneyGenEnergyConsumed += Number(tower.money_generator.activationCost) || 0;
+      }
+    });
+    save_obj.energy_level = save_obj.energy_level - moneyGenEnergyConsumed;
+  } catch (e) {}
 }
 
 //*#########################################################
@@ -5711,6 +5918,29 @@ if (btn_life_upgrade) {
       applyPurchase: () => {
         if (lifeItem.available) return false;
         addXpStoreAmount("live_generator", 1);
+        return true;
+      },
+    });
+  });
+}
+
+if (btn_geld_generator) {
+  btn_geld_generator.addEventListener("click", () => {
+    const genItem = return_Item_Amount_and_existence(save_obj, "geld_generator");
+    const price = Number(btn_geld_generator.getAttribute("data-skill_price"));
+    const alreadyBought = genItem.available && Number(genItem.amount) > 0;
+    const allowedQty = alreadyBought ? 0 : save_obj.XP_Coins >= price ? 1 : 0;
+
+    openSkillPurchaseModal({
+      displayName: "Geld Generierer",
+      price,
+      maxQty: allowedQty,
+      blockedMessage: alreadyBought
+        ? "Geld Generierer bereits gekauft"
+        : "Zu wenig XP-Coins.",
+      applyPurchase: () => {
+        if (alreadyBought) return false;
+        addXpStoreAmount("geld_generator", 1);
         return true;
       },
     });

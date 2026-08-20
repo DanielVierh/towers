@@ -152,11 +152,11 @@ export class Creep {
         if (this.health <= 0) {
           // Generiere Geld, bevor der Creep gelöscht wird
           if (!this.markedForDeletion) {
-            save_obj.money += 30;
+            save_obj.money += 300;
             moneyPopups.push({
               x: this.pos_x,
               y: this.pos_y,
-              amount: `+30`,
+              amount: `+300`,
               opacity: 1, // Start-Deckkraft
             });
           }

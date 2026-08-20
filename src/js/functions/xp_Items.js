@@ -55,6 +55,9 @@ export function render_amount(save_obj) {
   const lbl_sell_refund_amount = document.getElementById(
     "lbl_sell_refund_amount",
   );
+  const lbl_geld_generator_amount = document.getElementById(
+    "lbl_geld_generator_amount",
+  );
 
   let use_discount = {
     trap_discount: false,
@@ -269,6 +272,20 @@ export function render_amount(save_obj) {
         const total = base + lvl * perLevel;
         if (p) {
           p.innerHTML = `Erhöht den Rückerstattungswert beim Verkauf von Türmen. <br/>Base ${base}% + ${perLevel}% pro Stufe (aktuell ${total}%)`;
+        }
+      }
+    } catch (e) {}
+  }
+
+  const geldGen = return_Item_Amount_and_existence(save_obj, "geld_generator");
+  if (lbl_geld_generator_amount && geldGen.available) {
+    lbl_geld_generator_amount.innerHTML = `${geldGen.amount}x`;
+    try {
+      const tile = document.getElementById("tile_geld_generator");
+      if (tile) {
+        const p = tile.querySelector("p");
+        if (p) {
+          p.innerHTML = `Kostet 20.000 XP-Coins. Im Destroyer aktivierbar: 25 Energie (kein Geld). Nach Aktivierung dauert es 2 Minuten, dann alle 20 Kills +50€.`;
         }
       }
     } catch (e) {}
