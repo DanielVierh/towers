@@ -206,7 +206,7 @@ export function render_amount(save_obj) {
         const lvl = Number(startMoney.amount) || 0;
         const perLevel = 100;
         if (p) {
-          p.innerHTML = `Erhöht dein Startgeld dauerhaft pro Stufe. <br/>+${perLevel} Startgeld pro Stufe (aktuell +${lvl * perLevel})`;
+          p.innerHTML = `Erhöht dein Startgeld dauerhaft pro Stufe. <br/><span style="color: lightgreen; font-weight: bold;">+${perLevel} Startgeld </span> pro Stufe (aktuell +${lvl * perLevel})`;
         }
       }
     } catch (e) {}
@@ -225,7 +225,7 @@ export function render_amount(save_obj) {
         const lvl = Number(startEnergy.amount) || 0;
         const perLevel = 25;
         if (p) {
-          p.innerHTML = `Erhöht deine Startenergie dauerhaft pro Stufe. <br/>+${perLevel} Energie pro Stufe (aktuell +${lvl * perLevel})`;
+          p.innerHTML = `Erhöht deine Startenergie dauerhaft pro Stufe. <br/><span style="color: lightgreen; font-weight: bold;">+${perLevel} Energie </span> pro Stufe (aktuell +${lvl * perLevel})`;
         }
       }
     } catch (e) {}
@@ -243,7 +243,7 @@ export function render_amount(save_obj) {
         const p = tile.querySelector("p");
         const lvl = Number(minePlus.amount) || 0;
         if (p) {
-          p.innerHTML = `Erhöht die Anzahl verfügbarer Minen je Welle dauerhaft. <br/>+1 Mine pro Stufe (aktuell +${lvl})`;
+          p.innerHTML = `Erhöht die Anzahl verfügbarer Minen je Welle dauerhaft. <br/><span style="color: lightgreen; font-weight: bold;">+1 Mine </span> pro Stufe (aktuell +${lvl})`;
         }
       }
     } catch (e) {}
@@ -263,7 +263,7 @@ export function render_amount(save_obj) {
         const perLevelPct = 10; // +10% per level
         const totalPct = lvl * perLevelPct;
         if (p) {
-          p.innerHTML = `Erhöht die erhaltenen XP dauerhaft (Kills &amp; Wellenbonus). <br/>+${perLevelPct}% pro Stufe (aktuell +${totalPct}%)`;
+          p.innerHTML = `Erhöht die erhaltenen XP dauerhaft (Kills &amp; Wellenbonus). <br/> <span style="color: lightgreen; font-weight: bold;">+${perLevelPct}% </span> pro Stufe (aktuell +${totalPct}%)`;
         }
       }
     } catch (e) {}
@@ -281,7 +281,7 @@ export function render_amount(save_obj) {
         const p = tile.querySelector("p");
         const lvl = Math.min(3, Number(waveIncomeMulti.amount) || 0);
         if (p) {
-          p.innerHTML = `Erhöht den Faktor für Wellen-Geld von x2 dauerhaft per Stufe. <br/>+1 pro Stufe (aktuell x${2 + lvl})`;
+          p.innerHTML = `Erhöht den Faktor für Wellen-Geld von <span style="color: lightgreen; font-weight: bold;"> x2 </span> dauerhaft per Stufe. <br/>+1 pro Stufe (aktuell x${2 + lvl})`;
         }
       }
     } catch (e) {}
@@ -302,7 +302,7 @@ export function render_amount(save_obj) {
         const perLevel = 5;
         const total = base + lvl * perLevel;
         if (p) {
-          p.innerHTML = `Erhöht den Rückerstattungswert beim Verkauf von Türmen. <br/>Base ${base}% + ${perLevel}% pro Stufe (aktuell ${total}%)`;
+          p.innerHTML = `Erhöht den Rückerstattungswert beim Verkauf von Türmen. <br/>Base ${base}% <span style="color: lightgreen; font-weight: bold;">+ ${perLevel}% </span> pro Stufe (aktuell ${total}%)`;
         }
       }
     } catch (e) {}
