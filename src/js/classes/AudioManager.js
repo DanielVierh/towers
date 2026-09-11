@@ -121,6 +121,7 @@ export class AudioManager {
       case "laser_red":
       case "laser_blue":
       case "laser_green":
+      case "laser_tesla":
         return 60;
       case "missile":
         return 120;
@@ -192,6 +193,9 @@ export class AudioManager {
           type: "triangle",
           gain: 0.1 * volume,
         });
+        break;
+      case "laser_tesla":
+        this._teslaZap(t0, { gain: 0.12 * volume }); // tesla tower
         break;
       case "missile":
         this._sweep(t0, {
@@ -367,5 +371,53 @@ export class AudioManager {
 
     src.start(t0);
     src.stop(t0 + dur + 0.02);
+  }
+
+  _teslaZap(t0, { gain }) {
+    // tesla tower
+    // Initial electrical snap
+    this._beep(t0, {
+      freq: 1900,
+      dur: 0.012,
+      type: "square",
+      gain: gain * 0.75,
+    });
+
+    // Main arc: aggressive downward sweep
+    this._sweep(t0 + 0.002, {
+      from: 2600,
+      to: 520,
+      dur: 0.05,
+      type: "sawtooth",
+      gain: gain,
+    });
+
+    // Irregular crackle pulses for lightning texture
+    const crackleOffsets = [0.006, 0.013, 0.021, 0.032];
+    crackleOffsets.forEach((offset) => {
+      const freq = 1500 + Math.random() * 1800;
+      const dur = 0.005 + Math.random() * 0.007;
+      this._beep(t0 + offset, {
+        freq,
+        dur,
+        type: "triangle",
+        gain: gain * (0.35 + Math.random() * 0.25),
+      });
+    });
+
+    // Broadband fizz around the arc
+    this._noiseBurst(t0 + 0.001, {
+      dur: 0.055,
+      gain: gain * 0.55,
+    });
+
+    // Short low tail, like distant thunder resonance
+    this._sweep(t0 + 0.028, {
+      from: 260,
+      to: 110,
+      dur: 0.075,
+      type: "sine",
+      gain: gain * 0.22,
+    });
   }
 }

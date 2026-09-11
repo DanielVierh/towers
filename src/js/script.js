@@ -3828,7 +3828,7 @@ function gameLoop() {
                   },
                 ),
               );
-              audio.play("laser_blue");
+              audio.play("laser_tesla"); // tesla tower
             }
 
             tower.cooldown = 250 + low_energy_load_slowing_effect; // tesla tower
