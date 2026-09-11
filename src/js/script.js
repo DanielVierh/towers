@@ -3831,7 +3831,7 @@ function gameLoop() {
               audio.play("laser_tesla"); // tesla tower
             }
 
-            tower.cooldown = 250 + low_energy_load_slowing_effect; // tesla tower
+            tower.cooldown = 1000 + low_energy_load_slowing_effect; // tesla tower
 
             //* >>> Anti Air Tower <<<
           } else if (tower.tower_type === "anti_air") {
