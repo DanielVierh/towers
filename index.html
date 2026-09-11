@@ -540,6 +540,22 @@
             XP Coins
           </div>
         </div>
+        <!-- tesla tower -->
+        <div class="tile" id="tile_unlock_tesla">
+          <h3>Tesla Tower freischalten</h3>
+          <p>
+            Schaltet den Tesla Tower einmalig im Baumenü frei. Trifft Gegner in
+            Kettenreaktionen.
+          </p>
+          <div
+            class="button-buy"
+            id="btn_unlock_tesla_tower"
+            data-skill_price="15000"
+          >
+            Kaufen 15.000 <br />
+            XP Coins
+          </div>
+        </div>
         <div class="tile" id="tile_unlock_emp_field">
           <h3>EMP-Feld freischalten</h3>
           <p>Schaltet die EMP-Falle einmalig im Fallen-Menü frei.</p>
@@ -825,6 +841,36 @@
             </svg>
           </p>
           <div class="button-buy" id="buy_btn_sniper">Kaufen 300€</div>
+        </div>
+        <!-- tesla tower -->
+        <div
+          class="tile hidden"
+          id="btn_Tesla"
+          data-tower_price="350"
+          data-tower_img="src/assets/tower_rocket.png"
+        >
+          <img src="src/assets/tower_rocket.png" />
+          <h4>Tesla</h4>
+          <p>
+            Entlädt Blitze auf ein Ziel und springt auf nahe Gegner über.
+            Starker Ketteneffekt mit langer Abklingzeit.
+          </p>
+          <p class="lbl-needed-energy" data-needed_energy="100">
+            Benötigt 100
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              fill="yellow"
+              class="bi bi-lightning-charge-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
+              />
+            </svg>
+          </p>
+          <div class="button-buy" id="buy_btn_tesla">Kaufen 350€</div>
         </div>
       </div>
     </div>

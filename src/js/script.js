@@ -43,6 +43,7 @@ const btn_Slower = document.getElementById("btn_Slower");
 const btn_Destroyer = document.getElementById("btn_Destroyer");
 const btn_Toxic = document.getElementById("btn_Toxic");
 const btn_Sniper = document.getElementById("btn_Sniper");
+const btn_Tesla = document.getElementById("btn_Tesla"); // tesla tower
 const btn_energy = document.getElementById("btn_energy");
 const btn_close_modal_upgrade = document.getElementById(
   "btn_close_modal_upgrade",
@@ -361,6 +362,9 @@ const btn_sell_refund = document.getElementById("btn_sell_refund");
 const btn_unlock_sniper_tower = document.getElementById(
   "btn_unlock_sniper_tower",
 );
+const btn_unlock_tesla_tower = document.getElementById(
+  "btn_unlock_tesla_tower",
+); // tesla tower
 const btn_geld_generator = document.getElementById("btn_geld_generator");
 const btn_unlock_emp_field = document.getElementById("btn_unlock_emp_field");
 const mdl_skill_purchase = document.getElementById("mdl_skill_purchase");
@@ -1282,6 +1286,8 @@ function colorForLaser(laserColor) {
       return "rgba(255,210,120,0.95)";
     case "sniper":
       return "rgba(255, 235, 120, 0.98)";
+    case "tesla":
+      return "rgba(120, 240, 255, 0.98)"; // tesla tower
     default:
       return "rgba(255,255,255,0.9)";
   }
@@ -1703,6 +1709,10 @@ let save_obj = {
       amount: 0,
     },
     {
+      name: "unlock_tesla_tower",
+      amount: 0,
+    }, // tesla tower
+    {
       name: "unlock_emp_field",
       amount: 0,
     },
@@ -1767,11 +1777,13 @@ function getSellRefundFactor() {
 
 function getTowerBaseRange(towerType) {
   if (towerType === "sniper") return 180;
+  if (towerType === "tesla") return 90; // tesla tower
   return 80;
 }
 
 function getTowerMaxRange(towerType) {
   if (towerType === "sniper") return 240;
+  if (towerType === "tesla") return 150; // tesla tower
   return 140;
 }
 
@@ -1784,6 +1796,10 @@ function getSniperCooldownByLevel(level) {
 function isSniperUnlocked() {
   return getPassiveLevel("unlock_sniper_tower") > 0;
 }
+
+function isTeslaUnlocked() {
+  return getPassiveLevel("unlock_tesla_tower") > 0;
+} // tesla tower
 
 function isEmpFieldUnlocked() {
   return getPassiveLevel("unlock_emp_field") > 0;
@@ -1801,6 +1817,8 @@ function baseTowerCost(towerType) {
       return 300;
     case "sniper":
       return 300;
+    case "tesla":
+      return 350; // tesla tower
     case "anti_air":
       return 100;
     case "mine":
@@ -1857,6 +1875,8 @@ function getTowerDisplayName(towerType) {
       return "Air Mine";
     case "spikes":
       return "Spikes";
+    case "tesla":
+      return "Tesla"; // tesla tower
     default:
       return "Tower";
   }
@@ -2164,6 +2184,7 @@ function include_new_SaveObj_Properties() {
   ensureXpStoreItem("passive_wave_income_multi", 0);
   ensureXpStoreItem("passive_sell_refund", 0);
   ensureXpStoreItem("unlock_sniper_tower", 0);
+  ensureXpStoreItem("unlock_tesla_tower", 0); // tesla tower
   ensureXpStoreItem("unlock_emp_field", 0);
   ensureXpStoreItem("geld_generator", 0);
 
@@ -2177,6 +2198,7 @@ function include_new_SaveObj_Properties() {
 
 function syncSniperUnlockUI() {
   const unlocked = isSniperUnlocked();
+  const teslaUnlocked = isTeslaUnlocked(); // tesla tower
   const empUnlocked = isEmpFieldUnlocked();
   if (btn_Sniper) {
     if (unlocked) {
@@ -2193,6 +2215,14 @@ function syncSniperUnlockUI() {
       btn_emp_field.classList.add("hidden");
     }
   }
+
+  if (btn_Tesla) {
+    if (teslaUnlocked) {
+      btn_Tesla.classList.remove("hidden");
+    } else {
+      btn_Tesla.classList.add("hidden");
+    }
+  } // tesla tower
 
   if (btn_unlock_sniper_tower) {
     if (unlocked) {
@@ -2213,6 +2243,16 @@ function syncSniperUnlockUI() {
       btn_unlock_emp_field.classList.remove("disabled");
     }
   }
+
+  if (btn_unlock_tesla_tower) {
+    if (teslaUnlocked) {
+      btn_unlock_tesla_tower.innerHTML = "Freigeschaltet";
+      btn_unlock_tesla_tower.classList.add("disabled");
+    } else {
+      btn_unlock_tesla_tower.innerHTML = "Kaufen 15.000 <br />XP Coins";
+      btn_unlock_tesla_tower.classList.remove("disabled");
+    }
+  } // tesla tower
 }
 
 //*#########################################################
@@ -2806,6 +2846,8 @@ function drawTowerPlaces() {
           rangeColor = "rgba(120,220,255,0.95)";
         } else if (tower.tower_type === "sniper") {
           rangeColor = "purple";
+        } else if (tower.tower_type === "tesla") {
+          rangeColor = "rgba(120,240,255,0.95)"; // tesla tower
         } else {
           rangeColor = "transparent"; // Standardfarbe
         }
@@ -2880,6 +2922,65 @@ function calculateDistance(
   const centerY2 = y2 + height2 / 2;
   return Math.sqrt((centerX2 - centerX1) ** 2 + (centerY2 - centerY1) ** 2);
 }
+
+function getEnemyCenter(enemy) {
+  return {
+    x: enemy.pos_x + (Number(enemy.width) || 0) / 2,
+    y: enemy.pos_y + (Number(enemy.height) || 0) / 2,
+  };
+} // tesla tower
+
+function getTeslaChainNeighborCount(level) {
+  const lvl = Math.max(1, Math.min(3, Number(level) || 1));
+  if (lvl === 1) return 2;
+  if (lvl === 2) return 3;
+  return 4;
+} // tesla tower
+
+function getTeslaBaseDamage(level) {
+  const lvl = Math.max(1, Math.min(3, Number(level) || 1));
+  if (lvl === 1) return 120;
+  if (lvl === 2) return 170;
+  return 230;
+} // tesla tower
+
+function getTeslaChainDamageMultiplier(jumpIndex) {
+  const table = [1, 0.75, 0.5, 0.35, 0.35];
+  return table[Math.min(table.length - 1, Math.max(0, jumpIndex))];
+} // tesla tower
+
+function getTeslaChainTargets(primaryEnemy, maxNeighbors, radiusPx = 70) {
+  if (!primaryEnemy) return [];
+  const candidates = [];
+  enemies.forEach((otherEnemy) => {
+    if (
+      !otherEnemy ||
+      otherEnemy === primaryEnemy ||
+      otherEnemy.markedForDeletion
+    )
+      return;
+
+    const distance = calculateDistance(
+      primaryEnemy.pos_x,
+      primaryEnemy.pos_y,
+      otherEnemy.pos_x,
+      otherEnemy.pos_y,
+      primaryEnemy.width,
+      primaryEnemy.height,
+      otherEnemy.width,
+      otherEnemy.height,
+    );
+
+    if (distance <= radiusPx) {
+      candidates.push({ enemy: otherEnemy, distance });
+    }
+  });
+
+  candidates.sort((a, b) => a.distance - b.distance);
+  return candidates
+    .slice(0, Math.max(0, maxNeighbors))
+    .map((item) => item.enemy);
+} // tesla tower
 
 function detonateMineAoE(tower, resistanceKey) {
   if (!tower) return;
@@ -3676,6 +3777,62 @@ function gameLoop() {
               getSniperCooldownByLevel(tower.tower_damage_lvl) +
               low_energy_load_slowing_effect;
 
+            //* >>> Tesla Tower <<<
+          } else if (tower.tower_type === "tesla") {
+            const teslaBaseDamage = getTeslaBaseDamage(tower.tower_damage_lvl);
+            const chainNeighbors = getTeslaChainNeighborCount(
+              tower.tower_damage_lvl,
+            );
+            const chainTargets = getTeslaChainTargets(
+              enemy,
+              chainNeighbors,
+              70,
+            );
+            const affectedTargets = [enemy, ...chainTargets];
+            const chainPoints = [{ x: tower.x + 15, y: tower.y + 15 }];
+            const hitPoints = [];
+
+            affectedTargets.forEach((targetEnemy, jumpIndex) => {
+              if (!targetEnemy || targetEnemy.markedForDeletion) return;
+              if (
+                Array.isArray(targetEnemy.resistent) &&
+                targetEnemy.resistent.includes("tesla")
+              ) {
+                return;
+              }
+
+              const multiplier = getTeslaChainDamageMultiplier(jumpIndex);
+              const damage = teslaBaseDamage * multiplier;
+              targetEnemy.applyDamage(damage);
+              recordTowerDamage(tower, damage);
+
+              const center = getEnemyCenter(targetEnemy);
+              chainPoints.push(center);
+              hitPoints.push(center);
+
+              if (targetEnemy.isBoss) triggerScreenShake(2.9, 130);
+            });
+
+            if (chainPoints.length > 1) {
+              lasers.push(
+                new Laser(
+                  tower.x + 15,
+                  tower.y + 15,
+                  enemy.pos_x,
+                  enemy.pos_y,
+                  "tesla",
+                  {
+                    chainPoints,
+                    hitPoints,
+                    lifeMs: 120,
+                  },
+                ),
+              );
+              audio.play("laser_blue");
+            }
+
+            tower.cooldown = 250 + low_energy_load_slowing_effect; // tesla tower
+
             //* >>> Anti Air Tower <<<
           } else if (tower.tower_type === "anti_air") {
             //* Discover invisible Enemy
@@ -3832,7 +3989,13 @@ function gameLoop() {
       laser.finished ||
       (laser.posX === laser.targetX && laser.posY === laser.targetY)
     ) {
-      spawnHitParticles(laser.targetX, laser.targetY, laser.color);
+      if (Array.isArray(laser.hitPoints) && laser.hitPoints.length > 0) {
+        laser.hitPoints.forEach((point) => {
+          spawnHitParticles(point.x, point.y, laser.color);
+        });
+      } else {
+        spawnHitParticles(laser.targetX, laser.targetY, laser.color);
+      }
       lasers.splice(index, 1);
     }
   });
@@ -4338,6 +4501,11 @@ canvas.addEventListener("click", (event) => {
               "Cool Down Upgrade";
             document.getElementById("tile_upgrade_stronger_descr").innerHTML =
               "Reduziert die Abklingzeit des Snipers deutlich";
+          } else if (tower.tower_type === "tesla") {
+            document.getElementById("tile_upgrade_stronger_title").innerHTML =
+              "Leitungsstufe";
+            document.getElementById("tile_upgrade_stronger_descr").innerHTML =
+              "Erhöht Tesla-Schaden und erlaubt mehr Kettensprünge";
           } else {
             document.getElementById("tile_upgrade_stronger_title").innerHTML =
               "Stärke Upgrade";
@@ -4584,6 +4752,7 @@ const buy_btn_slower = document.getElementById("buy_btn_slower");
 const buy_btn_toxic = document.getElementById("buy_btn_toxic");
 const buy_btn_antiair = document.getElementById("buy_btn_antiair");
 const buy_btn_sniper = document.getElementById("buy_btn_sniper");
+const buy_btn_tesla = document.getElementById("buy_btn_tesla"); // tesla tower
 
 function show_recuded_price_on_discount() {
   const towerDiscount = return_Item_Amount_and_existence(
@@ -4597,6 +4766,7 @@ function show_recuded_price_on_discount() {
     const original_toxic_price = 300;
     const original_antiair_price = 100;
     const original_sniper_price = 300;
+    const original_tesla_price = 350;
 
     const new_powerplant_price = 70 / 2;
     const new_destroyer_price = 50 / 2;
@@ -4604,6 +4774,7 @@ function show_recuded_price_on_discount() {
     const new_toxic_price = 300 / 2;
     const new_antiair_price = 100 / 2;
     const new_sniper_price = 300 / 2;
+    const new_tesla_price = 350 / 2;
 
     if (
       towerDiscount.available &&
@@ -4624,6 +4795,10 @@ function show_recuded_price_on_discount() {
         buy_btn_sniper.innerHTML = `Kaufen ${new_sniper_price}€`;
         btn_Sniper.setAttribute("data-tower_price", new_sniper_price);
       }
+      if (buy_btn_tesla && btn_Tesla) {
+        buy_btn_tesla.innerHTML = `Kaufen ${new_tesla_price}€`;
+        btn_Tesla.setAttribute("data-tower_price", new_tesla_price);
+      } // tesla tower
     } else {
       buy_btn_powerplant.innerHTML = `Kaufen ${original_powerplant_price}€`;
       btn_energy.setAttribute("data-tower_price", original_powerplant_price);
@@ -4639,6 +4814,10 @@ function show_recuded_price_on_discount() {
         buy_btn_sniper.innerHTML = `Kaufen ${original_sniper_price}€`;
         btn_Sniper.setAttribute("data-tower_price", original_sniper_price);
       }
+      if (buy_btn_tesla && btn_Tesla) {
+        buy_btn_tesla.innerHTML = `Kaufen ${original_tesla_price}€`;
+        btn_Tesla.setAttribute("data-tower_price", original_tesla_price);
+      } // tesla tower
     }
   }
 
@@ -4869,6 +5048,22 @@ if (btn_Sniper) {
   });
 }
 
+if (btn_Tesla) {
+  btn_Tesla.addEventListener("click", () => {
+    if (!isTeslaUnlocked()) {
+      new GameMessage(
+        "Tesla gesperrt",
+        "Schalte den Tesla Tower zuerst im Skill Store frei.",
+        "error",
+        2500,
+      ).show_Message();
+      return;
+    }
+    const towerBuilt = set_Tower(btn_Tesla, "tesla", 1, mdl_towers);
+    if (towerBuilt) substract_tower_discount();
+  });
+} // tesla tower
+
 //*#########################################################
 //* ANCHOR -Set Tower Energy
 //*#########################################################
@@ -4971,6 +5166,10 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     if (tower_type === "sniper") {
       tower.range = getTowerBaseRange("sniper");
     }
+
+    if (tower_type === "tesla") {
+      tower.range = getTowerBaseRange("tesla");
+    } // tesla tower
 
     if (!towerImages.has(tower_img)) {
       const img = new Image();
@@ -5673,13 +5872,25 @@ function count_energy_level() {
     }
   });
 
+  const tesla_energy = 100;
+  let tesla_energy_amount = 0;
+  save_obj.tower_places.forEach((tower) => {
+    if (tower.tower_type === "tesla") {
+      tesla_energy_amount += Math.max(
+        0,
+        tesla_energy + tower.tower_damage_lvl * 25 - 25,
+      );
+    }
+  }); // tesla tower
+
   save_obj.energy_level =
     save_obj.energy_level -
     destroyer_energy_amount -
     toxic_energy_amount -
     slower_energy_amount -
     anti_air_energy_amount -
-    sniper_energy_amount;
+    sniper_energy_amount -
+    tesla_energy_amount;
 
   // Subtract activation energy for any pending/active Geld Generators (persisted per-tower)
   try {
@@ -6091,6 +6302,41 @@ if (btn_unlock_sniper_tower) {
     });
   });
 }
+
+if (btn_unlock_tesla_tower) {
+  btn_unlock_tesla_tower.addEventListener("click", () => {
+    const alreadyUnlocked = isTeslaUnlocked();
+    const price = Number(
+      btn_unlock_tesla_tower.getAttribute("data-skill_price"),
+    );
+    const maxQty = alreadyUnlocked ? 0 : Math.min(1, maxQtyByCoins(price));
+
+    openSkillPurchaseModal({
+      displayName: "Tesla Tower",
+      price,
+      maxQty,
+      blockedMessage: alreadyUnlocked
+        ? "Der Tesla Tower ist bereits freigeschaltet."
+        : "Zu wenig XP-Coins.",
+      applyPurchase: () => {
+        if (isTeslaUnlocked()) return false;
+        const unlockItem = return_Item_Amount_and_existence(
+          save_obj,
+          "unlock_tesla_tower",
+        );
+        if (unlockItem.available) {
+          save_obj.XP_Store_Items[unlockItem.index].amount = 1;
+        } else {
+          save_obj.XP_Store_Items.push({
+            name: "unlock_tesla_tower",
+            amount: 1,
+          });
+        }
+        return true;
+      },
+    });
+  });
+} // tesla tower
 
 if (btn_unlock_emp_field) {
   btn_unlock_emp_field.addEventListener("click", () => {

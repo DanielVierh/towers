@@ -39,6 +39,7 @@ export function render_amount(save_obj) {
   const tile_live_upgr = document.getElementById("tile_live_upgr");
   const btn_life_upgrade = document.getElementById("btn_life_upgrade");
   const tile_unlock_sniper = document.getElementById("tile_unlock_sniper");
+  const tile_unlock_tesla = document.getElementById("tile_unlock_tesla");
   const tile_unlock_emp = document.getElementById("tile_unlock_emp_field");
 
   const lbl_start_money_amount = document.getElementById(
@@ -191,6 +192,21 @@ export function render_amount(save_obj) {
   } else if (tile_unlock_emp) {
     tile_unlock_emp.classList.remove("is-active");
   }
+
+  //* Show if Tesla unlock is available
+  const tesla_unlock = return_Item_Amount_and_existence(
+    save_obj,
+    "unlock_tesla_tower",
+  );
+  if (
+    tile_unlock_tesla &&
+    tesla_unlock.available &&
+    Number(tesla_unlock.amount) > 0
+  ) {
+    tile_unlock_tesla.classList.add("is-active");
+  } else if (tile_unlock_tesla) {
+    tile_unlock_tesla.classList.remove("is-active");
+  } // tesla tower
 
   // Passive skills (levels)
   const startMoney = return_Item_Amount_and_existence(

@@ -15,6 +15,14 @@ export class Laser {
     this.finished = false;
     this.hitRadius = Number(options?.hitRadius) || 12;
     this.drawnBeamColors = ["blue", "red", "green"];
+    this.chainPoints = Array.isArray(options?.chainPoints)
+      ? options.chainPoints
+      : null; // tesla tower
+    this.hitPoints = Array.isArray(options?.hitPoints)
+      ? options.hitPoints
+      : null; // tesla tower
+    this.lifeMs = Math.max(40, Number(options?.lifeMs) || 120);
+    this.ageMs = 0;
 
     this.rotation = 0;
     this.glowColor = "rgba(255,255,255,0.8)";
@@ -41,6 +49,9 @@ export class Laser {
     } else if (this.color === "sniper") {
       this.speed = 16;
       this.hitRadius = Math.max(this.hitRadius, 10);
+    } else if (this.color === "tesla") {
+      this.speed = 0;
+      this.glowColor = "rgba(120, 240, 255, 0.95)";
     }
 
     this.loaded = false;
@@ -51,6 +62,14 @@ export class Laser {
 
   update() {
     if (this.finished) return;
+
+    if (this.color === "tesla") {
+      this.ageMs += 20;
+      if (this.ageMs >= this.lifeMs) {
+        this.finished = true;
+      }
+      return;
+    }
 
     this.prevX = this.posX;
     this.prevY = this.posY;
@@ -92,6 +111,24 @@ export class Laser {
 
   draw(ctx) {
     if (this.finished) return;
+
+    if (this.color === "tesla") {
+      if (!Array.isArray(this.chainPoints) || this.chainPoints.length < 2)
+        return;
+
+      ctx.save();
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = this.glowColor;
+
+      for (let i = 0; i < this.chainPoints.length - 1; i++) {
+        const from = this.chainPoints[i];
+        const to = this.chainPoints[i + 1];
+        this.drawTeslaSegment(ctx, from, to);
+      }
+
+      ctx.restore();
+      return;
+    }
 
     if (this.color === "sniper") {
       const angle = Math.atan2(
@@ -161,4 +198,43 @@ export class Laser {
       ctx.restore();
     }
   }
+
+  drawTeslaSegment(ctx, from, to) {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const length = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+    const nx = dx / length;
+    const ny = dy / length;
+    const px = -ny;
+    const py = nx;
+    const steps = Math.max(4, Math.floor(length / 18));
+
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const spread = (Math.random() - 0.5) * 12;
+      const x = from.x + dx * t + px * spread;
+      const y = from.y + dy * t + py * spread;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(to.x, to.y);
+    ctx.strokeStyle = "rgba(120, 240, 255, 0.9)";
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const spread = (Math.random() - 0.5) * 6;
+      const x = from.x + dx * t + px * spread;
+      const y = from.y + dy * t + py * spread;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(to.x, to.y);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+  } // tesla tower
 }
