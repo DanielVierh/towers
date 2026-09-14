@@ -1718,6 +1718,9 @@ let save_obj = {
     },
   ],
   save_date: new Date().toISOString(), // Deklariert das aktuelle Datum und die Uhrzeit
+  // Flags to track whether a unique tower has been built this run
+  sniper_built: false,
+  tesla_built: false, // tesla tower
   active_game_target_wave: 0,
 };
 
@@ -2118,6 +2121,19 @@ function loadGameFromLocalStorage() {
       render_amount(save_obj);
       render_XP_Coins(save_obj);
       syncSniperUnlockUI();
+      // Ensure shop buttons reflect unique-tower state from loaded save
+      try {
+        if (save_obj.sniper_built && btn_Sniper) {
+          btn_Sniper.classList.add("disabled");
+          btn_Sniper.disabled = true;
+        }
+        if (save_obj.tesla_built && btn_Tesla) {
+          btn_Tesla.classList.add("disabled");
+          btn_Tesla.disabled = true;
+        }
+      } catch (e) {
+        // ignore UI errors
+      }
       refreshSingleUseDiscountButtons();
     } catch (error) {
       console.log(error);
@@ -5101,6 +5117,25 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     tower_btn.getAttribute("data-tower_price"),
   );
   const tower_img = tower_btn.getAttribute("data-tower_img");
+  // Prevent building more than one Sniper or Tesla per game
+  if (tower_type === "sniper" && save_obj.sniper_built) {
+    new GameMessage(
+      "Sniper bereits gebaut",
+      "Pro Spiel darf nur ein Sniper-Turm gebaut werden.",
+      "error",
+      2500,
+    ).show_Message();
+    return false;
+  }
+  if (tower_type === "tesla" && save_obj.tesla_built) {
+    new GameMessage(
+      "Tesla bereits gebaut",
+      "Pro Spiel darf nur ein Tesla-Turm gebaut werden.",
+      "error",
+      2500,
+    ).show_Message();
+    return false;
+  }
   ensureTowerEconomyState(tower);
   if (save_obj.money >= tower_price) {
     //* Vorhandene Minen reduzieren
@@ -5178,6 +5213,28 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     }
     save_obj.money -= tower_price;
     closing_modal.style.display = "none";
+    // Mark unique towers as built and disable their shop button
+    try {
+      if (tower_type === "sniper") {
+        save_obj.sniper_built = true;
+        if (tower_btn) {
+          tower_btn.classList.add("disabled");
+          tower_btn.disabled = true;
+          tower_btn.classList.add("overpriced");
+        }
+      }
+      if (tower_type === "tesla") {
+        save_obj.tesla_built = true;
+        if (tower_btn) {
+          tower_btn.classList.add("disabled");
+          tower_btn.disabled = true;
+          tower_btn.classList.add("overpriced");
+        }
+      }
+      save_Game_without_saveDate();
+    } catch (e) {
+      // ignore UI enable/disable errors
+    }
     if (game_is_running === false) {
       play_pause();
     }
@@ -5381,9 +5438,32 @@ btn_SellTower.addEventListener("click", () => {
   const confirm = window.confirm("Soll der Turm wirklich verkauft werden?");
   if (confirm) {
     if (tower && tower.tower_is_build) {
+      const prevType = tower.tower_type;
       const sell_price = getTowerSellPrice(tower);
       save_obj.money += sell_price;
       resetTowerPlaceState(tower);
+      // If a unique tower was sold, free the slot and re-enable shop button
+      try {
+        if (prevType === "sniper") {
+          save_obj.sniper_built = false;
+          if (btn_Sniper) {
+            btn_Sniper.classList.remove("disabled");
+            btn_Sniper.disabled = false;
+            btn_Sniper.classList.remove("overpriced");
+          }
+        }
+        if (prevType === "tesla") {
+          save_obj.tesla_built = false;
+          if (btn_Tesla) {
+            btn_Tesla.classList.remove("disabled");
+            btn_Tesla.disabled = false;
+            btn_Tesla.classList.remove("overpriced");
+          }
+        }
+        save_Game_without_saveDate();
+      } catch (e) {
+        // ignore UI errors
+      }
       mdl_upgrade.style.display = "none";
       play_pause();
       if (save_obj.free_build && pathGrid) {
@@ -5643,6 +5723,9 @@ function initialize_game(level_details, selectedLevelId = null) {
   }
   //* Set the current wave to 0
   save_obj.wave = 0;
+  // Reset unique tower flags for a new game run
+  save_obj.sniper_built = false;
+  save_obj.tesla_built = false; // tesla tower
   //* Set the maximum enemy amount
   save_obj.max_enemy_amount = 2;
   if (save_obj.free_build && save_obj.free_build_enemy_multiplier) {
@@ -5967,7 +6050,10 @@ function set_class_for_overpriced_towers() {
   tiles.forEach((tile) => {
     try {
       const tower_price = tile.getAttribute("data-tower_price");
-      if (tower_price > current_money) {
+      const isUniqueBuilt =
+        (tile.id === "btn_Sniper" && save_obj.sniper_built) ||
+        (tile.id === "btn_Tesla" && save_obj.tesla_built);
+      if (isUniqueBuilt || tower_price > current_money) {
         tile.classList.add("overpriced");
       } else {
         tile.classList.remove("overpriced");
