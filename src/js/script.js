@@ -4781,16 +4781,16 @@ function show_recuded_price_on_discount() {
     const original_slower_price = 100;
     const original_toxic_price = 300;
     const original_antiair_price = 100;
-    const original_sniper_price = 300;
-    const original_tesla_price = 600;
+    const original_sniper_price = 600;
+    const original_tesla_price = 1800;
 
     const new_powerplant_price = 70 / 2;
     const new_destroyer_price = 50 / 2;
     const new_slower_price = 100 / 2;
     const new_toxic_price = 300 / 2;
     const new_antiair_price = 100 / 2;
-    const new_sniper_price = 300 / 2;
-    const new_tesla_price = 600;
+    const new_sniper_price = 600;
+    const new_tesla_price = 1800;
 
     if (
       towerDiscount.available &&
