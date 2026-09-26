@@ -3914,7 +3914,7 @@ function gameLoop() {
             //* >>> Rocket Tower <<<
           } else if (tower.tower_type === "rocket") {
             const impactFn = (impactX, impactY) => {
-              const rocketBlastRadius = 90;
+              const rocketBlastRadius = 70;
               triggerExplosion(impactX, impactY, rocketBlastRadius);
               detonateMineAoE(
                 tower,
@@ -3940,7 +3940,7 @@ function gameLoop() {
               ),
             );
             audio.play("missile");
-            tower.cooldown = 300 + low_energy_load_slowing_effect;
+            tower.cooldown = 4000 + low_energy_load_slowing_effect;
 
             //* >>> Anti Air Tower <<<
           } else if (tower.tower_type === "anti_air") {
