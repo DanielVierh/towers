@@ -3914,8 +3914,15 @@ function gameLoop() {
             //* >>> Rocket Tower <<<
           } else if (tower.tower_type === "rocket") {
             const impactFn = (impactX, impactY) => {
-              triggerExplosion(impactX, impactY);
-              detonateMineAoE(tower, "rocket", impactX, impactY, 90);
+              const rocketBlastRadius = 90;
+              triggerExplosion(impactX, impactY, rocketBlastRadius);
+              detonateMineAoE(
+                tower,
+                "rocket",
+                impactX,
+                impactY,
+                rocketBlastRadius,
+              );
             };
 
             lasers.push(
@@ -4124,13 +4131,15 @@ function gameLoop() {
   // Explosionen zeichnen
   activeExplosions.forEach((explosion, index) => {
     if (explosion.frame < explosionFrames.length) {
+      const radius = Math.max(18, Number(explosion.radius) || 40);
+      const diameter = radius * 2;
       // Zeichne das aktuelle Frame der Explosion
       ctx.drawImage(
         explosionFrames[explosion.frame],
-        explosion.x - 40,
-        explosion.y - 40,
-        80,
-        80,
+        explosion.x - radius,
+        explosion.y - radius,
+        diameter,
+        diameter,
       );
       explosion.frame++; // Nächstes Frame
     } else {
@@ -4165,10 +4174,11 @@ function preloadExplosionImages() {
   }
 }
 
-function triggerExplosion(x, y) {
+function triggerExplosion(x, y, radius = 40) {
   activeExplosions.push({
     x: x,
     y: y,
+    radius: radius,
     frame: 0, // Start bei Frame 0
   });
   audio.play("explosion");
