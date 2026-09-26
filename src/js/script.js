@@ -2046,6 +2046,7 @@ function resetTowerPlaceState(tower) {
   tower.tower_damage_lvl = 1;
   tower.range = 80;
   tower.cooldown = 0;
+  tower.cooldown_max = 0;
   tower.live_gen = 0;
   tower.kill_counter = 0;
   tower.purchase_price_paid = 0;
@@ -2887,6 +2888,37 @@ function drawTowerPlaces() {
       ctx.lineWidth = 3;
       ctx.strokeRect(tower.x + 3, tower.y + 33, 10, 3);
 
+      // Cooldown-Ladebalken: zeigt, wann der nächste Schuss bereit ist.
+      const currentCooldown = Math.max(0, Number(tower.cooldown) || 0);
+      const cooldownMax = Math.max(
+        0,
+        Number(tower.cooldown_max) || currentCooldown,
+      );
+      const showCooldownBar =
+        tower.tower_type === "sniper" ||
+        tower.tower_type === "tesla" ||
+        tower.tower_type === "rocket";
+      if (showCooldownBar && cooldownMax > 0) {
+        const barWidth = 34;
+        const barHeight = 4;
+        const barX = tower.x - 2;
+        const barY = tower.y - 12;
+        const readyRatio =
+          cooldownMax <= 0
+            ? 1
+            : Math.max(0, Math.min(1, 1 - currentCooldown / cooldownMax));
+
+        ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+        ctx.fillRect(barX, barY, barWidth, barHeight);
+        ctx.fillStyle = readyRatio >= 1 ? "#6CFF78" : "#FFB347";
+        ctx.fillRect(barX, barY, barWidth * readyRatio, barHeight);
+        ctx.strokeStyle = "rgba(255,255,255,0.7)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX, barY, barWidth, barHeight);
+        ctx.restore();
+      }
+
       if (show_tower_range) {
         ctx.beginPath();
         ctx.arc(tower.x + 15, tower.y + 15, tower.range, 0, Math.PI * 2);
@@ -3240,6 +3272,7 @@ function showGameOverModal(reason = "lives") {
 //* ANCHOR -GAMELOOP
 //*#########################################################
 let got_killed = false;
+const GAME_LOOP_INTERVAL_MS = 20;
 function gameLoop() {
   if (game_is_running === false) {
     return;
@@ -3476,6 +3509,8 @@ function gameLoop() {
 
     //* Überprüfen, ob der Creeps in der Nähe eines Turms ist
     save_obj.tower_places.forEach((tower) => {
+      const cooldownBeforeShot = Math.max(0, Number(tower.cooldown) || 0);
+
       if (tower.tower_is_build && tower.cooldown <= 0) {
         const distance = calculateDistance(
           enemy.pos_x,
@@ -3940,7 +3975,10 @@ function gameLoop() {
               ),
             );
             audio.play("missile");
-            tower.cooldown = 4000 + low_energy_load_slowing_effect;
+            tower.cooldown = Math.max(
+              1,
+              Math.round(5000 / GAME_LOOP_INTERVAL_MS),
+            );
 
             //* >>> Anti Air Tower <<<
           } else if (tower.tower_type === "anti_air") {
@@ -4060,8 +4098,14 @@ function gameLoop() {
         }
       }
 
-      //* Reduziere die Abklingzeit des Turms
-      if (tower.cooldown > 0) {
+      const cooldownAfterShot = Math.max(0, Number(tower.cooldown) || 0);
+      if (cooldownAfterShot > cooldownBeforeShot) {
+        tower.cooldown_max = cooldownAfterShot;
+      }
+
+      //* Legacy-Verhalten für alle Nicht-Rocket-Türme:
+      //* Cooldown reduziert sich im Gegner-Loop.
+      if (tower.tower_type !== "rocket" && tower.cooldown > 0) {
         tower.cooldown--;
       }
     });
@@ -4084,6 +4128,15 @@ function gameLoop() {
       drawCtfFlagOnEnemy(ctx, enemy);
     }
   }
+
+  //* Rocket-Cooldown reduziert sich genau einmal pro Tick,
+  //* damit der 5s-Timer unabhängig von der Gegneranzahl bleibt.
+  save_obj.tower_places.forEach((tower) => {
+    if (!tower || !tower.tower_is_build) return;
+    if (tower.tower_type === "rocket" && tower.cooldown > 0) {
+      tower.cooldown--;
+    }
+  });
 
   // Zeichne die Popups
   drawMoneyPopups();
@@ -4160,7 +4213,7 @@ function gameLoop() {
 
   setTimeout(() => {
     gameLoop();
-  }, 20);
+  }, GAME_LOOP_INTERVAL_MS);
 }
 
 const activeExplosions = [];
@@ -5291,6 +5344,7 @@ function set_Tower(tower_btn, tower_type, tower_damage_lvl, closing_modal) {
     tower.tower_damage_lvl = tower_damage_lvl;
     tower.purchase_price_paid = tower_price;
     tower.upgrade_spent = 0;
+    tower.cooldown_max = 0;
 
     if (tower_type === "mine" || tower_type === "air_mine") {
       let charges = 1;
