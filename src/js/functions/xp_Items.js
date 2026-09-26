@@ -41,6 +41,7 @@ export function render_amount(save_obj) {
   const tile_unlock_sniper = document.getElementById("tile_unlock_sniper");
   const tile_unlock_tesla = document.getElementById("tile_unlock_tesla");
   const tile_unlock_emp = document.getElementById("tile_unlock_emp_field");
+  const tile_unlock_rocket = document.getElementById("tile_unlock_rocket");
 
   const lbl_start_money_amount = document.getElementById(
     "lbl_start_money_amount",
@@ -207,6 +208,21 @@ export function render_amount(save_obj) {
   } else if (tile_unlock_tesla) {
     tile_unlock_tesla.classList.remove("is-active");
   } // tesla tower
+
+  //* Show if Rocket unlock is available
+  const rocket_unlock = return_Item_Amount_and_existence(
+    save_obj,
+    "unlock_rocket_tower",
+  );
+  if (
+    tile_unlock_rocket &&
+    rocket_unlock.available &&
+    Number(rocket_unlock.amount) > 0
+  ) {
+    tile_unlock_rocket.classList.add("is-active");
+  } else if (tile_unlock_rocket) {
+    tile_unlock_rocket.classList.remove("is-active");
+  }
 
   // Passive skills (levels)
   const startMoney = return_Item_Amount_and_existence(

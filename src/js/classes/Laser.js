@@ -21,6 +21,8 @@ export class Laser {
     this.hitPoints = Array.isArray(options?.hitPoints)
       ? options.hitPoints
       : null; // tesla tower
+    this.onHit = typeof options?.onHit === "function" ? options.onHit : null;
+    this.hitTriggered = false;
     this.lifeMs = Math.max(40, Number(options?.lifeMs) || 120);
     this.ageMs = 0;
 
@@ -36,6 +38,9 @@ export class Laser {
     } else if (this.color === "green") {
       this.speed = 10;
       this.glowColor = "rgba(120, 255, 160, 0.95)";
+    } else if (this.color === "rocket") {
+      this.speed = 7;
+      this.glowColor = "rgba(255, 190, 120, 0.95)";
     }
 
     if (this.color === "blue") {
@@ -46,6 +51,8 @@ export class Laser {
       this.image.src = "src/assets/laser_green.png";
     } else if (this.color === "missle") {
       this.image.src = "src/assets/missle.png";
+    } else if (this.color === "rocket") {
+      this.image.src = "src/assets/rocket.png";
     } else if (this.color === "sniper") {
       this.speed = 16;
       this.hitRadius = Math.max(this.hitRadius, 10);
@@ -101,6 +108,10 @@ export class Laser {
       this.posX = this.targetX;
       this.posY = this.targetY;
       this.finished = true;
+      if (this.onHit && !this.hitTriggered) {
+        this.hitTriggered = true;
+        this.onHit(this.posX, this.posY);
+      }
     } else {
       this.posX += (dx / distance) * this.speed;
       this.posY += (dy / distance) * this.speed;

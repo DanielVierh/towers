@@ -576,15 +576,15 @@
             Kaufen 20.000 XP Coins
           </div>
         </div>
-        <div class="tile hidden">
+        <div class="tile" id="tile_unlock_rocket">
           <h3>Raketen Tower freischalten</h3>
           <p>Schaltet den Raketen Tower im Baumenü frei</p>
           <div
             class="button-buy"
             id="btn_unlock_rocket_tower"
-            data-skill_price="20000"
+            data-skill_price="15000"
           >
-            Kaufen 20.000 XP Coins
+            Kaufen 15.000 <br />XP Coins
           </div>
         </div>
       </div>
@@ -871,6 +871,36 @@
             </svg>
           </p>
           <div class="button-buy" id="buy_btn_tesla">Kaufen 350€</div>
+        </div>
+
+        <div
+          class="tile hidden"
+          id="btn_Rocket"
+          data-tower_price="1500"
+          data-tower_img="src/assets/tower_rocket.png"
+        >
+          <img src="src/assets/tower_rocket.png" />
+          <h4>Raketen Tower</h4>
+          <p>
+            Feuert Raketen, die beim Einschlag explodieren und Gegner im Umkreis
+            auslöschen.
+          </p>
+          <p class="lbl-needed-energy" data-needed_energy="50">
+            Benötigt 50
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              fill="yellow"
+              class="bi bi-lightning-charge-fill"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"
+              />
+            </svg>
+          </p>
+          <div class="button-buy" id="buy_btn_rocket">Kaufen 1500€</div>
         </div>
       </div>
     </div>
