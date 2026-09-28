@@ -3949,7 +3949,7 @@ function gameLoop() {
             //* >>> Rocket Tower <<<
           } else if (tower.tower_type === "rocket") {
             const impactFn = (impactX, impactY) => {
-              const rocketBlastRadius = 70;
+              const rocketBlastRadius = 50;
               triggerExplosion(impactX, impactY, rocketBlastRadius);
               detonateMineAoE(
                 tower,
